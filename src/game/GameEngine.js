@@ -135,6 +135,11 @@ export class GameEngine {
         container.appendChild(this.canvas);
 
         this.ctx = this.canvas.getContext('2d');
+
+        if (!this.ctx) {
+            console.error("Impossible de récupérer le contexte 2D du canvas !");
+            return;
+        }
         this.resize();
 
         // Events

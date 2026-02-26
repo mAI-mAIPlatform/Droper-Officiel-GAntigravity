@@ -19,6 +19,11 @@ export class PlayerManager {
             rank: 'Bronze I',
             selectedHero: 'soldier'
         };
+
+        // Sécurité v0.3.1 : s'assurer que selectedHero existe pour les anciens comptes
+        if (!this.data.selectedHero) {
+            this.data.selectedHero = 'soldier';
+        }
     }
 
     persist() {

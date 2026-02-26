@@ -31,7 +31,8 @@ import { AdminManager } from './systems/AdminManager.js';
 
 class DroperApp {
     constructor() {
-        this.version = '0.3.0 Alpha';
+        this.version = '0.3.1 Alpha';
+        this.app = this; // Self reference for managers [v0.3.1]
         this.saveManager = new SaveManager();
         this.playerManager = new PlayerManager(this.saveManager);
         this.economyManager = new EconomyManager(this.saveManager);
@@ -51,6 +52,19 @@ class DroperApp {
         this.musicPlayer = new MusicPlayer();
         this.matchHistoryManager = new MatchHistoryManager(this.saveManager);
         this.adminManager = new AdminManager(this);
+
+        // Wiring [v0.3.1]
+        this.heroManager.app = this;
+        this.questManager.app = this;
+        this.playerManager.app = this;
+        this.economyManager.app = this;
+        this.inventoryManager.app = this;
+        this.recordManager.app = this;
+        this.seasonPassManager.app = this;
+        this.skinManager.app = this;
+        this.emoteManager.app = this;
+        this.matchHistoryManager.app = this;
+
         this.router = null;
         this.selectedMode = null;
         this.matchOnline = false;
@@ -94,8 +108,17 @@ class DroperApp {
         }, { once: true });
 
         // Router
-        this.router = new Router(this);
-        this.router.init();
+        try {
+            this.router = new Router(this);
+            this.router.init();
+        } catch (e) {
+            console.error("❌ Erreur critique lors de l'initialisation du Router:", e);
+            document.body.innerHTML = `<div style="background:#080c16; color:white; height:100vh; display:flex; align-items:center; justify-content:center; flex-direction:column; font-family:sans-serif; text-align:center; padding:20px;">
+                <h1 style="color:#ef4444;">Echec du chargement du jeu</h1>
+                <p>${e.message}</p>
+                <button onclick="localStorage.clear(); window.location.reload();" style="background:#4a9eff; color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; margin-top:20px;">Réinitialiser les données</button>
+            </div>`;
+        }
 
         console.log(`🎮 Droper v${this.version} Alpha — Initialisé !`);
     }

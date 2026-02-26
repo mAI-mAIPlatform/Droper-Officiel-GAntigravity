@@ -8,6 +8,7 @@ export class HeroManager {
     constructor(saveManager) {
         this.save = saveManager;
         this.data = null;
+        this.app = null;
     }
 
     load() {
@@ -16,7 +17,12 @@ export class HeroManager {
     }
 
     refreshHeroList() {
-        const customHeroes = this.app?.adminManager?.config?.customHeroes || [];
+        let customHeroes = [];
+        try {
+            customHeroes = this.app?.adminManager?.config?.customHeroes || [];
+        } catch (e) {
+            console.warn("HeroManager: Erreur lors de la récupération des héros personnalisés", e);
+        }
         this.allHeroes = [...HEROES, ...customHeroes];
     }
 
