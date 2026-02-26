@@ -1,0 +1,89 @@
+/* ============================
+   DROPER — Variables CSS
+   ============================ */
+
+:root {
+  /* --- Couleurs principales --- */
+  --color-bg-primary: #0a0e1a;
+  --color-bg-secondary: #111827;
+  --color-bg-card: #1a2236;
+  --color-bg-card-hover: #212d47;
+  --color-bg-input: #151c2e;
+
+  /* --- Bordures --- */
+  --color-border: rgba(99, 130, 191, 0.2);
+  --color-border-active: rgba(99, 130, 191, 0.5);
+  --color-border-card: rgba(99, 130, 191, 0.15);
+
+  /* --- Texte --- */
+  --color-text-primary: #e8ecf4;
+  --color-text-secondary: #8b95a8;
+  --color-text-muted: #5a6478;
+
+  /* --- Accents --- */
+  --color-accent-blue: #4a9eff;
+  --color-accent-purple: #a855f7;
+  --color-accent-green: #22c55e;
+  --color-accent-red: #ef4444;
+  --color-accent-orange: #f59e0b;
+  --color-accent-cyan: #06d6d0;
+  --color-accent-gold: #fbbf24;
+
+  /* --- Raretés --- */
+  --color-rarity-common: #8b95a8;
+  --color-rarity-rare: #4a9eff;
+  --color-rarity-epic: #a855f7;
+  --color-rarity-legendary: #fbbf24;
+
+  /* --- Dégradés --- */
+  --gradient-main: linear-gradient(135deg, #080c16 0%, #0f172a 100%);
+  --gradient-card: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
+  --gradient-card-dark: linear-gradient(145deg, #0f172a 0%, #020617 100%);
+  --gradient-card-alt: linear-gradient(145deg, #1e1b4b 0%, #0f172a 100%);
+  --gradient-accent: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  --gradient-green: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  --gradient-purple: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  --gradient-gold: linear-gradient(135deg, #ea580c 0%, #fbbf24 100%);
+
+  /* --- Ombres --- */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-glow-blue: 0 0 20px rgba(74, 158, 255, 0.15);
+  --shadow-glow-purple: 0 0 20px rgba(168, 85, 247, 0.15);
+
+  /* --- Typographie --- */
+  --font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-size-xs: 0.7rem;
+  --font-size-sm: 0.8rem;
+  --font-size-md: 0.95rem;
+  --font-size-lg: 1.15rem;
+  --font-size-xl: 1.4rem;
+  --font-size-2xl: 1.8rem;
+  --font-size-3xl: 2.2rem;
+
+  /* --- Espacement --- */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+
+  /* --- Rayons --- */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 50%;
+
+  /* --- Transitions --- */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 400ms ease;
+
+  /* --- Layout --- */
+  --sidebar-width: 220px;
+  --max-width: 1200px;
+  --navbar-height: 64px;
+}

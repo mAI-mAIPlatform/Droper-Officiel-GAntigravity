@@ -1,0 +1,15 @@
+{
+  "name": "droper",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Droper — Jeu 2D web par mBattle",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^6.1.0"
+  }
+}

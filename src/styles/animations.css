@@ -1,0 +1,186 @@
+/* ============================
+   DROPER — Animations CSS
+   ============================ */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.85);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes glow {
+
+    0%,
+    100% {
+        box-shadow: 0 0 8px rgba(74, 158, 255, 0.2);
+    }
+
+    50% {
+        box-shadow: 0 0 20px rgba(74, 158, 255, 0.4);
+    }
+}
+
+@keyframes shine {
+    0% { left: -100%; transition: none; }
+    20% { left: 100%; transition: all 0.6s ease; }
+    100% { left: 100%; transition: none; }
+}
+
+@keyframes buttonPulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(74, 158, 255, 0.4); }
+    70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(74, 158, 255, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(74, 158, 255, 0); }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+@keyframes progressFill {
+    from {
+        width: 0%;
+    }
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-6px);
+    }
+}
+
+/* --- Classes utilitaires d'animation --- */
+.anim-fade-in {
+    animation: fadeIn var(--transition-normal) both;
+}
+
+.anim-fade-in-up {
+    animation: fadeInUp var(--transition-slow) both;
+}
+
+.anim-fade-in-down {
+    animation: fadeInDown var(--transition-slow) both;
+}
+
+.anim-slide-up {
+    animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.anim-scale-in {
+    animation: scaleIn var(--transition-slow) both;
+}
+
+.anim-pulse {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.anim-glow {
+    animation: glow 2s ease-in-out infinite;
+}
+
+.anim-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+.anim-pulse-btn {
+    animation: buttonPulse 2s infinite;
+}
+
+.anim-delay-1 {
+    animation-delay: 0.05s;
+}
+
+.anim-delay-2 {
+    animation-delay: 0.1s;
+}
+
+.anim-delay-3 {
+    animation-delay: 0.15s;
+}
+
+.anim-delay-4 {
+    animation-delay: 0.2s;
+}
+
+.anim-delay-5 {
+    animation-delay: 0.25s;
+}
+
+.anim-delay-6 {
+    animation-delay: 0.3s;
+}
