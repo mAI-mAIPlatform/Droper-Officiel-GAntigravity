@@ -31,7 +31,7 @@ export class Player extends Entity {
 
         this.hero = heroData;
         const baseSpeed = heroData ? heroData.stats.speed * 30 + 100 : 200;
-        this.speed = baseSpeed * 0.8;
+        this.speed = baseSpeed * 0.6; // Reduced to 60% speed v0.3.0
         this.shootCooldown = 0;
         this.shootRate = 0.18;
         this.mouseX = 0;

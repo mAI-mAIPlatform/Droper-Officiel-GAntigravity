@@ -9,9 +9,9 @@ export class AdminManager {
         this.app = app;
         this.isAuthenticated = false;
 
-        // Sécurisation v0.2.6
-        this.adminLogin = 'Htths_Tss';
-        this.adminPassword = 'HtthsTs, 2012!';
+        // Sécurisation v0.3.0
+        this.adminLogin = 'Mths_Tss';
+        this.adminPassword = 'MthsTss2012!';
         this.adminVerifyCode = '2526';
 
         this.config = null;

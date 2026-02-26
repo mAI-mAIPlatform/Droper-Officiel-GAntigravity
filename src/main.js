@@ -31,7 +31,7 @@ import { AdminManager } from './systems/AdminManager.js';
 
 class DroperApp {
     constructor() {
-        this.version = '0.2.6 Alpha';
+        this.version = '0.3.0 Alpha';
         this.saveManager = new SaveManager();
         this.playerManager = new PlayerManager(this.saveManager);
         this.economyManager = new EconomyManager(this.saveManager);

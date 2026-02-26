@@ -16,7 +16,8 @@ export class PlayerManager {
             xpToNext: 100,
             reputation: 100,
             rankPoints: 0,
-            rank: 'Bronze I'
+            rank: 'Bronze I',
+            selectedHero: 'soldier'
         };
     }
 

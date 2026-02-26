@@ -189,7 +189,8 @@ export class ArmoryPage {
       if (this.app.audioManager) this.app.audioManager.playClick();
       toast.success(`▶ ${hero.name} sélectionné !`);
       this.closeModal();
-      this.refresh();
+      this.refresh(); // Refresh ArmoryPage grid
+      if (this.app.uiManager) this.app.uiManager.refresh(); // Global refresh if possible
     });
 
     document.getElementById('btn-upgrade-hero')?.addEventListener('click', () => {

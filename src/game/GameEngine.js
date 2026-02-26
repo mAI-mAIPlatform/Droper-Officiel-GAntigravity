@@ -209,8 +209,14 @@ export class GameEngine {
     }
 
     startGame() {
-        // Créer le joueur
-        const heroData = this.app.heroManager.getFullHero(this.app.playerManager.selectedHero);
+        // Créer le joueur avec sécurité [v0.3.0]
+        const heroId = this.app.playerManager.selectedHero || 'soldier';
+        const heroData = this.app.heroManager.getFullHero(heroId);
+
+        if (!heroData) {
+            console.warn("HeroData introuvable pour:", heroId, "Utilisation du soldier par défaut.");
+        }
+
         this.player = new Player(heroData, this.width / 2, this.height / 2);
         this.player.mouseX = this.width / 2;
         this.player.mouseY = this.height / 2;
