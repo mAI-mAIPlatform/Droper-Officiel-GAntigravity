@@ -59,18 +59,25 @@ export class Router {
 
     init() {
         window.addEventListener('hashchange', () => this.handleRoute());
-        if (!window.location.hash) {
-            window.location.hash = '#accueil';
+        if (!window.location.hash || window.location.hash === '#') {
+            history.replaceState(null, null, '#accueil');
+            this.handleRoute();
         } else {
             this.handleRoute();
         }
     }
 
     handleRoute() {
-        const hash = window.location.hash.slice(1) || 'accueil';
+        let hash = window.location.hash.slice(1);
+        if (!hash) {
+            hash = 'accueil';
+            history.replaceState(null, null, '#accueil');
+        }
+
         const PageClass = this.routes[hash];
         if (!PageClass) {
-            window.location.hash = '#accueil';
+            history.replaceState(null, null, '#accueil');
+            this.handleRoute(); // Call explicitly to render fallback
             return;
         }
         this.renderPage(PageClass, hash);
