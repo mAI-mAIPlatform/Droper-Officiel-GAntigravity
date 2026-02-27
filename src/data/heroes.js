@@ -27,7 +27,7 @@ export const HEROES = [
         description: 'Polyvalent et fiable. Le starter parfait.',
         rarity: RARITIES.COMMON,
         archetype: ARCHETYPES.SUPPORT,
-        stats: { hp: 100, attack: 15, speed: 120, defense: 10 },
+        stats: { hp: 100, attack: 15, speed: 72, defense: 10 },
         unlocked: true,
         coverImage: '/assets/heroes/soldat.png', // v0.5.0
         // Design unique
@@ -49,7 +49,7 @@ export const HEROES = [
         description: 'Ultra rapide mais fragile. Esquive tout.',
         rarity: RARITIES.COMMON,
         archetype: ARCHETYPES.FLASH,
-        stats: { hp: 70, attack: 12, speed: 175, defense: 5 },
+        stats: { hp: 70, attack: 12, speed: 105, defense: 5 },
         unlocked: true,
         bodyShape: 'diamond',
         bodyColor: '#22d3ee',
@@ -69,7 +69,7 @@ export const HEROES = [
         description: 'Mur de fer. Lent mais inarrêtable.',
         rarity: RARITIES.RARE,
         archetype: ARCHETYPES.TANK,
-        stats: { hp: 280, attack: 8, speed: 85, defense: 30 },
+        stats: { hp: 280, attack: 8, speed: 51, defense: 30 },
         unlocked: false,
         coverImage: '/assets/heroes/goliath.png', // v0.5.0
         bodyShape: 'square',
@@ -90,7 +90,7 @@ export const HEROES = [
         description: 'Un tir, un kill. Précision mortelle.',
         rarity: RARITIES.RARE,
         archetype: ARCHETYPES.SNIPER,
-        stats: { hp: 70, attack: 30, speed: 100, defense: 5 },
+        stats: { hp: 70, attack: 30, speed: 60, defense: 5 },
         unlocked: false,
         bodyShape: 'triangle',
         bodyColor: '#ef4444',

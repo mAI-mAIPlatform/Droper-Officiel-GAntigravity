@@ -7,31 +7,31 @@ import { Projectile } from './Projectile.js';
 
 const ENEMY_TYPES = {
     basic: {
-        name: 'Basic', color: '#ef4444', hp: 40, attack: 8, speed: 64, // 80 * 0.8
+        name: 'Basic', color: '#ef4444', hp: 35, attack: 8, speed: 48,
         width: 22, height: 22, xp: 10, coins: 5,
         shootRate: 2.0, shootRange: 250, bulletSpeed: 180, bulletDamage: 6,
         behavior: 'approach_shoot',
     },
     fast: {
-        name: 'Fast', color: '#f59e0b', hp: 25, attack: 6, speed: 128, // 160 * 0.8
+        name: 'Fast', color: '#f59e0b', hp: 20, attack: 6, speed: 90,
         width: 18, height: 18, xp: 15, coins: 8,
         shootRate: 1.5, shootRange: 200, bulletSpeed: 250, bulletDamage: 4,
         behavior: 'strafe',
     },
     heavy: {
-        name: 'Heavy', color: '#8b5cf6', hp: 120, attack: 15, speed: 36, // 45 * 0.8
+        name: 'Heavy', color: '#8b5cf6', hp: 120, attack: 15, speed: 30,
         width: 30, height: 30, xp: 25, coins: 15,
         shootRate: 3.0, shootRange: 300, bulletSpeed: 140, bulletDamage: 12,
         behavior: 'tank',
     },
     boss: {
-        name: 'Boss', color: '#dc2626', hp: 500, attack: 25, speed: 28, // 35 * 0.8
+        name: 'Boss', color: '#dc2626', hp: 450, attack: 25, speed: 22,
         width: 44, height: 44, xp: 100, coins: 50,
         shootRate: 1.2, shootRange: 400, bulletSpeed: 200, bulletDamage: 15,
         behavior: 'boss',
     },
     mega_boss: {
-        name: 'Méga-Boss', color: '#7c3aed', hp: 3000, attack: 40, speed: 20, // 25 * 0.8
+        name: 'Méga-Boss', color: '#7c3aed', hp: 3000, attack: 40, speed: 20,
         width: 80, height: 80, xp: 500, coins: 250,
         shootRate: 0.8, shootRange: 500, bulletSpeed: 250, bulletDamage: 25,
         behavior: 'boss',
