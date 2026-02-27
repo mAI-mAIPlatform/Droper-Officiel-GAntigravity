@@ -3,16 +3,38 @@
    ============================ */
 
 const SAVE_KEY = 'droper_save_v1';
+const CHECKSUM_KEY = 'droper_checksum';
+const INTEGRITY_SECRET = 'DrP_s3cur!ty_K3y_v080';
 
 export class SaveManager {
     constructor() {
         this.data = {};
     }
 
+    _generateChecksum(jsonStr) {
+        // Simple but effective hash: FNV-1a + secret salt
+        let hash = 0x811c9dc5;
+        const input = INTEGRITY_SECRET + jsonStr + INTEGRITY_SECRET;
+        for (let i = 0; i < input.length; i++) {
+            hash ^= input.charCodeAt(i);
+            hash = Math.imul(hash, 0x01000193);
+        }
+        return (hash >>> 0).toString(16).padStart(8, '0');
+    }
+
     loadAll() {
         try {
             const raw = localStorage.getItem(SAVE_KEY);
+            const storedChecksum = localStorage.getItem(CHECKSUM_KEY);
             if (raw) {
+                // 🔒 Vérification d'intégrité
+                const expectedChecksum = this._generateChecksum(raw);
+                if (storedChecksum && storedChecksum !== expectedChecksum) {
+                    console.warn('⚠️ ALERTE SÉCURITÉ : Sauvegarde modifiée manuellement détectée ! Reset forcé.');
+                    this.data = this.getDefaultSave();
+                    this.saveAll();
+                    return;
+                }
                 this.data = JSON.parse(raw);
             } else {
                 this.data = this.getDefaultSave();
@@ -27,7 +49,10 @@ export class SaveManager {
 
     saveAll() {
         try {
-            localStorage.setItem(SAVE_KEY, JSON.stringify(this.data));
+            const jsonStr = JSON.stringify(this.data);
+            localStorage.setItem(SAVE_KEY, jsonStr);
+            // 🔒 Signer les données
+            localStorage.setItem(CHECKSUM_KEY, this._generateChecksum(jsonStr));
         } catch (e) {
             console.error('❌ Erreur de sauvegarde', e);
         }

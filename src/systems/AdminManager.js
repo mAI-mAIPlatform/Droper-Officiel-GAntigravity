@@ -9,10 +9,16 @@ export class AdminManager {
         this.app = app;
         this.isAuthenticated = false;
 
-        // Sécurisation v0.3.0
-        this.adminLogin = 'Mths_Tss';
-        this.adminPassword = 'MthsTss2012!';
-        this.adminVerifyCode = '2526';
+        // 🔒 Sécurité v0.8.0 — Identifiants hashés (SHA-256)
+        // Hash pré-calculés, les identifiants en clair ne sont plus dans le code
+        this._loginHash = '9b3a625eb0c1cd498b5dc498e07692407f863485a0340b38a2de7de0b26eb3c0';
+        this._passwordHash = 'a7f5397443359ea76a6e0d0e0f5c4031d6e251e7de81b78c6508cbea5e54f447';
+        this._codeHash = '42e9d18b3be510a2ab7f1bc61cf5dca39417acd5b6769bca75e36703e521e1b0';
+
+        // Anti brute-force
+        this._loginAttempts = 0;
+        this._maxAttempts = 3;
+        this._lockoutUntil = 0;
 
         this.config = null;
         this.loadConfig();
@@ -31,7 +37,7 @@ export class AdminManager {
                     legendary: 100000
                 }
             },
-            timedDiscounts: {}, // { passId: { percent: 20, end: timestamp } }
+            timedDiscounts: {},
             gamespeed: 1.0,
             infiniteAmmo: false,
             godMode: false,
@@ -41,12 +47,12 @@ export class AdminManager {
             playerSpeedBoost: 1.0,
             nightMode: false,
             partyMode: false,
-            doubleFireRate: false, // [NEW] v0.2.6
-            doubleHP: false,       // [NEW] v0.2.6
-            smallPlayer: false,    // [NEW] v0.2.6
-            customNews: [], // Admin created news
-            customHeroes: [], // [NEW] v0.2.6
-            customSkins: []   // [NEW] v0.2.6
+            doubleFireRate: false,
+            doubleHP: false,
+            smallPlayer: false,
+            customNews: [],
+            customHeroes: [],
+            customSkins: []
         };
     }
 
@@ -54,13 +60,43 @@ export class AdminManager {
         this.app.saveManager.set('admin_config', this.config);
     }
 
-    authenticate(login, password, code) {
-        if (login === this.adminLogin && password === this.adminPassword && code === this.adminVerifyCode) {
+    async _sha256(text) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(text);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async authenticate(login, password, code) {
+        // Anti brute-force check
+        if (this._lockoutUntil > Date.now()) {
+            const remaining = Math.ceil((this._lockoutUntil - Date.now()) / 1000);
+            toast.error(`🔒 Trop de tentatives. Réessayez dans ${remaining}s.`);
+            return false;
+        }
+
+        const [loginHash, passHash, codeHash] = await Promise.all([
+            this._sha256(login),
+            this._sha256(password),
+            this._sha256(code)
+        ]);
+
+        if (loginHash === this._loginHash && passHash === this._passwordHash && codeHash === this._codeHash) {
             this.isAuthenticated = true;
+            this._loginAttempts = 0;
             toast.success('🛡️ Accès Administrateur accordé');
             return true;
         } else {
-            toast.error('❌ Identifiants invalides ou code incorrect');
+            this._loginAttempts++;
+            const remaining = this._maxAttempts - this._loginAttempts;
+            if (this._loginAttempts >= this._maxAttempts) {
+                this._lockoutUntil = Date.now() + 30000; // 30s cooldown
+                this._loginAttempts = 0;
+                toast.error('🔒 Compte verrouillé pendant 30 secondes.');
+            } else {
+                toast.error(`❌ Identifiants invalides. ${remaining} tentative(s) restante(s).`);
+            }
             return false;
         }
     }

@@ -894,6 +894,7 @@ export class GameEngine {
         this.running = false;
 
         const isRanked = (this.app.selectedMode === 'ranked');
+        const won = this.player && this.player.hp > 0;
 
         // Sauvegarder les stats classiques
         const stats = this.app.playerManager.getStats();
@@ -901,6 +902,17 @@ export class GameEngine {
         this.app.playerManager.incrementStat('gamesPlayed', 1);
         if (this.wave > (stats.maxWave || 0)) {
             this.app.playerManager.updateStat('maxWave', this.wave);
+        }
+
+        // [NEW] v0.8.1 — Anti-cheat: Envoyer le résultat au serveur pour validation
+        if (this.app.networkManager && this.app.networkManager.isConnected) {
+            this.app.networkManager.send({
+                type: 'match_result',
+                score: this.score, // Use this.score
+                kills: this.kills, // Use this.kills
+                duration: Math.floor(this.gameTime), // Use this.gameTime
+                modeId: this.app.selectedMode
+            });
         }
 
         // Enregistrer dans l'historique

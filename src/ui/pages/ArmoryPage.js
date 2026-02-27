@@ -22,11 +22,14 @@ export class ArmoryPage {
           </h1>
         </div>
 
-        <!-- Filtres par Archétype -->
-        <div class="armory-filters" style="display: flex; gap: 10px; justify-content: center; margin-bottom: var(--spacing-lg); flex-wrap: wrap;">
-          <button class="btn btn--sm btn--outline filter-btn active" data-filter="all">Tous</button>
+        <!-- Filtres par Archétype (v0.8.1 Horizontal) -->
+        <div class="armory-filters row row--center row--wrap" style="margin-bottom: var(--spacing-xl); gap: var(--spacing-md); background: rgba(255,255,255,0.03); padding: 15px; border-radius: 16px; border: 1px solid var(--color-border);">
+          <button class="btn btn--sm btn--outline btn--shine filter-btn active" data-filter="all" style="width: auto; min-width: 100px;">TOUS</button>
           ${Object.values(ARCHETYPES).map(arch => `
-            <button class="btn btn--sm btn--outline filter-btn" data-filter="${arch.id}">${arch.icon} ${arch.label}</button>
+            <button class="btn btn--sm btn--outline btn--shine filter-btn" data-filter="${arch.id}" style="width: auto; min-width: 110px;">
+              <span style="font-size: 1.2rem; margin-right: 5px;">${arch.icon}</span> 
+              ${arch.label.toUpperCase()}
+            </button>
           `).join('')}
         </div>
 

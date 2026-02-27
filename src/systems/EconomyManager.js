@@ -21,19 +21,39 @@ export class EconomyManager {
     get gems() { return this.data.gems; }
     get eventTokens() { return this.data.eventTokens || 0; }
 
+    // 🔒 Plafonds de sécurité v0.8.0
+    static MAX_COINS_PER_TX = 50000;
+    static MAX_GEMS_PER_TX = 5000;
+    static MAX_TOKENS_PER_TX = 1000;
+
     addCoins(amount) {
+        amount = Math.floor(amount);
+        if (amount <= 0 || amount > EconomyManager.MAX_COINS_PER_TX) {
+            console.warn(`⚠️ Transaction pièces suspecte rejetée: ${amount}`);
+            return this.data.coins;
+        }
         this.data.coins += amount;
         this.persist();
         return this.data.coins;
     }
 
     addGems(amount) {
+        amount = Math.floor(amount);
+        if (amount <= 0 || amount > EconomyManager.MAX_GEMS_PER_TX) {
+            console.warn(`⚠️ Transaction gemmes suspecte rejetée: ${amount}`);
+            return this.data.gems;
+        }
         this.data.gems += amount;
         this.persist();
         return this.data.gems;
     }
 
     addEventTokens(amount) {
+        amount = Math.floor(amount);
+        if (amount <= 0 || amount > EconomyManager.MAX_TOKENS_PER_TX) {
+            console.warn(`⚠️ Transaction tokens suspecte rejetée: ${amount}`);
+            return this.data.eventTokens;
+        }
         if (this.data.eventTokens === undefined) this.data.eventTokens = 0;
         this.data.eventTokens += amount;
         this.persist();

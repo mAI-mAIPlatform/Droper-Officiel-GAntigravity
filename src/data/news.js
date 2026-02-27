@@ -4,6 +4,38 @@
 
 export const NEWS_ARTICLES = [
     {
+        id: 'news_v081_alpha',
+        date: '27/02/2026',
+        version: 'v0.8.1 Alpha',
+        title: '🛡️ v0.8.1 Alpha — Anti-Cheat & Polissage',
+        type: 'update',
+        emoji: '🎯',
+        summary: 'Renforcement de la sécurité contre le cheat et ajout des portraits de héros.',
+        content: [
+            '🛡️ Anti-Cheat : Validation des scores et des kills par le serveur en fin de match.',
+            '🎨 Portraits : Ajout des illustrations HD pour Sniper, Phantom, Titan, Volt, Blade et Drone.',
+            '💄 UI : Refonte horizontale des filtres d\'archétypes dans l\'Armurerie.',
+            '🐛 Bug Fixes : Amélioration de la stabilité de la connexion WebSocket.',
+        ],
+    },
+    {
+        id: 'news_v080_alpha',
+        date: '27/02/2026',
+        version: 'v0.8.0 Alpha',
+        title: '🛡️ v0.8.0 Alpha — Mise à jour Sécurité',
+        type: 'update',
+        emoji: '🔒',
+        summary: 'Renforcement majeur de la sécurité du jeu et correction de bugs critiques.',
+        content: [
+            '🔐 Admin : Identifiants hashés SHA-256 + protection anti brute-force',
+            '🛡️ Sauvegardes : Checksum d\'intégrité — triche détectée = reset',
+            '💰 Économie : Plafonds de transaction pour empêcher l\'injection de ressources',
+            '💬 Chat : Messages isolés par salle de jeu + limitation de débit',
+            '🎯 Serveur : Validation des positions, tirs et dégâts (anti-téléportation)',
+            '🐛 Fix critique : Correction du crash en fin de partie',
+        ],
+    },
+    {
         id: 'news_v079_alpha',
         date: '27/02/2026',
         version: 'v0.7.9 Alpha',

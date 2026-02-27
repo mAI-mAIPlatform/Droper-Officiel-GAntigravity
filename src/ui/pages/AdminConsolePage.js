@@ -160,11 +160,11 @@ export class AdminConsolePage {
         const am = this.app.adminManager;
         const loginBtn = document.getElementById('btn-login-admin');
         if (loginBtn) {
-            loginBtn.onclick = () => {
+            loginBtn.onclick = async () => {
                 const login = document.getElementById('admin-login').value;
                 const pass = document.getElementById('admin-pass').value;
                 const code = document.getElementById('admin-code').value;
-                if (am.authenticate(login, pass, code)) this.refresh();
+                if (await am.authenticate(login, pass, code)) this.refresh();
             };
         }
 
