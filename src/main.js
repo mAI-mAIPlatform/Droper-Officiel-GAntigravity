@@ -34,7 +34,7 @@ import { AdminManager } from './systems/AdminManager.js';
 
 class DroperApp {
     constructor() {
-        this.version = '0.7.6 Stable';
+        this.version = '0.7.7 Stable';
         this.app = this; // Self reference for managers [v0.3.1]
         this.saveManager = new SaveManager();
         this.playerManager = new PlayerManager(this.saveManager);
