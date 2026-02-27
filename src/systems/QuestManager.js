@@ -44,6 +44,11 @@ export class QuestManager {
         return last.toDateString() !== now.toDateString();
     }
 
+    isWeekPassed(timestamp) {
+        const diffMs = Date.now() - timestamp;
+        return diffMs > 7 * 24 * 60 * 60 * 1000;
+    }
+
     isMonthPassed(timestamp) {
         const diffMs = Date.now() - timestamp;
         return diffMs > 30 * 24 * 60 * 60 * 1000;
