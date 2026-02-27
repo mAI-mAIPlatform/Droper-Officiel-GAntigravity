@@ -134,13 +134,20 @@ export class GameEngine {
         this.canvas.style.cursor = 'crosshair';
         container.appendChild(this.canvas);
 
-        this.ctx = this.canvas.getContext('2d');
+        try {
+            this.ctx = this.canvas.getContext('2d');
 
-        if (!this.ctx) {
-            console.error("Impossible de récupérer le contexte 2D du canvas !");
+            if (!this.ctx) {
+                console.error("Impossible de récupérer le contexte 2D du canvas !");
+                this.displayFallbackError("Impossible de récupérer le contexte 2D.");
+                return;
+            }
+            this.resize();
+        } catch (e) {
+            console.error("Erreur d'initialisation du canvas:", e);
+            this.displayFallbackError(e.message);
             return;
         }
-        this.resize();
 
         // Events
         window.addEventListener('resize', this._onResize);
@@ -293,11 +300,29 @@ export class GameEngine {
         if (this.running) return;
         this.running = true;
         this.lastTime = performance.now();
-        this.loop(this.lastTime);
+        try {
+            this.loop(this.lastTime);
+        } catch (e) {
+            console.error("Erreur serveur de jeu :", e);
+            this.displayFallbackError(e.message);
+        }
     }
 
     stop() {
         this.running = false;
+    }
+
+    displayFallbackError(msg) {
+        if (!this.canvas) return;
+        this.running = false;
+        const parent = this.canvas.parentElement;
+        if (parent) {
+            parent.innerHTML = `<div style="display:flex; flex-direction:column; justify-content:center; align-items:center; width:100%; height:100%; background:#080c16; color:#ef4444; font-family: Outfit, sans-serif;">
+                <h2>Erreur Critique du Jeu</h2>
+                <p style="color:#e8ecf4">${msg}</p>
+                <button onclick="window.location.reload()" style="margin-top:20px; padding:10px 20px; background:#ef4444; color:white; border:none; border-radius:5px; cursor:pointer;">Recharger</button>
+            </div>`;
+        }
     }
 
     togglePause() {
@@ -748,6 +773,26 @@ export class GameEngine {
         ctx.stroke();
 
         ctx.restore();
+    }
+
+    updateGas(dt) {
+        if (!this.isCaveaux) return;
+        if (this.gasRadius > this.targetGasRadius) {
+            this.gasRadius -= this.gasShrinkRate * dt;
+        }
+        if (this.gasRadius < 100) this.gasRadius = 100;
+        
+        // Damage players if outside
+        if (this.player && this.player.alive) {
+            const dist = Math.hypot(this.player.x - this.gasCenter.x, this.player.y - this.gasCenter.y);
+            if (dist > this.gasRadius) {
+                // Takes 10 damage per second when outside gas!
+                this.player.takeDamage(10 * dt);
+                if (this.frameCount % 10 === 0) {
+                    this.particles.spawnExplosion(this.player.x, this.player.y, '#ef4444', 2);
+                }
+            }
+        }
     }
 
     drawPauseOverlay(ctx) {
