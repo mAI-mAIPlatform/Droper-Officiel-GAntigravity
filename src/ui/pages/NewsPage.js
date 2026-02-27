@@ -73,7 +73,7 @@ export class NewsPage {
               <p style="font-size: var(--font-size-sm); color: var(--color-text-secondary); margin-bottom: var(--spacing-md);">
                 ${article.summary}
               </p>
-              <div class="news-details" style="font-size: var(--font-size-xs); color: var(--color-text-muted);">
+              <div class="news-details" style="font-size: var(--font-size-xs); color: var(--color-text-muted); text-align: left; line-height: 1.4;">
                 ${article.content.map(line => `<div style="padding: 2px 0;">• ${line}</div>`).join('')}
               </div>
             </div>
@@ -122,7 +122,7 @@ export class NewsPage {
         <div class="card" style="padding: 30px; line-height: 1.8;">
             ${article.summary ? `<p style="font-size: 1.1rem; color: var(--color-text-primary); font-weight: 600; margin-bottom: 25px; border-left: 4px solid var(--color-accent-blue); padding-left: 15px;">${article.summary}</p>` : ''}
             
-            <div class="stack" style="gap: 15px; color: var(--color-text-secondary); font-size: 1rem;">
+            <div class="stack" style="gap: 15px; color: var(--color-text-secondary); font-size: 1rem; text-align: left;">
                 ${article.content.map(line => `<div>${line}</div>`).join('')}
             </div>
 

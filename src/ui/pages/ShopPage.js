@@ -48,11 +48,15 @@ export class ShopPage {
         ${sections.map(section => {
       let offers = [];
       if (section.key === 'special') {
-        offers = this.app.adminManager.config.specialOffers;
+        const adminOffers = this.app.adminManager?.config?.specialOffers || [];
+        offers = [...adminOffers];
       } else if (section.key === 'starter') {
         offers = this.getStarters();
       } else {
-        offers = getOffersByCategory(section.key);
+        const standardOffers = getOffersByCategory(section.key);
+        // Inject admin offers into specific categories if they match
+        const adminOffers = (this.app.adminManager?.config?.specialOffers || []).filter(o => o.category === section.key);
+        offers = [...standardOffers, ...adminOffers];
       }
 
       if (offers.length === 0) return '';
@@ -74,12 +78,17 @@ export class ShopPage {
     const am = this.app.adminManager;
 
     let cost = { ...offer.cost };
-    // Apply global reduction
-    if (cost.type !== 'free' && am.config.globalReduction > 0) {
+    // Handle free offers from data or admin
+    if (!cost || Object.keys(cost).length === 0 || cost.amount === 0 || cost.type === 'free') {
+      cost = { type: 'free', amount: 0 };
+    }
+
+    // Apply global reduction (only for non-free)
+    if (cost.type !== 'free' && am.config && am.config.globalReduction > 0) {
       cost.amount = Math.ceil(cost.amount * (1 - am.config.globalReduction / 100));
     }
 
-    const canAfford = !isClaimed && economy.canAfford(cost.type, cost.amount);
+    const canAfford = !isClaimed && (cost.type === 'free' || economy.canAfford(cost.type, cost.amount));
     const costLabel = cost.type === 'free'
       ? 'GRATUIT'
       : cost.type === 'gems'

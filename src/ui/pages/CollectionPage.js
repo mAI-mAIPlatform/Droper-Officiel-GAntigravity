@@ -118,9 +118,9 @@ export class CollectionPage {
 
   renderSkins() {
     const sm = this.app.skinManager;
-    const hero = HEROES.find(h => h.id === this.selectedHero);
-    const skins = getSkinsForHero(this.selectedHero);
-    const equippedId = sm.getEquippedSkin(this.selectedHero);
+    const hero = getHeroById(this.selectedHero);
+    const skins = this.app.skinManager.getAllSkinsForHero(this.selectedHero);
+    const equippedId = this.app.skinManager.getEquippedSkin(this.selectedHero);
     const skinData = sm.getActiveSkinData(this.selectedHero);
 
     return `

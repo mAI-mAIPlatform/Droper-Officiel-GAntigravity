@@ -41,33 +41,48 @@ export class CrateAnimation {
     const rewardsEl = overlay.querySelector('#crate-rewards');
     const closeBtn = overlay.querySelector('#crate-close');
 
-    // Phase 1 — Shake on click
+    // Phase 1 — Multi-click upgrade mechanic
+    let clickCount = 0;
+    const targetClicks = 5;
+
     box.addEventListener('click', () => {
       if (opened) return;
-      opened = true;
 
+      clickCount++;
+
+      // Visual feedback for each click
       box.classList.add('crate-box--shaking');
-      text.textContent = '✨ Ouverture...';
+      setTimeout(() => box.classList.remove('crate-box--shaking'), 200);
 
-      // Play potential sound if available (via DOM event or if app is globally accessible)
-      if (window.app && window.app.audioManager) {
-        window.app.audioManager.playSound('click'); // placeholder temp
+      // Upgrade simulation
+      const currentLevel = Math.min(safeRarity + Math.floor(clickCount / 1.5), 6);
+      const currentColor = rarityColors[currentLevel] || glowColor;
+      box.querySelector('.crate-box__glow').style.background = `radial-gradient(circle, ${currentColor} 0%, transparent 70%)`;
+
+      if (clickCount < targetClicks) {
+        text.textContent = `⚡ Énergie : ${clickCount}/${targetClicks}`;
+        if (window.app && window.app.audioManager) {
+          window.app.audioManager.playSound('click');
+        }
+        return;
       }
 
-      // Phase 2 — Explode after shake
+      opened = true;
+      text.textContent = '✨ Explosion !';
+
+      // Phase 2 — Explode after last click
       setTimeout(() => {
-        box.classList.remove('crate-box--shaking');
         box.classList.add('crate-box--explode');
 
         // Play impact sound based on rarity
         if (window.app && window.app.audioManager) {
-          for (let s = 0; s < Math.min(safeRarity, 4); s++) {
+          for (let s = 0; s < Math.min(currentLevel, 4); s++) {
             setTimeout(() => window.app.audioManager.playPurchase(), s * 100);
           }
         }
 
-        // Spawn particles with specific color
-        CrateAnimation.spawnParticles(overlay, glowColor);
+        // Spawn particles with current color
+        CrateAnimation.spawnParticles(overlay, currentColor);
 
         // Phase 3 — Show rewards
         setTimeout(() => {
@@ -107,7 +122,7 @@ export class CrateAnimation {
 
           closeBtn.style.display = 'block';
         }, 600);
-      }, 800);
+      }, 300);
     });
 
     // Close handler

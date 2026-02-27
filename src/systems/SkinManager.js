@@ -39,6 +39,12 @@ export class SkinManager {
         return this.data.equipped[heroId] || heroId + '_default';
     }
 
+    getAllSkinsForHero(heroId) {
+        const baseSkins = getSkinsForHero(heroId);
+        const customSkins = (this.app.adminManager?.config?.customSkins || []).filter(s => s.heroId === heroId || s.targetHero === heroId);
+        return [...baseSkins, ...customSkins];
+    }
+
     equip(heroId, skinId) {
         if (!this.isOwned(heroId, skinId)) {
             toast.error('Skin non possédé !');

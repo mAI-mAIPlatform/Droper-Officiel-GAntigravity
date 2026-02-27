@@ -893,7 +893,7 @@ export class GameEngine {
         this.gameOver = true;
         this.running = false;
 
-        const won = this.player && this.player.hp > 0;
+        const isRanked = (this.app.selectedMode === 'ranked');
 
         // Sauvegarder les stats classiques
         const stats = this.app.playerManager.getStats();
@@ -912,18 +912,31 @@ export class GameEngine {
                 score: this.score,
                 heroId: this.player ? this.player.heroId : 'soldier',
                 duration: Math.floor(this.gameTime),
+                isRanked: isRanked
             });
         }
 
-        // XP de saison
-        if (this.app.seasonPassManager) {
-            this.app.seasonPassManager.addXp(this.score);
-        }
+        // Récompenses différenciées
+        if (isRanked) {
+            // Uniquement RP (Records) via RankedModeManager
+            if (this.rankedModeManager) {
+                this.rankedModeManager.onMatchEnd(won);
+            }
+            // Add a small amount of records based on performance even if not won
+            const rpGain = Math.floor(this.score / 10) + (won ? 20 : 0);
+            this.app.recordManager.add('total', rpGain);
+            console.log(`🏆 Mode Classé : +${rpGain} RP`);
+        } else {
+            // XP de saison
+            if (this.app.seasonPassManager) {
+                this.app.seasonPassManager.addXp(this.score);
+            }
 
-        // Quêtes
-        this.app.questManager.updateProgress('daily_xp_1', this.score);
-        this.app.questManager.updateProgress('daily_kills', this.kills);
-        this.app.questManager.updateProgress('weekly_games', 1);
+            // Quêtes
+            this.app.questManager.updateProgress('daily_xp_1', this.score);
+            this.app.questManager.updateProgress('daily_kills', this.kills);
+            this.app.questManager.updateProgress('weekly_games', 1);
+        }
 
         // Animation de fin
         const finalStats = {

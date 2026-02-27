@@ -4,6 +4,22 @@
 
 export const NEWS_ARTICLES = [
     {
+        id: 'news_v079_alpha',
+        date: '27/02/2026',
+        version: 'v0.7.9 Alpha',
+        title: '🚀 v0.7.9 Alpha — Refonte des Caisses & Classé',
+        type: 'update',
+        emoji: '🏆',
+        summary: 'Nouvelle mécanique d\'ouverture de caisse, mode Classé RP, et expansion des raretés !',
+        content: [
+            '📦 Caisses : Clique 5 fois pour charger l\'énergie et augmenter la rareté !',
+            '🏆 Mode Classé : Gagne uniquement des RP pour monter dans les ligues.',
+            '✨ Rarerités : Expansion du système (Rare à Ultra) pour héros et skins.',
+            '🛒 Shop : Meilleure intégration des offres Admin et des cadeaux.',
+            '📰 News : Correction de l\'alignement des textes.',
+        ],
+    },
+    {
         id: 'news_v010',
         date: '25/02/2026',
         version: 'v0.1.0',

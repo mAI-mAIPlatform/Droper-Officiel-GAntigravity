@@ -183,6 +183,26 @@ export const GAME_MODES = [
         mapWidth: 2500,
         mapHeight: 2500,
     },
+    {
+        id: 'ranked',
+        name: 'Mode Classé',
+        emoji: '🏆',
+        type: 'solo',
+        teamSize: 1,
+        teams: 1,
+        totalPlayers: 6,
+        duration: 120,
+        description: 'Compétition pure. Gagne des points RP pour grimper dans le classement !',
+        objective: 'Terminer premier pour un max de RP',
+        rules: [
+            'Seul le gain de RP est actif',
+            'Bots ajustés selon ton rang',
+            'Pas de pièces ni de gemmes ici',
+        ],
+        color: '#f59e0b',
+        mapWidth: 1200,
+        mapHeight: 800,
+    },
 ];
 
 export function getModeById(id) {

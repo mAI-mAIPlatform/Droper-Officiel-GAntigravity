@@ -11,6 +11,7 @@ import { HackServerMode } from './modes/HackServerMode.js';
 import { CyberBallMode } from './modes/CyberBallMode.js';
 import { PrimeDigitaleMode } from './modes/PrimeDigitaleMode.js';
 import { ZoneSurchargeMode } from './modes/ZoneSurchargeMode.js';
+import { RankedMode } from './modes/RankedMode.js';
 
 const MODE_CLASSES = {
     nanopuces: NanopucesMode,
@@ -19,6 +20,7 @@ const MODE_CLASSES = {
     cyber_ball: CyberBallMode,
     prime_digitale: PrimeDigitaleMode,
     zone_surcharge: ZoneSurchargeMode,
+    ranked: RankedMode,
 };
 
 export class ModeManager {
