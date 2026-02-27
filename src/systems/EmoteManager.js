@@ -27,6 +27,15 @@ export class EmoteManager {
         return this.data.owned.includes(emoteId);
     }
 
+    unlock(emoteId) {
+        if (!this.data.owned.includes(emoteId)) {
+            this.data.owned.push(emoteId);
+            this.persist();
+            return true;
+        }
+        return false;
+    }
+
     triggerByKey(key) {
         const emoteId = this.data.equipped[key - 1];
         if (!emoteId) return null;

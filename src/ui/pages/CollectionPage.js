@@ -6,21 +6,22 @@ import { ITEM_CATEGORIES } from '../../data/inventory.js';
 import { HEROES, drawHeroBody } from '../../data/heroes.js';
 import { getSkinsForHero } from '../../data/skins.js';
 import { toast } from '../components/ToastManager.js';
+import { CrateAnimation } from '../components/CrateAnimation.js';
 
 export class CollectionPage {
-    constructor(app) {
-        this.app = app;
-        this.activeTab = 'items'; // 'items' or 'skins'
+  constructor(app) {
+    this.app = app;
+    this.activeTab = 'items'; // 'items' or 'skins'
 
-        // State for items
-        this.itemFilter = 'all';
+    // State for items
+    this.itemFilter = 'all';
 
-        // State for skins
-        this.selectedHero = 'soldier';
-    }
+    // State for skins
+    this.selectedHero = 'soldier';
+  }
 
-    render() {
-        return `
+  render() {
+    return `
       <div class="page">
         <div class="page__header">
           <h1 class="section-title">
@@ -45,23 +46,23 @@ export class CollectionPage {
         </div>
       </div>
     `;
-    }
+  }
 
-    renderItems() {
-        const items = this.app.inventoryManager.getAllItems();
-        const categories = [
-            { id: 'all', label: 'Tout', emoji: '🎒' },
-            { id: 'crate', label: 'Caisses', emoji: '📦' },
-            { id: 'fragment', label: 'Fragments', emoji: '🧩' },
-            { id: 'booster', label: 'Boosters', emoji: '⚡' },
-            { id: 'key', label: 'Clés', emoji: '🔑' },
-        ];
+  renderItems() {
+    const items = this.app.inventoryManager.getAllItems();
+    const categories = [
+      { id: 'all', label: 'Tout', emoji: '🎒' },
+      { id: 'crate', label: 'Caisses', emoji: '📦' },
+      { id: 'fragment', label: 'Fragments', emoji: '🧩' },
+      { id: 'booster', label: 'Boosters', emoji: '⚡' },
+      { id: 'key', label: 'Clés', emoji: '🔑' },
+    ];
 
-        const filtered = this.itemFilter === 'all'
-            ? items
-            : items.filter(i => i.category === this.itemFilter);
+    const filtered = this.itemFilter === 'all'
+      ? items
+      : items.filter(i => i.category === this.itemFilter);
 
-        return `
+    return `
             <div class="anim-fade-in">
                 <!-- Filtres -->
                 <div class="row row--wrap" style="margin-bottom: var(--spacing-lg); gap: var(--spacing-sm);">
@@ -86,19 +87,19 @@ export class CollectionPage {
                 `}
             </div>
         `;
-    }
+  }
 
-    renderSingleItem(item) {
-        const rarityColors = {
-            common: 'var(--color-rarity-common)',
-            rare: 'var(--color-rarity-rare)',
-            epic: 'var(--color-rarity-epic)',
-            legendary: 'var(--color-rarity-legendary)',
-        };
-        const borderColor = rarityColors[item.rarity] || rarityColors.common;
-        const isCrate = item.category === 'crate';
+  renderSingleItem(item) {
+    const rarityColors = {
+      common: 'var(--color-rarity-common)',
+      rare: 'var(--color-rarity-rare)',
+      epic: 'var(--color-rarity-epic)',
+      legendary: 'var(--color-rarity-legendary)',
+    };
+    const borderColor = rarityColors[item.rarity] || rarityColors.common;
+    const isCrate = item.category === 'crate';
 
-        return `
+    return `
           <div class="card anim-fade-in-up" style="text-align: center; border-color: ${borderColor}; cursor: ${isCrate ? 'pointer' : 'default'};"
                ${isCrate ? `data-open-crate="${item.id}"` : ''}>
             <span style="font-size: 2.2rem;">${item.emoji}</span>
@@ -113,30 +114,30 @@ export class CollectionPage {
             </div>
           </div>
         `;
-    }
+  }
 
-    renderSkins() {
-        const sm = this.app.skinManager;
-        const hero = HEROES.find(h => h.id === this.selectedHero);
-        const skins = getSkinsForHero(this.selectedHero);
-        const equippedId = sm.getEquippedSkin(this.selectedHero);
-        const skinData = sm.getActiveSkinData(this.selectedHero);
+  renderSkins() {
+    const sm = this.app.skinManager;
+    const hero = HEROES.find(h => h.id === this.selectedHero);
+    const skins = getSkinsForHero(this.selectedHero);
+    const equippedId = sm.getEquippedSkin(this.selectedHero);
+    const skinData = sm.getActiveSkinData(this.selectedHero);
 
-        return `
+    return `
             <div class="anim-fade-in">
                 <!-- Hero selector -->
                 <div class="row row--wrap" style="gap: var(--spacing-sm); margin-bottom: var(--spacing-xl);">
                   ${HEROES.map(h => {
-            const state = this.app.heroManager.getHeroState(h.id);
-            const isUnlocked = state.unlocked || h.unlocked;
-            return `
+      const state = this.app.heroManager.getHeroState(h.id);
+      const isUnlocked = state.unlocked || h.unlocked;
+      return `
                       <button class="btn ${this.selectedHero === h.id ? 'btn--accent' : 'btn--ghost'} hero-select-btn"
                               data-hero="${h.id}" ${!isUnlocked ? 'disabled' : ''}
                               style="width: auto; padding: 6px 14px; font-size: var(--font-size-sm); ${!isUnlocked ? 'opacity:0.4;' : ''}">
                         ${h.emoji} ${h.name}
                       </button>
                     `;
-        }).join('')}
+    }).join('')}
                 </div>
 
                 <div class="row" style="gap: var(--spacing-xl); align-items: flex-start;">
@@ -153,9 +154,9 @@ export class CollectionPage {
                     <div style="flex: 1;">
                         <div class="grid-2" style="gap: var(--spacing-sm);">
                             ${skins.map(skin => {
-            const owned = sm.isOwned(this.selectedHero, skin.id);
-            const equipped = skin.id === equippedId;
-            return `
+      const owned = sm.isOwned(this.selectedHero, skin.id);
+      const equipped = skin.id === equippedId;
+      return `
                                     <div class="card ${equipped ? 'ult-ready-glow' : ''}" 
                                          style="padding: var(--spacing-md); border-color: ${equipped ? skin.bodyColor : 'var(--color-border-card)'}; cursor: pointer;"
                                          data-skin-id="${skin.id}">
@@ -165,97 +166,103 @@ export class CollectionPage {
                                           <strong style="font-size: var(--font-size-sm);">${skin.name}</strong>
                                           ${equipped ? '<div style="font-size: var(--font-size-xs); color: var(--color-accent-green); font-weight: 800;">ÉQUIPÉ</div>' : ''}
                                         </div>
-                                        ${!owned ? `<span class="badge badge--common" style="color: var(--color-accent-gold);">🪙 ${skin.price}</span>` : ''}
+                                        ${!owned ? `<span class="badge ${skin.isEvent ? 'badge--rare' : 'badge--common'}" style="color: ${skin.isEvent ? 'var(--color-accent-purple)' : 'var(--color-accent-gold)'};">${skin.isEvent ? '🎟️' : '🪙'} ${skin.isEvent ? skin.eventPrice : skin.price}</span>` : ''}
                                       </div>
                                     </div>
                                 `;
-        }).join('')}
+    }).join('')}
                         </div>
                     </div>
                 </div>
             </div>
         `;
+  }
+
+  afterRender() {
+    // Tab switching
+    document.querySelectorAll('[data-tab]').forEach(btn => {
+      btn.onclick = () => {
+        this.activeTab = btn.dataset.tab;
+        this.refresh();
+      };
+    });
+
+    if (this.activeTab === 'items') {
+      this.afterRenderItems();
+    } else {
+      this.afterRenderSkins();
     }
+  }
 
-    afterRender() {
-        // Tab switching
-        document.querySelectorAll('[data-tab]').forEach(btn => {
-            btn.onclick = () => {
-                this.activeTab = btn.dataset.tab;
-                this.refresh();
-            };
-        });
+  afterRenderItems() {
+    document.querySelectorAll('[data-filter]').forEach(btn => {
+      btn.onclick = () => {
+        this.itemFilter = btn.dataset.filter;
+        this.refresh();
+      };
+    });
 
-        if (this.activeTab === 'items') {
-            this.afterRenderItems();
-        } else {
-            this.afterRenderSkins();
+    document.querySelectorAll('[data-open-crate]').forEach(btn => {
+      btn.onclick = (e) => {
+        const crateId = btn.dataset.openCrate;
+        const rewards = this.app.inventoryManager.openCrate(crateId);
+        if (rewards) {
+          if (this.app.audioManager) this.app.audioManager.playPurchase();
+          const safeRarity = rewards.safeRarity || 1;
+          CrateAnimation.show(rewards, () => {
+            this.refresh();
+          }, safeRarity);
         }
-    }
+      };
+    });
+  }
 
-    afterRenderItems() {
-        document.querySelectorAll('[data-filter]').forEach(btn => {
-            btn.onclick = () => {
-                this.itemFilter = btn.dataset.filter;
-                this.refresh();
-            };
-        });
+  afterRenderSkins() {
+    document.querySelectorAll('.hero-select-btn').forEach(btn => {
+      btn.onclick = () => {
+        this.selectedHero = btn.dataset.hero;
+        this.refresh();
+      };
+    });
 
-        document.querySelectorAll('[data-open-crate]').forEach(btn => {
-            btn.onclick = (e) => {
-                const crateId = btn.dataset.openCrate;
-                const rewards = this.app.inventoryManager.openCrate(crateId);
-                if (rewards) this.refresh();
-            };
-        });
-    }
-
-    afterRenderSkins() {
-        document.querySelectorAll('.hero-select-btn').forEach(btn => {
-            btn.onclick = () => {
-                this.selectedHero = btn.dataset.hero;
-                this.refresh();
-            };
-        });
-
-        document.querySelectorAll('[data-skin-id]').forEach(card => {
-            card.onclick = () => {
-                const skinId = card.dataset.skinId;
-                const sm = this.app.skinManager;
-                if (sm.isOwned(this.selectedHero, skinId)) {
-                    sm.equip(this.selectedHero, skinId);
-                } else {
-                    sm.buy(this.selectedHero, skinId);
-                }
-                this.refresh();
-            };
-        });
-
-        this.renderPreview();
-    }
-
-    renderPreview() {
-        const canvas = document.getElementById('skin-preview');
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
+    document.querySelectorAll('[data-skin-id]').forEach(card => {
+      card.onclick = () => {
+        const skinId = card.dataset.skinId;
         const sm = this.app.skinManager;
-        const hero = HEROES.find(h => h.id === this.selectedHero);
-        const skinData = sm.getActiveSkinData(this.selectedHero);
-
-        ctx.clearRect(0, 0, 180, 180);
-        const previewHero = {
-            ...hero,
-            bodyColor: skinData.bodyColor,
-            glowColor: skinData.glowColor,
-        };
-        drawHeroBody(ctx, 90, 90, previewHero, 3.0);
-    }
-
-    refresh() {
-        const container = document.getElementById('page-container');
-        if (container) {
-            container.innerHTML = this.render();
-            this.afterRender();
+        if (sm.isOwned(this.selectedHero, skinId)) {
+          sm.equip(this.selectedHero, skinId);
+        } else {
+          sm.buy(this.selectedHero, skinId);
         }
+        this.refresh();
+      };
+    });
+
+    this.renderPreview();
+  }
+
+  renderPreview() {
+    const canvas = document.getElementById('skin-preview');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const sm = this.app.skinManager;
+    const hero = HEROES.find(h => h.id === this.selectedHero);
+    const skinData = sm.getActiveSkinData(this.selectedHero);
+
+    ctx.clearRect(0, 0, 180, 180);
+    const previewHero = {
+      ...hero,
+      bodyColor: skinData.bodyColor,
+      glowColor: skinData.glowColor,
+    };
+    drawHeroBody(ctx, 90, 90, previewHero, 3.0);
+  }
+
+  refresh() {
+    const container = document.getElementById('page-container');
+    if (container) {
+      container.innerHTML = this.render();
+      this.afterRender();
     }
+  }
 }

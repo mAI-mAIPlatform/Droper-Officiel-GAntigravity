@@ -5,6 +5,8 @@
 import { SHOP_OFFERS, getOffersByCategory } from '../../data/shop.js';
 import { toast } from '../components/ToastManager.js';
 import { CrateAnimation } from '../components/CrateAnimation.js';
+import { RARITIES } from '../../data/heroes.js';
+import { rollSafeLoot } from '../../data/safeLoot.js';
 
 export class ShopPage {
   constructor(app) {
@@ -30,6 +32,7 @@ export class ShopPage {
             <div class="row" style="gap: var(--spacing-sm);">
               <div class="currency-item">🪙 ${economy.coins}</div>
               <div class="currency-item">💎 ${economy.gems}</div>
+              ${economy.eventTokens > 0 ? `<div class="currency-item" style="color:var(--color-accent-purple);">🎟️ ${economy.eventTokens}</div>` : ''}
             </div>
           </div>
         </div>
@@ -109,46 +112,67 @@ export class ShopPage {
   }
 
   renderDailyReward() {
-    const lastClaim = this.app.saveManager.get('shop')?.lastFreeGemsClaim || 0;
+    const shopData = this.app.saveManager.get('shop') || {};
+    const safeData = shopData.safe || { upgradesLeft: 5, lastClaim: 0, currentRarity: 1 };
+
+    if (!shopData.safe) {
+      shopData.safe = safeData;
+      this.app.saveManager.set('shop', shopData);
+    }
+
     const now = Date.now();
     const cooldown = 24 * 60 * 60 * 1000;
-    const timeLeft = lastClaim + cooldown - now;
-    const canClaim = timeLeft <= 0;
+    const timeLeft = safeData.lastClaim + cooldown - now;
+    const canClaimOrUpgrade = timeLeft <= 0;
 
-    if (!canClaim) {
+    if (!canClaimOrUpgrade) {
       const hours = Math.floor(timeLeft / (1000 * 60 * 60));
       const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
       return `
-            <div class="card card--daily-reward" style="background: var(--gradient-card-dark); border-style: dashed; border-color: var(--color-accent-purple);">
-                <div class="row row--between">
+            <div class="card card--daily-reward" style="background: var(--gradient-card-dark); border-style: dashed; border-color: var(--color-border-card);">
+                <div class="row row--between" style="align-items: center;">
                     <div>
-                        <div style="font-size: var(--font-size-lg); font-weight: 800; color: var(--color-text-muted);">Récompense Récupérée ! ✅</div>
-                        <div style="font-size: var(--font-size-xs); color: var(--color-accent-purple); margin-top: 4px;">Reviens dans ${hours}h ${minutes}m</div>
+                        <div style="font-size: var(--font-size-lg); font-weight: 800; color: var(--color-text-muted);">Coffre-fort ouvert ! 📦</div>
+                        <div style="font-size: var(--font-size-xs); color: var(--color-accent-blue); margin-top: 4px;">Nouveau coffre dans ${hours}h ${minutes}m</div>
                     </div>
-                    <div style="font-size: 2.5rem; opacity: 0.3;">💎</div>
+                    <div style="font-size: 2.5rem; opacity: 0.3;">🔒</div>
                 </div>
             </div>
         `;
     }
 
+    const rarityKey = Object.keys(RARITIES).find(k => RARITIES[k].value === safeData.currentRarity) || 'COMMON';
+    const rarity = RARITIES[rarityKey];
+
     return `
-        <div class="card card--daily-reward btn--shine" style="background: var(--gradient-purple); border: 2px solid rgba(255,255,255,0.2); cursor: pointer;" id="claim-daily-btn">
-            <div class="row row--between">
-                <div>
-                    <div style="font-size: var(--font-size-lg); font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">GEMMES GRATUITES ! 🎁</div>
-                    <div style="font-size: var(--font-size-xs); color: rgba(255,255,255,0.8); margin-top: 4px;">Réclame tes 10 gemmes quotidiennes</div>
+        <div class="card card--daily-reward" style="background: var(--gradient-purple); border: 2px solid ${rarity.color}; position:relative; overflow:hidden;">
+            <div class="row row--between" style="align-items: center;">
+                <div style="flex: 1;">
+                    <div style="font-size: var(--font-size-lg); font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">COFFRE-FORT ÉVOLUTIF</div>
+                    <div style="font-size: var(--font-size-xs); color: ${rarity.color}; margin-top: 4px; font-weight: bold;">Rareté actuelle: ${rarity.label}</div>
+                    <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="btn btn--sm" id="btn-upgrade-safe" style="background: var(--color-accent-blue); color: white;" ${safeData.upgradesLeft <= 0 ? 'disabled' : ''}>
+                          Améliorer (${safeData.upgradesLeft}/5)
+                        </button>
+                        <button class="btn btn--sm" id="btn-open-safe" style="background: var(--color-accent-green); color: white;">
+                          Ouvrir le coffre
+                        </button>
+                    </div>
                 </div>
-                <div style="font-size: 2.5rem;">💎</div>
+                <div style="font-size: 3.5rem; text-align: center; width: 80px;">
+                    📦
+                </div>
             </div>
         </div>
     `;
   }
 
   afterRender() {
-    const claimBtn = document.getElementById('claim-daily-btn');
-    if (claimBtn) {
-      claimBtn.addEventListener('click', () => this.handleDailyClaim());
-    }
+    const btnUpgrade = document.getElementById('btn-upgrade-safe');
+    if (btnUpgrade) btnUpgrade.addEventListener('click', () => this.handleSafeUpgrade());
+
+    const btnOpen = document.getElementById('btn-open-safe');
+    if (btnOpen) btnOpen.addEventListener('click', () => this.handleSafeOpen());
 
     document.querySelectorAll('[data-buy-id]').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -252,20 +276,57 @@ export class ShopPage {
     return rewards;
   }
 
-  handleDailyClaim() {
-    const economy = this.app.economyManager;
+  handleSafeUpgrade() {
     const sm = this.app.saveManager;
     const shopData = sm.get('shop') || {};
+    const safeData = shopData.safe || { upgradesLeft: 5, lastClaim: 0, currentRarity: 1 };
 
-    const amount = 10;
-    economy.addGems(amount);
+    if (safeData.upgradesLeft > 0) {
+      safeData.upgradesLeft--;
+      if (safeData.currentRarity < 6) safeData.currentRarity++;
+      shopData.safe = safeData;
+      sm.set('shop', shopData);
+      this.refresh();
+    }
+  }
 
-    shopData.lastFreeGemsClaim = Date.now();
+  handleSafeOpen() {
+    const sm = this.app.saveManager;
+    const shopData = sm.get('shop') || {};
+    const safeData = shopData.safe;
+    if (!safeData) return;
+
+    const rarity = safeData.currentRarity; // 1 to 6
+    const rewards = [];
+    const economy = this.app.economyManager;
+    const inventory = this.app.inventoryManager;
+
+    const rolledReward = rollSafeLoot(rarity, this.app.skinManager, this.app.emoteManager);
+    rewards.push(rolledReward);
+
+    rewards.forEach(r => {
+      if (r.type === 'coins') economy.addCoins(r.amount);
+      else if (r.type === 'gems') economy.addGems(r.amount);
+      else if (r.type === 'item' && inventory) inventory.addItem(r.itemId, r.amount);
+      else if (r.type === 'skin' && this.app.skinManager) {
+        this.app.skinManager.unlock(r.skinId);
+        toast.reward(`👕 Skin débloqué : ${r.name} !`);
+      }
+      else if (r.type === 'emote' && this.app.emoteManager) {
+        this.app.emoteManager.unlock(r.emoteId);
+        toast.reward(`💬 Emote débloquée : ${r.emoji} ${r.name} !`);
+      }
+    });
+
+    safeData.lastClaim = Date.now();
+    safeData.upgradesLeft = 5;
+    safeData.currentRarity = 1; // reset
+
+    shopData.safe = safeData;
     sm.set('shop', shopData);
 
     if (this.app.audioManager) this.app.audioManager.playPurchase();
-
-    CrateAnimation.show([{ type: 'gems', amount }], () => {
+    CrateAnimation.show(rewards, () => {
       this.refresh();
     });
   }

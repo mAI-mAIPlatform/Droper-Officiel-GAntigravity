@@ -3,10 +3,20 @@
    ============================ */
 
 export const RARITIES = {
-    COMMON: { id: 'common', label: 'Commun', color: '#8b95a8', cssClass: 'badge--common' },
-    RARE: { id: 'rare', label: 'Rare', color: '#4a9eff', cssClass: 'badge--rare' },
-    EPIC: { id: 'epic', label: 'Épique', color: '#a855f7', cssClass: 'badge--epic' },
-    LEGENDARY: { id: 'legendary', label: 'Légendaire', color: '#fbbf24', cssClass: 'badge--legendary' },
+    COMMON: { id: 'common', label: 'Commun', color: '#8b95a8', cssClass: 'badge--common', value: 1 },
+    RARE: { id: 'rare', label: 'Rare', color: '#4a9eff', cssClass: 'badge--rare', value: 2 },
+    EPIC: { id: 'epic', label: 'Épique', color: '#a855f7', cssClass: 'badge--epic', value: 3 },
+    MYTHIC: { id: 'mythic', label: 'Mythique', color: '#ec4899', cssClass: 'badge--mythic', value: 4 },
+    LEGENDARY: { id: 'legendary', label: 'Légendaire', color: '#fbbf24', cssClass: 'badge--legendary', value: 5 },
+    ULTRA: { id: 'ultra', label: 'Ultra', color: '#f87171', cssClass: 'badge--ultra', value: 6 },
+};
+
+export const ARCHETYPES = {
+    SNIPER: { id: 'sniper', label: 'Sniper', icon: '🎯' },
+    SUPPORT: { id: 'support', label: 'Soutien', icon: '❤️' },
+    ASSASSIN: { id: 'assassin', label: 'Assassin', icon: '🗡️' },
+    FLASH: { id: 'flash', label: 'Flash', icon: '⚡' },
+    TANK: { id: 'tank', label: 'Tank', icon: '🛡️' }
 };
 
 export const HEROES = [
@@ -16,8 +26,10 @@ export const HEROES = [
         emoji: '🔫',
         description: 'Polyvalent et fiable. Le starter parfait.',
         rarity: RARITIES.COMMON,
+        archetype: ARCHETYPES.SUPPORT,
         stats: { hp: 100, attack: 15, speed: 120, defense: 10 },
         unlocked: true,
+        coverImage: '/assets/heroes/soldat.png', // v0.5.0
         // Design unique
         bodyShape: 'circle',
         bodyColor: '#4a9eff',
@@ -36,6 +48,7 @@ export const HEROES = [
         emoji: '🛸',
         description: 'Ultra rapide mais fragile. Esquive tout.',
         rarity: RARITIES.COMMON,
+        archetype: ARCHETYPES.FLASH,
         stats: { hp: 70, attack: 12, speed: 175, defense: 5 },
         unlocked: true,
         bodyShape: 'diamond',
@@ -55,8 +68,10 @@ export const HEROES = [
         emoji: '🛡️',
         description: 'Mur de fer. Lent mais inarrêtable.',
         rarity: RARITIES.RARE,
+        archetype: ARCHETYPES.TANK,
         stats: { hp: 280, attack: 8, speed: 85, defense: 30 },
         unlocked: false,
+        coverImage: '/assets/heroes/goliath.png', // v0.5.0
         bodyShape: 'square',
         bodyColor: '#22c55e',
         glowColor: '#16a34a',
@@ -74,6 +89,7 @@ export const HEROES = [
         emoji: '🎯',
         description: 'Un tir, un kill. Précision mortelle.',
         rarity: RARITIES.RARE,
+        archetype: ARCHETYPES.SNIPER,
         stats: { hp: 70, attack: 30, speed: 100, defense: 5 },
         unlocked: false,
         bodyShape: 'triangle',
@@ -93,6 +109,7 @@ export const HEROES = [
         emoji: '👻',
         description: 'Rapide et mortel dans l\'ombre.',
         rarity: RARITIES.EPIC,
+        archetype: ARCHETYPES.ASSASSIN,
         stats: { hp: 80, attack: 28, speed: 145, defense: 8 },
         unlocked: false,
         bodyShape: 'hexagon',
@@ -112,6 +129,7 @@ export const HEROES = [
         emoji: '⚡',
         description: 'Puissance destructrice ultime.',
         rarity: RARITIES.LEGENDARY,
+        archetype: ARCHETYPES.TANK,
         stats: { hp: 350, attack: 40, speed: 80, defense: 25 },
         unlocked: false,
         bodyShape: 'star',
@@ -131,8 +149,10 @@ export const HEROES = [
         emoji: '🥷',
         description: 'Vitesse extrême. Maître de l\'esquive.',
         rarity: RARITIES.EPIC,
+        archetype: ARCHETYPES.ASSASSIN,
         stats: { hp: 85, attack: 18, speed: 170, defense: 6 },
         unlocked: false,
+        coverImage: '/assets/heroes/ninja.png', // v0.5.0
         bodyShape: 'diamond',
         bodyColor: '#10b981',
         glowColor: '#059669',
@@ -157,6 +177,7 @@ export const HEROES = [
         emoji: '🧠',
         description: 'Contrôle la gravité et le champ de bataille.',
         rarity: RARITIES.LEGENDARY,
+        archetype: ARCHETYPES.SUPPORT,
         stats: { hp: 150, attack: 25, speed: 95, defense: 15 },
         unlocked: false,
         bodyShape: 'hexagon',
@@ -183,6 +204,7 @@ export const HEROES = [
         emoji: '⚡',
         description: 'L\'énergie pure. Foudroie ses ennemis avant même qu\'ils ne le voient.',
         rarity: RARITIES.LEGENDARY,
+        archetype: ARCHETYPES.FLASH,
         stats: { hp: 110, attack: 32, speed: 180, defense: 12 },
         unlocked: false,
         bodyShape: 'star',
@@ -209,6 +231,7 @@ export const HEROES = [
         emoji: '🗡️',
         description: 'Expert en combat rapproché. Précis et tranchant.',
         rarity: RARITIES.EPIC,
+        archetype: ARCHETYPES.ASSASSIN,
         stats: { hp: 160, attack: 32, speed: 125, defense: 22 },
         unlocked: false,
         bodyShape: 'triangle',
@@ -235,6 +258,7 @@ export const HEROES = [
         emoji: '🌟',
         description: 'Énergie cosmique pure. Brille de mille feux.',
         rarity: RARITIES.LEGENDARY,
+        archetype: ARCHETYPES.SUPPORT,
         stats: { hp: 130, attack: 45, speed: 140, defense: 15 },
         unlocked: false,
         bodyShape: 'star',
@@ -261,6 +285,7 @@ export const HEROES = [
         emoji: '🦖',
         description: 'Force primitive. Le roi de l\'arène.',
         rarity: RARITIES.RARE,
+        archetype: ARCHETYPES.TANK,
         stats: { hp: 220, attack: 35, speed: 100, defense: 25 },
         unlocked: false,
         bodyShape: 'square',
@@ -287,6 +312,7 @@ export const HEROES = [
         emoji: '🐍',
         description: 'Venimeux et sournois. Ne laisse aucune chance.',
         rarity: RARITIES.EPIC,
+        archetype: ARCHETYPES.ASSASSIN,
         stats: { hp: 110, attack: 38, speed: 155, defense: 10 },
         unlocked: false,
         bodyShape: 'hexagon',
@@ -313,6 +339,7 @@ export const HEROES = [
         emoji: '👾',
         description: 'Erreur système. Sa présence déforme la réalité.',
         rarity: RARITIES.LEGENDARY,
+        archetype: ARCHETYPES.FLASH,
         stats: { hp: 90, attack: 55, speed: 180, defense: 5 },
         unlocked: false,
         bodyShape: 'diamond',
@@ -339,6 +366,7 @@ export const HEROES = [
         emoji: '☀️',
         description: 'Feu solaire. Brûle tout sur son passage.',
         rarity: RARITIES.RARE,
+        archetype: ARCHETYPES.SUPPORT,
         stats: { hp: 140, attack: 32, speed: 120, defense: 20 },
         unlocked: false,
         bodyShape: 'circle',

@@ -12,7 +12,7 @@ export const EVEIL_PASS = {
     tiers: [
         { tier: 1, cost: 5, reward: { type: 'coins', amount: 200, emoji: '🪙', label: '200 Pièces' } },
         { tier: 2, cost: 5, reward: { type: 'gems', amount: 10, emoji: '💎', label: '10 Gemmes' } },
-        { tier: 3, cost: 5, reward: { type: 'item', itemId: 'crate_basic', amount: 2, emoji: '📦', label: '2 Caisses' } },
+        { tier: 3, cost: 5, reward: { type: 'item', itemId: 'crate_safe', amount: 1, emoji: '🔒', label: '1 Coffre' } },
         { tier: 4, cost: 5, reward: { type: 'coins', amount: 400, emoji: '🪙', label: '400 Pièces' } },
         { tier: 5, cost: 5, reward: { type: 'item', itemId: 'crate_rare', amount: 1, emoji: '🎁', label: '1 Caisse Rare' } },
         { tier: 6, cost: 5, reward: { type: 'gems', amount: 20, emoji: '💎', label: '20 Gemmes' } },

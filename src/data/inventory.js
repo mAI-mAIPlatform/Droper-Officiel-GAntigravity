@@ -27,6 +27,19 @@ export const ITEMS = [
         ],
     },
     {
+        id: 'crate_safe',
+        name: 'Coffre-fort',
+        emoji: '🔒',
+        description: 'Un coffre-fort renfermant divers butins.',
+        category: ITEM_CATEGORIES.CRATE,
+        rarity: 'rare',
+        loot: [
+            { type: 'coins', min: 100, max: 500, weight: 50 },
+            { type: 'gems', min: 5, max: 20, weight: 40 },
+            { type: 'item', itemId: 'booster_xp', min: 1, max: 1, weight: 10 },
+        ],
+    },
+    {
         id: 'crate_rare',
         name: 'Caisse Rare',
         emoji: '🎁',

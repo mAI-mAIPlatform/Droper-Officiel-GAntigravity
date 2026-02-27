@@ -175,6 +175,37 @@ export class ParticleSystem {
         }
     }
 
+    spawnGadgetEffect(x, y, level) {
+        const count = 10 + (level * 2);
+        for (let i = 0; i < count; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const speed = 50 + Math.random() * 100;
+            this.particles.push(new Particle(x, y, {
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                lifetime: 0.8,
+                color: '#ff914d',
+                size: 3 + Math.random() * 3,
+                friction: 0.85
+            }));
+        }
+    }
+
+    spawnSuperchargeAura(x, y) {
+        for (let i = 0; i < 5; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const radius = 25 + Math.random() * 15;
+            this.particles.push(new Particle(x + Math.cos(angle) * radius, y + Math.sin(angle) * radius, {
+                vx: 0,
+                vy: -30 - Math.random() * 30, // Goes up
+                lifetime: 0.5,
+                color: '#a855f7', // Purple Supercharge
+                size: 2 + Math.random() * 3,
+                friction: 0.95
+            }));
+        }
+    }
+
     clear() {
         this.particles = [];
     }

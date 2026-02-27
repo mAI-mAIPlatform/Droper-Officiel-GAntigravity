@@ -53,6 +53,8 @@ export class Player extends Entity {
         this.powerCharges = 3;
         this.powerTimer = 0;
         this.powerActive = false;
+
+        this.chipsCharges = 2; // NEW v0.4.0 Limit
         this.chipsActive = false;
         this.chipsTimer = 0;
 
@@ -63,6 +65,10 @@ export class Player extends Entity {
             reloadSpeed: 1,
             healthRegen: 0
         };
+
+        // NEW v0.4.0
+        this.superchargeActive = false;
+        this.superchargeTimer = 0;
     }
 
     update(dt, engine) {
@@ -132,6 +138,18 @@ export class Player extends Entity {
             }
         }
 
+        // v0.4.0 SUPERCHARGE Update
+        if (this.superchargeActive) {
+            this.superchargeTimer -= dt;
+            if (this.superchargeTimer <= 0) {
+                this.superchargeActive = false;
+                this.activeBoosts.speed /= 1.5;
+                this.activeBoosts.shootRate /= 2;
+            }
+            // Continuous healing
+            this.hp = Math.min(this.maxHp, this.hp + 5 * dt);
+        }
+
         if (this.ultimateCharge >= this.ultimateMax) this.ultimateReady = true;
         if (this.invincibleTimer > 0) this.invincibleTimer -= dt;
     }
@@ -151,6 +169,25 @@ export class Player extends Entity {
         if (!this.canShoot()) return null;
         this.shootCooldown = this.getShootRate();
         this.ammo--;
+
+        if (this.superchargeActive) {
+            // v0.4.0 360 Degree Wave Shot
+            const bullets = [];
+            const numBullets = 12;
+            for (let i = 0; i < numBullets; i++) {
+                const angle = (i * Math.PI * 2) / numBullets;
+                bullets.push({
+                    x: this.x + Math.cos(angle) * 20,
+                    y: this.y + Math.sin(angle) * 20,
+                    angle: angle,
+                    damage: this.attack * this.activeBoosts.damage,
+                    speed: 600,
+                    owner: 'player',
+                });
+            }
+            return bullets; // Array of bullets
+        }
+
         return {
             x: this.x + Math.cos(this.angle) * 20,
             y: this.y + Math.sin(this.angle) * 20,
@@ -161,17 +198,30 @@ export class Player extends Entity {
         };
     }
 
+    activateSupercharge() {
+        if (this.superchargeActive || !this.hero?.state?.superchargeUnlocked) return false;
+        this.superchargeActive = true;
+        this.superchargeTimer = 15;
+        this.activeBoosts.speed *= 1.5;
+        this.activeBoosts.shootRate *= 2;
+        return true;
+    }
+
     activatePower() {
         if (this.powerActive || this.powerCharges <= 0) return false;
         this.powerCharges--;
         this.powerActive = true;
         this.powerTimer = 5;
-        this.activeBoosts.damage *= 2;
+        // v0.4.0 Gadget Scaling
+        const heroLevel = this.hero?.state?.level || 1;
+        const multiplier = 2 + (heroLevel * 0.1); // Base x2, goes up with level
+        this.activeBoosts.damage *= multiplier;
         return true;
     }
 
     activateChips() {
-        if (this.chipsActive) return false;
+        if (this.chipsActive || this.chipsCharges <= 0) return false;
+        this.chipsCharges--; // v0.4.0 Limit decrement
         this.chipsActive = true;
         this.chipsTimer = 10;
         if (this.hero?.state?.equippedChips) {

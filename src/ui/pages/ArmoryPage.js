@@ -3,6 +3,7 @@
    ============================ */
 
 import { toast } from '../components/ToastManager.js';
+import { ARCHETYPES } from '../../data/heroes.js';
 
 export class ArmoryPage {
   constructor(app) {
@@ -21,6 +22,14 @@ export class ArmoryPage {
           </h1>
         </div>
 
+        <!-- Filtres par Archétype -->
+        <div class="armory-filters" style="display: flex; gap: 10px; justify-content: center; margin-bottom: var(--spacing-lg); flex-wrap: wrap;">
+          <button class="btn btn--sm btn--outline filter-btn active" data-filter="all">Tous</button>
+          ${Object.values(ARCHETYPES).map(arch => `
+            <button class="btn btn--sm btn--outline filter-btn" data-filter="${arch.id}">${arch.icon} ${arch.label}</button>
+          `).join('')}
+        </div>
+
         <div class="grid-3" id="heroes-grid">
           ${heroes.map((hero, i) => {
       const unlocked = hero.state.unlocked;
@@ -28,11 +37,17 @@ export class ArmoryPage {
       return `
               <div class="card hero-card anim-fade-in-up anim-delay-${Math.min(i + 1, 6)}"
                    data-hero-id="${hero.id}"
+                   data-archetype="${hero.archetype.id}"
                    style="cursor: pointer; text-align: center; position: relative;
                           border-color: ${isSelected ? 'var(--color-accent-blue)' : unlocked ? hero.rarity.color : 'var(--color-border-card)'};
                           ${!unlocked ? 'opacity: 0.6;' : ''}">
                 ${!unlocked ? '<div class="hero-card__lock">🔒</div>' : ''}
                 ${isSelected ? '<div class="hero-card__selected">✅ ACTIF</div>' : ''}
+                
+                <div style="position: absolute; top: 10px; left: 10px; font-size: 1.5rem;" title="Archétype: ${hero.archetype.label}">
+                  ${hero.archetype.icon}
+                </div>
+
                 <span style="font-size: 2.5rem;">${hero.emoji}</span>
                 <strong style="font-size: var(--font-size-md); display: block; margin-top: var(--spacing-sm);">
                   ${hero.name}
@@ -69,6 +84,25 @@ export class ArmoryPage {
     document.getElementById('hero-modal')?.addEventListener('click', (e) => {
       if (e.target.id === 'hero-modal') this.closeModal();
     });
+
+    // Filtres d'Archétype
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        // Retirer la classe active
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+
+        // Filtrer
+        const filter = e.target.dataset.filter;
+        document.querySelectorAll('.hero-card').forEach(card => {
+          if (filter === 'all' || card.dataset.archetype === filter) {
+            card.style.display = 'block';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
   }
 
   showHeroModal(heroId) {
@@ -82,15 +116,38 @@ export class ArmoryPage {
     if (!modal) return;
 
     modal.innerHTML = `
-      <button class="modal__close" id="btn-close-modal">✕</button>
-      <div style="text-align: center; margin-bottom: var(--spacing-xl);">
-        <span style="font-size: 4rem;">${hero.emoji}</span>
-        <h2 style="font-size: var(--font-size-2xl); font-weight: 900; margin-top: var(--spacing-sm);">
-          ${hero.name}
-        </h2>
-        <span class="badge ${hero.rarity.cssClass}">${hero.rarity.label}</span>
-        ${!unlocked ? '<div style="margin-top: var(--spacing-sm); color: var(--color-accent-red); font-weight: 700;">🔒 Verrouillé</div>' : ''}
-        ${isSelected ? '<div style="margin-top: var(--spacing-sm); color: var(--color-accent-green); font-weight: 700;">✅ Héros actif</div>' : ''}
+      <button class="modal__close" id="btn-close-modal" style="z-index: 10;">✕</button>
+      
+      <!-- En-tête avec Image HD -->
+      <div style="
+        position: relative; 
+        margin: -var(--spacing-lg) -var(--spacing-lg) var(--spacing-xl) -var(--spacing-lg);
+        height: 250px;
+        background: radial-gradient(circle at center, ${hero.bodyColor}33 0%, transparent 70%);
+        border-bottom: 2px solid ${hero.bodyColor};
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      ">
+        ${hero.coverImage
+        ? `<img src="${hero.coverImage}" style="height: 120%; object-fit: contain; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)); transform: scale(1.1);">`
+        : `<span style="font-size: 6rem; filter: drop-shadow(0 5px 15px ${hero.glowColor});">${hero.emoji}</span>`
+      }
+        <!-- Overlay dégradé pour le texte -->
+        <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 100px; background: linear-gradient(to top, var(--color-bg), transparent);"></div>
+        
+        <div style="position: absolute; bottom: 15px; left: 20px;">
+          <h2 style="font-size: var(--font-size-3xl); font-weight: 900; margin: 0; text-transform: uppercase; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.8);">
+            ${hero.name}
+          </h2>
+          <span class="badge ${hero.rarity.cssClass}" style="box-shadow: 0 2px 10px rgba(0,0,0,0.5);">${hero.rarity.label}</span>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-bottom: var(--spacing-md); justify-content: center;">
+        ${!unlocked ? '<div style="color: var(--color-accent-red); font-weight: 700;">🔒 Verrouillé</div>' : ''}
+        ${isSelected ? '<div style="color: var(--color-accent-green); font-weight: 700;">✅ Héros actif</div>' : ''}
       </div>
 
       <p style="color: var(--color-text-secondary); text-align: center; margin-bottom: var(--spacing-xl);">
@@ -135,6 +192,28 @@ export class ArmoryPage {
                 ${this.renderChipItem('tir', 'Cadence', '🔥', hero.state.chips.includes('tir'), hero.state.equippedChips.includes('tir'))}
                 ${this.renderChipItem('reload', 'Recharge', '⚡', hero.state.chips.includes('reload'), hero.state.equippedChips.includes('reload'))}
                 ${this.renderChipItem('health_regen', 'Régén', '❤️', hero.state.chips.includes('health_regen'), hero.state.equippedChips.includes('health_regen'))}
+              </div>
+            ` : ''}
+          </div>
+
+          <!-- SUPERCHARGE (NIV 10) -->
+          <div class="card" style="padding: 10px; border: 1px solid ${hero.state.level >= 10 ? 'var(--color-accent-purple)' : 'var(--color-border)'}; background: ${hero.state.superchargeUnlocked ? 'rgba(168,85,247,0.1)' : 'transparent'};">
+            <div class="row row--between">
+              <span style="font-size: 0.7rem; font-weight: 800; color: var(--color-accent-purple);">⚡ SUPERCHARGE [C]</span>
+              ${hero.state.level < 10 ? '<span style="font-size: 0.6rem; opacity: 0.6;">NIVEAU 10 REQUIS</span>' : ''}
+            </div>
+            ${hero.state.level >= 10 ? `
+              <div style="margin-top: 8px;">
+                ${hero.state.superchargeUnlocked ? `
+                  <div style="font-size: 0.8rem; color: var(--color-accent-purple); font-weight: 700; text-align: center; padding: 5px;">
+                    ✅ Supercharge Débloquée
+                  </div>
+                ` : `
+                  <button class="btn btn--accent btn--sm" id="btn-buy-supercharge" style="width: 100%; display: flex; justify-content: space-between;">
+                    <span>Débloquer</span>
+                    <span>🪙 1500 &nbsp; 💎 20</span>
+                  </button>
+                `}
               </div>
             ` : ''}
           </div>
@@ -247,6 +326,20 @@ export class ArmoryPage {
           this.showHeroModal(heroId);
         }
       };
+    });
+
+    // Écouteur Supercharge
+    document.getElementById('btn-buy-supercharge')?.addEventListener('click', () => {
+      if (confirm('Débloquer la Supercharge pour 1500 Pièces et 20 Gemmes ?')) {
+        const res = this.app.heroManager.buySupercharge(heroId, this.app.economyManager);
+        if (res.success) {
+          if (this.app.audioManager) this.app.audioManager.playReward();
+          toast.reward(`⚡ Supercharge débloquée pour ${hero.name} !`);
+          this.showHeroModal(heroId);
+        } else {
+          toast.error(res.reason);
+        }
+      }
     });
   }
 

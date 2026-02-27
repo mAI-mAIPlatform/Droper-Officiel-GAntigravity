@@ -31,14 +31,27 @@ export class HeroManager {
     }
 
     getHeroState(heroId) {
-        return this.data[heroId] || {
+        const saved = this.data[heroId];
+        const defaults = {
             unlocked: false,
             level: 1,
             xp: 0,
-            powers: [], // List of purchased power IDs
+            powers: [],
             equippedPower: null,
-            chips: [], // List of purchased chip IDs
-            equippedChips: [] // Max 2
+            chips: [],
+            equippedChips: [],
+            superchargeUnlocked: false // NEW v0.4.0
+        };
+
+        if (!saved) return defaults;
+
+        // Migration: garantit que les tableaux existent toujours
+        return {
+            ...defaults,
+            ...saved,
+            powers: Array.isArray(saved.powers) ? saved.powers : [],
+            chips: Array.isArray(saved.chips) ? saved.chips : [],
+            equippedChips: Array.isArray(saved.equippedChips) ? saved.equippedChips : [],
         };
     }
 
@@ -206,5 +219,26 @@ export class HeroManager {
 
         this.persist();
         return true;
+    }
+
+    buySupercharge(heroId, economyManager) {
+        const state = this.getHeroState(heroId);
+        const SP_COINS_PRICE = 1500;
+        const SP_GEMS_PRICE = 20;
+
+        if (state.level < 10) return { success: false, reason: 'Niveau 10 requis' };
+        if (state.superchargeUnlocked) return { success: false, reason: 'Supercharge déjà débloquée' };
+        if (economyManager.coins < SP_COINS_PRICE || economyManager.gems < SP_GEMS_PRICE) {
+            return { success: false, reason: 'Fonds insuffisants' };
+        }
+
+        economyManager.spendCoins(SP_COINS_PRICE);
+        economyManager.spendGems(SP_GEMS_PRICE);
+
+        state.superchargeUnlocked = true;
+        this.data[heroId] = state;
+        this.persist();
+
+        return { success: true };
     }
 }

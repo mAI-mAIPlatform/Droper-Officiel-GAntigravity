@@ -3,6 +3,7 @@
    ============================ */
 
 import { getSkinsForHero } from '../data/skins.js';
+import { getHeroById } from '../data/heroes.js';
 import { toast } from '../ui/components/ToastManager.js';
 
 export class SkinManager {
@@ -25,6 +26,15 @@ export class SkinManager {
         return this.data.owned[skinId] === true;
     }
 
+    unlock(skinId) {
+        if (!this.data.owned[skinId]) {
+            this.data.owned[skinId] = true;
+            this.persist();
+            return true;
+        }
+        return false;
+    }
+
     getEquippedSkin(heroId) {
         return this.data.equipped[heroId] || heroId + '_default';
     }
@@ -34,10 +44,22 @@ export class SkinManager {
             toast.error('Skin non possédé !');
             return false;
         }
+
+        const hero = getHeroById(heroId);
+        const skins = getSkinsForHero(heroId);
+        const skin = skins.find(s => s.id === skinId);
+
+        if (hero && skin) {
+            if (skin.rarity.value > hero.rarity.value) {
+                toast.error(`Rareté trop élevée (${skin.rarity.label}) pour ce héros !`);
+                return { success: false, reason: "La rareté du cosmétique dépasse celle du héros." };
+            }
+        }
+
         this.data.equipped[heroId] = skinId;
         this.persist();
         toast.success('👕 Skin équipé !');
-        return true;
+        return { success: true };
     }
 
     buy(heroId, skinId) {
@@ -48,11 +70,21 @@ export class SkinManager {
             toast.info('Déjà possédé !');
             return false;
         }
-        if (this.economy.coins < skin.price) {
-            toast.error('Pas assez de pièces !');
-            return false;
+
+        if (skin.isEvent) {
+            if (this.economy.eventTokens < skin.eventPrice) {
+                toast.error("Pas assez de Jetons d'Événement !");
+                return false;
+            }
+            this.economy.spendEventTokens(skin.eventPrice);
+        } else {
+            if (this.economy.coins < skin.price) {
+                toast.error('Pas assez de pièces !');
+                return false;
+            }
+            this.economy.spendCoins(skin.price);
         }
-        this.economy.addCoins(-skin.price);
+
         this.data.owned[skinId] = true;
         this.persist();
         toast.reward(`👕 Skin "${skin.name}" acheté !`);

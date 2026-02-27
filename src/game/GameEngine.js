@@ -108,6 +108,16 @@ export class GameEngine {
                     console.log("Niveau 9 requis pour utiliser une Puce !");
                 }
             }
+            // Supercharge activation (C) - Level 10+
+            if (e.code === 'KeyC' && this.player && !this.gameOver && !this.paused) {
+                if (this.player.hero && this.player.hero.state.level >= 10 && this.player.hero.state.superchargeUnlocked) {
+                    const activated = this.player.activateSupercharge();
+                    if (activated) {
+                        this.particles.spawnSuperchargeAura(this.player.x, this.player.y);
+                        // Optional sound
+                    }
+                }
+            }
         };
         this._onKeyUp = (e) => { this.keys[e.code] = false; };
         this._onMouseMove = (e) => this.handleMouseMove(e);
@@ -377,6 +387,13 @@ export class GameEngine {
             this.particles.spawnDashTrail(this.player.x, this.player.y, this.player.hero?.bodyColor || '#10b981');
         }
 
+        // v0.4.0 Supercharge effect
+        if (this.player && this.player.superchargeActive) {
+            if (this.frameCount % 8 === 0) {
+                this.particles.spawnSuperchargeAura(this.player.x, this.player.y);
+            }
+        }
+
         if (this.isCaveaux) {
             this.updateGas(dt);
         }
@@ -406,13 +423,22 @@ export class GameEngine {
 
                 const bulletData = this.player.shoot();
                 if (bulletData) {
-                    const projectile = new Projectile(bulletData);
-                    this.entities.push(projectile);
-
-                    // Muzzle flash
-                    this.particles.spawnMuzzleFlash(bulletData.x, bulletData.y, bulletData.angle);
-
-                    if (this.audioManager) this.audioManager.playShoot();
+                    if (Array.isArray(bulletData)) {
+                        // v0.4.0 Supercharge 360 multiple bullets
+                        bulletData.forEach(bd => {
+                            const projectile = new Projectile(bd);
+                            this.entities.push(projectile);
+                            this.particles.spawnMuzzleFlash(bd.x, bd.y, bd.angle);
+                        });
+                        if (this.audioManager) this.audioManager.playShoot();
+                    } else {
+                        // Standard single bullet
+                        const projectile = new Projectile(bulletData);
+                        this.entities.push(projectile);
+                        // Muzzle flash
+                        this.particles.spawnMuzzleFlash(bulletData.x, bulletData.y, bulletData.angle);
+                        if (this.audioManager) this.audioManager.playShoot();
+                    }
                 }
             }
         }

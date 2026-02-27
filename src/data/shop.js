@@ -5,16 +5,6 @@
 export const SHOP_OFFERS = [
     // --- FLASH ---
     {
-        id: 'free_gems',
-        name: 'Gemmes Gratuites',
-        emoji: '💎',
-        description: 'Récupère tes gemmes quotidiennes !',
-        reward: { type: 'gems', amount: 10 },
-        cost: { type: 'free', amount: 0 },
-        category: 'flash',
-        daily: true,
-    },
-    {
         id: 'mega_coins',
         name: 'Mega Pack de Pièces',
         emoji: '🪙',
@@ -71,6 +61,24 @@ export const SHOP_OFFERS = [
         reward: { type: 'item_bundle', items: [{ itemId: 'crate_epic', amount: 1 }, { itemId: 'key_gold', amount: 1 }] },
         cost: { type: 'gems', amount: 350 },
         category: 'crate',
+    },
+    {
+        id: 'buy_safe',
+        name: 'Coffre-fort',
+        emoji: '🔒',
+        description: 'Ouvre un mystérieux Coffre-fort.',
+        reward: { type: 'item', itemId: 'crate_safe', amount: 1 },
+        cost: { type: 'coins', amount: 100 },
+        category: 'crate',
+    },
+    {
+        id: 'buy_event_tokens',
+        name: 'Jetons d\'Événement x50',
+        emoji: '🎟️',
+        description: 'Achète de la monnaie événementielle.',
+        reward: { type: 'eventTokens', amount: 50 },
+        cost: { type: 'gems', amount: 20 },
+        category: 'season',
     },
 
     // --- SAISON ---

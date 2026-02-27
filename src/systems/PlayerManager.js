@@ -24,6 +24,14 @@ export class PlayerManager {
         if (!this.data.selectedHero) {
             this.data.selectedHero = 'soldier';
         }
+
+        // v0.5.0 Custom Image URLs
+        if (typeof this.data.customAvatarUrl === 'undefined') {
+            this.data.customAvatarUrl = null;
+        }
+        if (typeof this.data.customBannerUrl === 'undefined') {
+            this.data.customBannerUrl = null;
+        }
     }
 
     persist() {
@@ -38,6 +46,18 @@ export class PlayerManager {
     get xpToNext() { return this.data.xpToNext; }
     get selectedHero() { return this.data.selectedHero; }
     get avatarEmoji() { return this.data.avatarEmoji; }
+    get customAvatarUrl() { return this.data.customAvatarUrl; }
+    get customBannerUrl() { return this.data.customBannerUrl; }
+
+    setAvatarUrl(url) {
+        this.data.customAvatarUrl = url;
+        this.persist();
+    }
+
+    setBannerUrl(url) {
+        this.data.customBannerUrl = url;
+        this.persist();
+    }
 
     setUsername(name) {
         this.data.username = name.slice(0, 20);

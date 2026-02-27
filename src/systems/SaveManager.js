@@ -86,6 +86,7 @@ export class SaveManager {
             shop: {
                 claimedOffers: [],
                 lastFreeGemsClaim: null,
+                safe: { upgradesLeft: 5, lastClaim: 0, currentRarity: 1 }
             },
             seasonPass: {
                 seasonId: 'season_1',

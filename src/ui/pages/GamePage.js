@@ -139,8 +139,8 @@ export class GamePage {
       const pEl = document.getElementById('hud-chips');
 
       if (gEl) {
-        const hasPower = p.hero && p.hero.state.equippedPower;
-        const levelOk = p.hero && p.hero.state.level >= 5;
+        const hasPower = p.hero && p.hero.state && p.hero.state.equippedPower;
+        const levelOk = p.hero && p.hero.state && p.hero.state.level >= 5;
         gEl.style.opacity = (hasPower && levelOk) ? (p.powerActive ? '1' : '0.8') : '0.3';
         if (p.powerActive) gEl.style.color = '#ff914d';
         else gEl.style.color = '#fff';
@@ -148,18 +148,38 @@ export class GamePage {
 
       if (gCharges) {
         gCharges.innerHTML = '';
+        const charges = (p.powerCharges !== undefined) ? p.powerCharges : 0;
         for (let i = 0; i < 3; i++) {
-          const color = i < p.powerCharges ? '#ff914d' : '#444';
+          const color = i < charges ? '#ff914d' : '#444';
           gCharges.innerHTML += `<span style="width: 6px; height: 6px; border-radius: 50%; background: ${color};"></span>`;
         }
       }
 
       if (pEl) {
-        const hasChips = p.hero && p.hero.state.equippedChips.length > 0;
-        const level9Ok = p.hero && p.hero.state.level >= 9;
+        const equippedChips = (p.hero && p.hero.state && Array.isArray(p.hero.state.equippedChips))
+          ? p.hero.state.equippedChips
+          : [];
+        const hasChips = equippedChips.length > 0;
+        const level9Ok = p.hero && p.hero.state && p.hero.state.level >= 9;
         pEl.style.opacity = (hasChips && level9Ok) ? (p.chipsActive ? '1' : '0.8') : '0.3';
         if (p.chipsActive) pEl.style.color = '#00f7ff';
         else pEl.style.color = '#fff';
+
+        let pCharges = document.getElementById('hud-chips-charges');
+        if (!pCharges) {
+          pCharges = document.createElement('div');
+          pCharges.id = 'hud-chips-charges';
+          pCharges.style.display = 'flex';
+          pCharges.style.gap = '2px';
+          pCharges.style.marginTop = '2px';
+          pEl.parentElement.appendChild(pCharges);
+        }
+        pCharges.innerHTML = '';
+        const cCharges = (p.chipsCharges !== undefined) ? p.chipsCharges : 0;
+        for (let i = 0; i < 2; i++) {
+          const color = i < cCharges ? '#00f7ff' : '#444';
+          pCharges.innerHTML += `<span style="width: 6px; height: 6px; border-radius: 50%; background: ${color};"></span>`;
+        }
       }
     }
   }

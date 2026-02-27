@@ -24,74 +24,71 @@ export class ProfilePage {
           </h1>
         </div>
 
-        <!-- Carte Profil -->
-        <div class="profile-card anim-fade-in-up">
-          <div class="profile-card__identity">
-            <div class="avatar">
-              ${player.avatarEmoji}
-              <div class="avatar__edit" id="btn-edit-avatar" title="Modifier l'avatar">✏️</div>
-            </div>
-            <div class="profile-card__info">
-              <div class="profile-card__label">Identité</div>
-              <div class="profile-card__name">
-                ${player.username}
-                <span class="player-tag">${player.tag}</span>
+        <!-- Inputs cachés pour l'import d'images -->
+        <input type="file" id="input-banner-upload" accept="image/png, image/jpeg" style="display:none">
+        <input type="file" id="input-avatar-upload" accept="image/png, image/jpeg" style="display:none">
+
+        <!-- Carte Profil Redesign -->
+        <div class="profile-card anim-fade-in-up" style="padding: 0; overflow: hidden;">
+          
+          <!-- Banner Section -->
+          <div class="profile-banner" style="
+            height: 120px; 
+            background: ${player.customBannerUrl ? `url(${player.customBannerUrl}) center/cover` : 'linear-gradient(135deg, var(--color-accent-blue), var(--color-accent-purple))'};
+            position: relative;
+          ">
+            <button class="btn btn--sm" id="btn-edit-banner" style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2);">
+              🖼️ Modifier Bannière
+            </button>
+          </div>
+
+          <!-- Info Section -->
+          <div style="padding: var(--spacing-lg); position: relative; margin-top: -60px;">
+            <div class="profile-card__identity" style="align-items: flex-end; margin-bottom: var(--spacing-md);">
+              <div class="avatar" style="width: 100px; height: 100px; border: 4px solid var(--color-surface); font-size: 3rem; background: var(--color-bg);">
+                ${player.customAvatarUrl
+        ? `<img src="${player.customAvatarUrl}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`
+        : player.avatarEmoji}
+                <div class="avatar__edit" id="btn-edit-avatar" title="Modifier l'avatar">✏️</div>
               </div>
-              <div class="profile-card__bio">
-                ${player.bio || 'Aucune bio définie...'}
+              <div class="profile-card__info" style="margin-bottom: 10px;">
+                <div class="profile-card__name" style="font-size: var(--font-size-xl);">
+                  ${player.username}
+                  <span class="player-tag">${player.tag}</span>
+                </div>
+                <div class="profile-card__bio">
+                  ${player.bio || 'Aucune bio définie...'}
+                  <span id="btn-edit-bio" style="cursor:pointer; opacity:0.5; margin-left:5px;">✏️</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="profile-card__badges">
-            <span class="badge badge--level">⚡ LVL ${player.level}</span>
-            <span class="badge badge--common">🏆 ${stats.trophies || 0}</span>
-            <span class="badge badge--rare">👑 ${hero ? hero.name : 'Aucun'}</span>
-            <span class="badge badge--epic">🎮 ${stats.gamesPlayed || 0}</span>
-          </div>
-
-          <!-- XP Bar -->
-          <div style="margin-top: var(--spacing-md);">
-            <div class="row row--between" style="margin-bottom: 4px;">
-              <span style="font-size: var(--font-size-xs); font-weight: 600;">Progression</span>
-              <span style="font-size: var(--font-size-xs); color: var(--color-text-muted);">${player.xp} / ${player.xpToNext} XP</span>
+            <div class="profile-card__badges">
+              <span class="badge badge--level">⚡ LVL ${player.level}</span>
+              <span class="badge badge--common">🏆 ${stats.trophies || 0}</span>
+              <span class="badge badge--rare">👑 ${hero ? hero.name : 'Aucun'}</span>
+              <span class="badge badge--epic">🎮 ${stats.gamesPlayed || 0}</span>
             </div>
-            <div class="progress-bar" style="height: 6px;">
-              <div class="progress-bar__fill" style="width: ${xpPct}%"></div>
-            </div>
-          </div>
 
-          <span class="profile-card__version">v${this.app.version}</span>
+            <!-- XP Bar -->
+            <div style="margin-top: var(--spacing-md);">
+              <div class="row row--between" style="margin-bottom: 4px;">
+                <span style="font-size: var(--font-size-xs); font-weight: 600;">Progression</span>
+                <span style="font-size: var(--font-size-xs); color: var(--color-text-muted);">${player.xp} / ${player.xpToNext} XP</span>
+              </div>
+              <div class="progress-bar" style="height: 6px;">
+                <div class="progress-bar__fill" style="width: ${xpPct}%"></div>
+              </div>
+            </div>
+            
+            <button class="btn btn--outline btn--sm" id="btn-edit-name" style="margin-top: 15px; width: 100%;">
+              ✏️ Modifier le pseudo
+            </button>
+          </div>
         </div>
 
         <!-- Statistiques détaillées -->
         <div class="section anim-fade-in-up anim-delay-1" style="margin-top: var(--spacing-xl);">
-          <h2 class="section-title" style="margin-bottom: var(--spacing-lg);">📊 STATISTIQUES</h2>
-          <div class="grid-4">
-            ${this.renderStatCard('☠️', 'Kills totaux', stats.kills || 0)}
-            ${this.renderStatCard('🌊', 'Vague max', stats.maxWave || 0)}
-            ${this.renderStatCard('🎮', 'Parties', stats.gamesPlayed || 0)}
-            ${this.renderStatCard('🏆', 'Trophées', stats.trophies || 0)}
-            ${this.renderStatCard('⭐', 'Score total', stats.totalScore || 0)}
-            ${this.renderStatCard('💀', 'Boss vaincus', stats.bossKills || 0)}
-            ${this.renderStatCard('🪙', 'Pièces totales', economy.coins)}
-            ${this.renderStatCard('💎', 'Gemmes totales', economy.gems)}
-          </div>
-        </div>
-
-        <!-- Actions rapides -->
-        <div class="section anim-fade-in-up anim-delay-2" style="margin-top: var(--spacing-xl);">
-          <h2 class="section-title" style="margin-bottom: var(--spacing-lg);">✏️ PERSONNALISATION</h2>
-          <div class="grid-2">
-            <button class="btn btn--accent" id="btn-edit-name">✏️ Modifier le pseudo</button>
-            <button class="btn btn--purple" id="btn-edit-bio">📝 Modifier la bio</button>
-            <button class="btn btn--ghost" id="btn-edit-emoji">😀 Changer l'avatar</button>
-            <a href="#armurerie" class="btn btn--ghost" style="text-align: center;">⚔️ Changer de héros</a>
-          </div>
-        </div>
-
-        <!-- Paramètres -->
-        <div class="section anim-fade-in-up anim-delay-3" style="margin-top: var(--spacing-xl);">
           <h2 class="section-title" style="margin-bottom: var(--spacing-lg);">⚙️ PARAMÈTRES</h2>
           <div class="stack">
             <div class="card row row--between" style="padding: var(--spacing-md) var(--spacing-lg);">
@@ -171,19 +168,48 @@ export class ProfilePage {
       }
     });
 
-    // Edit avatar emoji
-    document.getElementById('btn-edit-emoji')?.addEventListener('click', () => {
-      const emojis = ['😎', '🤖', '👾', '🎮', '🚀', '⚡', '🔥', '💀', '👑', '🐉', '🌟', '🎯'];
-      const choice = prompt(`Choisis un avatar :\n${emojis.join(' ')}`, this.app.playerManager.avatarEmoji);
-      if (choice && choice.trim()) {
-        this.app.playerManager.data.avatarEmoji = choice.trim().slice(0, 2);
-        this.app.playerManager.persist();
-        toast.success('😀 Avatar modifié !');
-        this.refresh();
+    // Edit avatar
+    document.getElementById('btn-edit-avatar')?.addEventListener('click', () => {
+      document.getElementById('input-avatar-upload')?.click();
+    });
+
+    document.getElementById('input-avatar-upload')?.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        if (file.size > 1024 * 1024) { // 1 MB limit
+          toast.error("L'image est trop grande (Max 1 Mo).");
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          this.app.playerManager.setAvatarUrl(event.target.result);
+          toast.success('😀 Avatar modifié !');
+          this.refresh();
+        };
+        reader.readAsDataURL(file);
       }
     });
-    document.getElementById('btn-edit-avatar')?.addEventListener('click', () => {
-      document.getElementById('btn-edit-emoji')?.click();
+
+    // Edit Banner
+    document.getElementById('btn-edit-banner')?.addEventListener('click', () => {
+      document.getElementById('input-banner-upload')?.click();
+    });
+
+    document.getElementById('input-banner-upload')?.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        if (file.size > 1024 * 1024) { // 1 MB limit
+          toast.error("L'image est trop grande (Max 1 Mo).");
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          this.app.playerManager.setBannerUrl(event.target.result);
+          toast.success('🖼️ Bannière modifiée !');
+          this.refresh();
+        };
+        reader.readAsDataURL(file);
+      }
     });
 
     // Export

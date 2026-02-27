@@ -60,7 +60,20 @@ export const WEEKLY_CHALLENGES = [
         type: 'kills', target: 200,
         reward: { type: 'gems', amount: 25, emoji: '💎' },
     },
-    // ... rest of weekly
+    {
+        id: 'weekly_event_1',
+        title: 'Éveil de la saison (Survie)',
+        description: 'Atteindre la vague 30 pour l\'événement.',
+        type: 'wave', target: 30,
+        reward: { type: 'eventTokens', amount: 100, emoji: '🎟️' },
+    },
+    {
+        id: 'weekly_event_2',
+        title: 'Éveil de la saison (Boss)',
+        description: 'Éliminer 10 Boss.',
+        type: 'boss_kills', target: 10,
+        reward: { type: 'eventTokens', amount: 150, emoji: '🎟️' },
+    }
 ];
 
 // NOUVEAU v0.2.6 : Quêtes Mensuelles

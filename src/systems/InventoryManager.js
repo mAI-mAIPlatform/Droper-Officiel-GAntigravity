@@ -4,6 +4,7 @@
 
 import { getItemById } from '../data/inventory.js';
 import { toast } from '../ui/components/ToastManager.js';
+import { rollSafeRarity, rollSafeLoot } from '../data/safeLoot.js';
 
 export class InventoryManager {
     constructor(saveManager, economyManager) {
@@ -97,7 +98,14 @@ export class InventoryManager {
         if (crateId === 'crate_season') this.removeItem('key_season');
 
         // Roll loot
-        const rewards = this.rollLoot(crate.loot);
+        let rewards = [];
+        if (crateId === 'crate_safe') {
+            const rarity = rollSafeRarity();
+            rewards = [rollSafeLoot(rarity, this.app.skinManager, this.app.emoteManager)];
+            rewards.safeRarity = rarity;
+        } else {
+            rewards = this.rollLoot(crate.loot);
+        }
 
         // Apply rewards
         for (const r of rewards) {
@@ -107,6 +115,16 @@ export class InventoryManager {
                 this.economy.addGems(r.amount);
             } else if (r.type === 'item') {
                 this.addItem(r.itemId, r.amount);
+            } else if (r.type === 'skin') {
+                if (this.app.skinManager) {
+                    this.app.skinManager.unlock(r.skinId);
+                    toast.reward(`👕 Skin débloqué : ${r.name} !`);
+                }
+            } else if (r.type === 'emote') {
+                if (this.app.emoteManager) {
+                    this.app.emoteManager.unlock(r.emoteId);
+                    toast.reward(`💬 Emote débloquée : ${r.emoji} ${r.name} !`);
+                }
             }
         }
 
