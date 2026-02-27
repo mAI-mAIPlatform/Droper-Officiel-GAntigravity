@@ -336,27 +336,32 @@ export class GameEngine {
     loop(timestamp) {
         if (!this.running) return;
 
-        const am = this.app.adminManager;
-        const speedMult = (am && am.config.gamespeed) ? am.config.gamespeed : 1.0;
-        // Fix Teleport Bug: Cap delta time to 30fps equivalence (0.033s)
-        this.deltaTime = Math.min((timestamp - this.lastTime) / 1000, 0.033) * speedMult;
-        this.lastTime = timestamp;
+        try {
+            const am = this.app.adminManager;
+            const speedMult = (am && am.config.gamespeed) ? am.config.gamespeed : 1.0;
+            // Fix Teleport Bug: Cap delta time to 30fps equivalence (0.033s)
+            this.deltaTime = Math.min((timestamp - this.lastTime) / 1000, 0.033) * speedMult;
+            this.lastTime = timestamp;
 
-        // FPS
-        this.frameCount++;
-        this.fpsTimer += this.deltaTime;
-        if (this.fpsTimer >= 1) {
-            this.fps = this.frameCount;
-            this.frameCount = 0;
-            this.fpsTimer = 0;
+            // FPS
+            this.frameCount++;
+            this.fpsTimer += this.deltaTime;
+            if (this.fpsTimer >= 1) {
+                this.fps = this.frameCount;
+                this.frameCount = 0;
+                this.fpsTimer = 0;
+            }
+
+            if (!this.paused && !this.gameOver) {
+                this.update(this.deltaTime);
+            }
+
+            this.draw();
+            requestAnimationFrame((t) => this.loop(t));
+        } catch (e) {
+            console.error("Game loop error:", e);
+            this.displayFallbackError(e.stack || e.message);
         }
-
-        if (!this.paused && !this.gameOver) {
-            this.update(this.deltaTime);
-        }
-
-        this.draw();
-        requestAnimationFrame((t) => this.loop(t));
     }
 
     update(dt) {
@@ -413,7 +418,7 @@ export class GameEngine {
         }
 
         // Update Entités
-        const config = am?.config || {};
+        const config = this.app.adminManager?.config || {};
 
         // Triggers Admin
         if (config.triggerMapClear) {
@@ -781,7 +786,7 @@ export class GameEngine {
             this.gasRadius -= this.gasShrinkRate * dt;
         }
         if (this.gasRadius < 100) this.gasRadius = 100;
-        
+
         // Damage players if outside
         if (this.player && this.player.alive) {
             const dist = Math.hypot(this.player.x - this.gasCenter.x, this.player.y - this.gasCenter.y);

@@ -7,8 +7,11 @@ import './styles/reset.css';
 import './styles/animations.css';
 import './styles/components.css';
 import './styles/layout.css';
-
 import { Router } from './router.js';
+import { ErrorReporter } from './utils/ErrorReporter.js';
+
+// Activer le rapport d'erreurs global
+ErrorReporter.init();
 import { SaveManager } from './systems/SaveManager.js';
 import { PlayerManager } from './systems/PlayerManager.js';
 import { EconomyManager } from './systems/EconomyManager.js';
@@ -31,7 +34,7 @@ import { AdminManager } from './systems/AdminManager.js';
 
 class DroperApp {
     constructor() {
-        this.version = '0.3.3 Alpha';
+        this.version = '0.3.4 Alpha';
         this.app = this; // Self reference for managers [v0.3.1]
         this.saveManager = new SaveManager();
         this.playerManager = new PlayerManager(this.saveManager);
