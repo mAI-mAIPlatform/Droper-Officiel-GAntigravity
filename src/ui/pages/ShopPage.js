@@ -77,6 +77,11 @@ export class ShopPage {
     const isClaimed = claimed.includes(offer.id);
     const am = this.app.adminManager;
 
+    const rarityKey = (offer.rarity || 'common').toUpperCase();
+    const rarity = RARITIES[rarityKey] || RARITIES.COMMON;
+    const borderColor = rarity.color;
+    const glowColor = `${rarity.color}66`; // ~40% d'opacité
+
     let cost = { ...offer.cost };
     // Handle free offers from data or admin
     if (!cost || Object.keys(cost).length === 0 || cost.amount === 0 || cost.type === 'free') {
@@ -103,8 +108,11 @@ export class ShopPage {
           ? 'var(--color-accent-purple)'
           : 'var(--color-accent-gold)';
 
+    const isLegendary = rarityKey === 'LEGENDARY';
+    const animationClass = isLegendary ? 'anim-glow-pulse' : '';
+
     return `
-      <div class="card card--offer anim-scale-in" data-offer-id="${offer.id}" style="
+      <div class="card card--offer anim-scale-in ${animationClass}" data-offer-id="${offer.id}" style="
         border: 2px solid ${borderColor}; 
         box-shadow: 0 4px 15px ${glowColor}; 
         position: relative; 

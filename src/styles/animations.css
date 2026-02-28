@@ -13,17 +13,49 @@
 }
 
 @keyframes crate-shake {
-    0% { transform: translate(1px, 1px) rotate(0deg); }
-    10% { transform: translate(-1px, -2px) rotate(-1deg); }
-    20% { transform: translate(-3px, 0px) rotate(1deg); }
-    30% { transform: translate(3px, 2px) rotate(0deg); }
-    40% { transform: translate(1px, -1px) rotate(1deg); }
-    50% { transform: translate(-1px, 2px) rotate(-1deg); }
-    60% { transform: translate(-3px, 1px) rotate(0deg); }
-    70% { transform: translate(3px, 1px) rotate(-1deg); }
-    80% { transform: translate(-1px, -1px) rotate(1deg); }
-    90% { transform: translate(1px, 2px) rotate(0deg); }
-    100% { transform: translate(1px, -2px) rotate(-1deg); }
+    0% {
+        transform: translate(1px, 1px) rotate(0deg);
+    }
+
+    10% {
+        transform: translate(-1px, -2px) rotate(-1deg);
+    }
+
+    20% {
+        transform: translate(-3px, 0px) rotate(1deg);
+    }
+
+    30% {
+        transform: translate(3px, 2px) rotate(0deg);
+    }
+
+    40% {
+        transform: translate(1px, -1px) rotate(1deg);
+    }
+
+    50% {
+        transform: translate(-1px, 2px) rotate(-1deg);
+    }
+
+    60% {
+        transform: translate(-3px, 1px) rotate(0deg);
+    }
+
+    70% {
+        transform: translate(3px, 1px) rotate(-1deg);
+    }
+
+    80% {
+        transform: translate(-1px, -1px) rotate(1deg);
+    }
+
+    90% {
+        transform: translate(1px, 2px) rotate(0deg);
+    }
+
+    100% {
+        transform: translate(1px, -2px) rotate(-1deg);
+    }
 }
 
 @keyframes fadeInUp {
@@ -99,15 +131,37 @@
 }
 
 @keyframes shine {
-    0% { left: -100%; transition: none; }
-    20% { left: 100%; transition: all 0.6s ease; }
-    100% { left: 100%; transition: none; }
+    0% {
+        left: -100%;
+        transition: none;
+    }
+
+    20% {
+        left: 100%;
+        transition: all 0.6s ease;
+    }
+
+    100% {
+        left: 100%;
+        transition: none;
+    }
 }
 
 @keyframes buttonPulse {
-    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(74, 158, 255, 0.4); }
-    70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(74, 158, 255, 0); }
-    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(74, 158, 255, 0); }
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(74, 158, 255, 0.4);
+    }
+
+    70% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 10px rgba(74, 158, 255, 0);
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(74, 158, 255, 0);
+    }
 }
 
 @keyframes shimmer {
@@ -138,7 +192,27 @@
     }
 }
 
-/* --- Classes utilitaires d'animation --- */
+@keyframes glowPulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 15px rgba(251, 191, 36, 0.4);
+    }
+
+    50% {
+        transform: scale(1.02);
+        box-shadow: 0 0 30px rgba(251, 191, 36, 0.7);
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 15px rgba(251, 191, 36, 0.4);
+    }
+}
+
+.anim-glow-pulse {
+    animation: glowPulse 3s ease-in-out infinite;
+}
+
 .anim-fade-in {
     animation: fadeIn var(--transition-normal) both;
 }

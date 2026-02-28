@@ -169,6 +169,21 @@
     border-radius: var(--radius-lg);
 }
 
+.btn-favorite {
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.2s;
+    color: var(--color-text-muted);
+}
+
+.btn-favorite:hover {
+    transform: scale(1.2);
+    color: var(--color-accent-gold);
+}
+
+.btn-favorite.active {
+    color: var(--color-accent-gold);
+    text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+}
+
 /* --- Barre de progression --- */
 .progress-bar {
     width: 100%;

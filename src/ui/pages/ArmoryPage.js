@@ -137,7 +137,7 @@ export class ArmoryPage {
         animation: pulseBg 3s infinite alternate;
       ">
         ${hero.coverImage
-        ? `<img src="${hero.coverImage}" style="height: 120%; object-fit: contain; filter: drop-shadow(0 15px 25px rgba(0,0,0,0.7)); transform: scale(1.1); animation: float 6s ease-in-out infinite;">`
+        ? `<img src="${hero.coverImage}" loading="lazy" style="height: 120%; object-fit: contain; filter: drop-shadow(0 15px 25px rgba(0,0,0,0.7)); transform: scale(1.1); animation: float 6s ease-in-out infinite;">`
         : `<span style="font-size: 6rem; filter: drop-shadow(0 5px 15px ${hero.glowColor}); animation: float 4s ease-in-out infinite;">${hero.emoji}</span>`
       }
         <!-- Overlay dégradé pour le texte -->

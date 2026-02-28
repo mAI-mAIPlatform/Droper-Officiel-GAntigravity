@@ -3,7 +3,7 @@
    ============================ */
 
 import { ITEM_CATEGORIES } from '../../data/inventory.js';
-import { HEROES, drawHeroBody } from '../../data/heroes.js';
+import { HEROES, drawHeroBody, getHeroById } from '../../data/heroes.js';
 import { getSkinsForHero } from '../../data/skins.js';
 import { toast } from '../components/ToastManager.js';
 import { CrateAnimation } from '../components/CrateAnimation.js';
@@ -18,6 +18,10 @@ export class CollectionPage {
 
     // State for skins
     this.selectedHero = 'soldier';
+
+    // Animation state
+    this.previewRotation = 0;
+    this.animationFrame = null;
   }
 
   render() {
@@ -58,9 +62,19 @@ export class CollectionPage {
       { id: 'key', label: 'Clés', emoji: '🔑' },
     ];
 
+    const favorites = this.app.saveManager.get('favorites') || { items: [], skins: {} };
     const filtered = this.itemFilter === 'all'
       ? items
       : items.filter(i => i.category === this.itemFilter);
+
+    // Sort: favorites first
+    filtered.sort((a, b) => {
+      const aFav = favorites.items.includes(a.id);
+      const bFav = favorites.items.includes(b.id);
+      if (aFav && !bFav) return -1;
+      if (!aFav && bFav) return 1;
+      return 0;
+    });
 
     return `
             <div class="anim-fade-in">
@@ -82,14 +96,14 @@ export class CollectionPage {
                   </div>
                 ` : `
                   <div class="grid-4">
-                    ${filtered.map(item => this.renderSingleItem(item)).join('')}
+                    ${filtered.map(item => this.renderSingleItem(item, favorites.items.includes(item.id))).join('')}
                   </div>
                 `}
             </div>
         `;
   }
 
-  renderSingleItem(item) {
+  renderSingleItem(item, isFavorite) {
     const rarityColors = {
       common: 'var(--color-rarity-common)',
       rare: 'var(--color-rarity-rare)',
@@ -100,8 +114,12 @@ export class CollectionPage {
     const isCrate = item.category === 'crate';
 
     return `
-          <div class="card anim-fade-in-up" style="text-align: center; border-color: ${borderColor}; cursor: ${isCrate ? 'pointer' : 'default'};"
+          <div class="card anim-fade-in-up" style="text-align: center; border-color: ${borderColor}; cursor: ${isCrate ? 'pointer' : 'default'}; position: relative;"
                ${isCrate ? `data-open-crate="${item.id}"` : ''}>
+            <button class="btn-favorite ${isFavorite ? 'active' : ''}" data-fav-item="${item.id}" 
+                    style="position: absolute; top: 5px; right: 5px; background: none; border: none; font-size: 1.2rem; cursor: pointer; z-index: 2;">
+              ${isFavorite ? '⭐' : '☆'}
+            </button>
             <span style="font-size: 2.2rem;">${item.emoji}</span>
             <strong style="font-size: var(--font-size-sm); display: block; margin-top: var(--spacing-xs);">
               ${item.name}
@@ -123,6 +141,18 @@ export class CollectionPage {
     const equippedId = this.app.skinManager.getEquippedSkin(this.selectedHero);
     const skinData = sm.getActiveSkinData(this.selectedHero);
 
+    const favorites = this.app.saveManager.get('favorites') || { items: [], skins: {} };
+    const heroFavs = favorites.skins[this.selectedHero] || [];
+
+    // Sort skins: favorites first
+    skins.sort((a, b) => {
+      const aFav = heroFavs.includes(a.id);
+      const bFav = heroFavs.includes(b.id);
+      if (aFav && !bFav) return -1;
+      if (!aFav && bFav) return 1;
+      return 0;
+    });
+
     return `
             <div class="anim-fade-in">
                 <!-- Hero selector -->
@@ -143,7 +173,7 @@ export class CollectionPage {
                 <div class="row" style="gap: var(--spacing-xl); align-items: flex-start;">
                     <!-- Preview -->
                     <div class="card" style="min-width: 220px; text-align: center; padding: var(--spacing-lg);">
-                        <canvas id="skin-preview" width="180" height="180" style="background: rgba(0,0,0,0.3); border-radius: 12px;"></canvas>
+                        <canvas id="skin-preview" width="180" height="180" style="background: rgba(0,0,0,0.5); border-radius: 12px;"></canvas>
                         <div style="margin-top: var(--spacing-md);">
                             <strong style="color: var(--color-accent-blue);">${hero.name.toUpperCase()}</strong>
                             <div style="font-size: var(--font-size-sm); color: var(--color-text-secondary); margin-top: 4px;">${skinData.name}</div>
@@ -156,10 +186,15 @@ export class CollectionPage {
                             ${skins.map(skin => {
       const owned = sm.isOwned(this.selectedHero, skin.id);
       const equipped = skin.id === equippedId;
+      const isFav = heroFavs.includes(skin.id);
       return `
                                     <div class="card ${equipped ? 'ult-ready-glow' : ''}" 
-                                         style="padding: var(--spacing-md); border-color: ${equipped ? skin.bodyColor : 'var(--color-border-card)'}; cursor: pointer;"
+                                         style="padding: var(--spacing-md); border-color: ${equipped ? skin.bodyColor : 'var(--color-border-card)'}; cursor: pointer; position: relative;"
                                          data-skin-id="${skin.id}">
+                                      <button class="btn-favorite ${isFav ? 'active' : ''}" data-fav-skin="${skin.id}" 
+                                              style="position: absolute; top: 5px; right: 5px; background: none; border: none; font-size: 1rem; cursor: pointer; z-index: 2;">
+                                        ${isFav ? '⭐' : '☆'}
+                                      </button>
                                       <div class="row" style="gap: var(--spacing-md); align-items: center;">
                                         <div style="width: 32px; height: 32px; border-radius: 50%; background: ${skin.bodyColor}; border: 2px solid ${skin.glowColor}; border-bottom-width: 6px; flex-shrink: 0;"></div>
                                         <div style="flex: 1;">
@@ -204,6 +239,7 @@ export class CollectionPage {
 
     document.querySelectorAll('[data-open-crate]').forEach(btn => {
       btn.onclick = (e) => {
+        if (e.target.closest('[data-fav-item]')) return;
         const crateId = btn.dataset.openCrate;
         const rewards = this.app.inventoryManager.openCrate(crateId);
         if (rewards) {
@@ -213,6 +249,14 @@ export class CollectionPage {
             this.refresh();
           }, safeRarity);
         }
+      };
+    });
+
+    document.querySelectorAll('[data-fav-item]').forEach(btn => {
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        const itemId = btn.dataset.favItem;
+        this.toggleFavoriteItem(itemId);
       };
     });
   }
@@ -226,7 +270,8 @@ export class CollectionPage {
     });
 
     document.querySelectorAll('[data-skin-id]').forEach(card => {
-      card.onclick = () => {
+      card.onclick = (e) => {
+        if (e.target.closest('[data-fav-skin]')) return;
         const skinId = card.dataset.skinId;
         const sm = this.app.skinManager;
         if (sm.isOwned(this.selectedHero, skinId)) {
@@ -238,7 +283,52 @@ export class CollectionPage {
       };
     });
 
-    this.renderPreview();
+    document.querySelectorAll('[data-fav-skin]').forEach(btn => {
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        const skinId = btn.dataset.favSkin;
+        this.toggleFavoriteSkin(skinId);
+      };
+    });
+
+    this.startRotation();
+  }
+
+  toggleFavoriteItem(itemId) {
+    const sm = this.app.saveManager;
+    const favorites = sm.get('favorites') || { items: [], skins: {} };
+    if (favorites.items.includes(itemId)) {
+      favorites.items = favorites.items.filter(id => id !== itemId);
+    } else {
+      favorites.items.push(itemId);
+    }
+    sm.set('favorites', favorites);
+    this.refresh();
+  }
+
+  toggleFavoriteSkin(skinId) {
+    const sm = this.app.saveManager;
+    const favorites = sm.get('favorites') || { items: [], skins: {} };
+    if (!favorites.skins[this.selectedHero]) favorites.skins[this.selectedHero] = [];
+
+    const heroFavs = favorites.skins[this.selectedHero];
+    if (heroFavs.includes(skinId)) {
+      favorites.skins[this.selectedHero] = heroFavs.filter(id => id !== skinId);
+    } else {
+      favorites.skins[this.selectedHero].push(skinId);
+    }
+    sm.set('favorites', favorites);
+    this.refresh();
+  }
+
+  startRotation() {
+    if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
+    const animate = () => {
+      this.previewRotation += 0.02;
+      this.renderPreview();
+      this.animationFrame = requestAnimationFrame(animate);
+    };
+    this.animationFrame = requestAnimationFrame(animate);
   }
 
   renderPreview() {
@@ -255,7 +345,16 @@ export class CollectionPage {
       bodyColor: skinData.bodyColor,
       glowColor: skinData.glowColor,
     };
-    drawHeroBody(ctx, 90, 90, previewHero, 3.0);
+
+    ctx.save();
+    ctx.translate(90, 90);
+    ctx.rotate(Math.sin(this.previewRotation) * 0.3); // Balancement fluide
+    drawHeroBody(ctx, 0, 0, previewHero, 3.0);
+    ctx.restore();
+  }
+
+  destroy() {
+    if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
   }
 
   refresh() {

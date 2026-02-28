@@ -148,6 +148,10 @@ export class SaveManager {
             },
             emotes: null,
             matchHistory: [],
+            favorites: {
+                items: [], // Array of item IDs
+                skins: {}, // Object: { heroId: [skinIds] }
+            },
         };
     }
 

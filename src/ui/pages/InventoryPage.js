@@ -6,26 +6,36 @@ import { ITEM_CATEGORIES, getItemsByCategory } from '../../data/inventory.js';
 import { toast } from '../components/ToastManager.js';
 
 export class InventoryPage {
-    constructor(app) {
-        this.app = app;
-        this.filter = 'all';
-    }
+  constructor(app) {
+    this.app = app;
+    this.filter = 'all';
+  }
 
-    render() {
-        const items = this.app.inventoryManager.getAllItems();
-        const categories = [
-            { id: 'all', label: 'Tout', emoji: '🎒' },
-            { id: 'crate', label: 'Caisses', emoji: '📦' },
-            { id: 'fragment', label: 'Fragments', emoji: '🧩' },
-            { id: 'booster', label: 'Boosters', emoji: '⚡' },
-            { id: 'key', label: 'Clés', emoji: '🔑' },
-        ];
+  render() {
+    const items = this.app.inventoryManager.getAllItems();
+    const categories = [
+      { id: 'all', label: 'Tout', emoji: '🎒' },
+      { id: 'crate', label: 'Caisses', emoji: '📦' },
+      { id: 'fragment', label: 'Fragments', emoji: '🧩' },
+      { id: 'booster', label: 'Boosters', emoji: '⚡' },
+      { id: 'key', label: 'Clés', emoji: '🔑' },
+    ];
 
-        const filtered = this.filter === 'all'
-            ? items
-            : items.filter(i => i.category === this.filter);
+    const favorites = this.app.saveManager.get('favorites') || { items: [], skins: {} };
+    const filtered = this.filter === 'all'
+      ? items
+      : items.filter(i => i.category === this.filter);
 
-        return `
+    // Sort: favorites first
+    filtered.sort((a, b) => {
+      const aFav = favorites.items.includes(a.id);
+      const bFav = favorites.items.includes(b.id);
+      if (aFav && !bFav) return -1;
+      if (!aFav && bFav) return 1;
+      return 0;
+    });
+
+    return `
       <div class="page">
         <div class="page__header">
           <h1 class="section-title">
@@ -55,26 +65,30 @@ export class InventoryPage {
           </div>
         ` : `
           <div class="grid-4" id="inventory-grid">
-            ${filtered.map(item => this.renderItem(item)).join('')}
+            ${filtered.map(item => this.renderItem(item, favorites.items.includes(item.id))).join('')}
           </div>
         `}
       </div>
     `;
-    }
+  }
 
-    renderItem(item) {
-        const rarityColors = {
-            common: 'var(--color-rarity-common)',
-            rare: 'var(--color-rarity-rare)',
-            epic: 'var(--color-rarity-epic)',
-            legendary: 'var(--color-rarity-legendary)',
-        };
-        const borderColor = rarityColors[item.rarity] || rarityColors.common;
-        const isCrate = item.category === 'crate';
+  renderItem(item, isFavorite) {
+    const rarityColors = {
+      common: 'var(--color-rarity-common)',
+      rare: 'var(--color-rarity-rare)',
+      epic: 'var(--color-rarity-epic)',
+      legendary: 'var(--color-rarity-legendary)',
+    };
+    const borderColor = rarityColors[item.rarity] || rarityColors.common;
+    const isCrate = item.category === 'crate';
 
-        return `
-      <div class="card anim-fade-in-up" style="text-align: center; border-color: ${borderColor}; cursor: ${isCrate ? 'pointer' : 'default'};"
+    return `
+      <div class="card anim-fade-in-up" style="text-align: center; border-color: ${borderColor}; cursor: ${isCrate ? 'pointer' : 'default'}; position: relative;"
            ${isCrate ? `data-open-crate="${item.id}"` : ''}>
+        <button class="btn-favorite ${isFavorite ? 'active' : ''}" data-fav-item="${item.id}" 
+                style="position: absolute; top: 5px; right: 5px; background: none; border: none; font-size: 1.2rem; cursor: pointer; z-index: 2;">
+          ${isFavorite ? '⭐' : '☆'}
+        </button>
         <span style="font-size: 2rem;">${item.emoji}</span>
         <strong style="font-size: var(--font-size-sm); display: block; margin-top: var(--spacing-xs);">
           ${item.name}
@@ -93,35 +107,57 @@ export class InventoryPage {
         ` : ''}
       </div>
     `;
-    }
+  }
 
-    afterRender() {
-        // Filtres
-        document.querySelectorAll('[data-filter]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                this.filter = btn.dataset.filter;
-                this.refresh();
-            });
-        });
+  afterRender() {
+    // Filtres
+    document.querySelectorAll('[data-filter]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.filter = btn.dataset.filter;
+        this.refresh();
+      });
+    });
 
-        // Ouverture de caisses
-        document.querySelectorAll('[data-open-crate]').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const crateId = btn.dataset.openCrate;
-                const rewards = this.app.inventoryManager.openCrate(crateId);
-                if (rewards) {
-                    this.refresh();
-                }
-            });
-        });
-    }
-
-    refresh() {
-        const container = document.getElementById('page-container');
-        if (container) {
-            container.innerHTML = this.render();
-            this.afterRender();
+    // Ouverture de caisses
+    document.querySelectorAll('[data-open-crate]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        if (e.target.closest('[data-fav-item]')) return;
+        e.stopPropagation();
+        const crateId = btn.dataset.openCrate;
+        const rewards = this.app.inventoryManager.openCrate(crateId);
+        if (rewards) {
+          this.refresh();
         }
+      });
+    });
+
+    // Favoris
+    document.querySelectorAll('[data-fav-item]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const itemId = btn.dataset.favItem;
+        this.toggleFavorite(itemId);
+      });
+    });
+  }
+
+  toggleFavorite(itemId) {
+    const sm = this.app.saveManager;
+    const favorites = sm.get('favorites') || { items: [], skins: {} };
+    if (favorites.items.includes(itemId)) {
+      favorites.items = favorites.items.filter(id => id !== itemId);
+    } else {
+      favorites.items.push(itemId);
     }
+    sm.set('favorites', favorites);
+    this.refresh();
+  }
+
+  refresh() {
+    const container = document.getElementById('page-container');
+    if (container) {
+      container.innerHTML = this.render();
+      this.afterRender();
+    }
+  }
 }

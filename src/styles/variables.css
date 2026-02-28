@@ -5,10 +5,10 @@
 :root {
   /* --- Couleurs principales --- */
   --color-bg-primary: #0a0e1a;
-  --color-bg-secondary: #111827;
-  --color-bg-card: #1a2236;
-  --color-bg-card-hover: #212d47;
-  --color-bg-input: #151c2e;
+  --color-bg-secondary: #0d121f;
+  --color-bg-card: #161e31;
+  --color-bg-card-hover: #1c263d;
+  --color-bg-input: #121829;
 
   /* --- Bordures --- */
   --color-border: rgba(255, 255, 255, 0.1);
@@ -36,10 +36,10 @@
   --color-rarity-legendary: #fbbf24;
 
   /* --- Dégradés (Liquid Glass v0.9.0) --- */
-  --gradient-main: linear-gradient(135deg, #080c16 0%, #0f172a 100%);
-  --gradient-card: linear-gradient(145deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.3) 100%);
-  --gradient-card-dark: linear-gradient(145deg, rgba(15, 23, 42, 0.6) 0%, rgba(2, 6, 23, 0.4) 100%);
-  --gradient-card-alt: linear-gradient(145deg, rgba(30, 27, 75, 0.5) 0%, rgba(15, 23, 42, 0.3) 100%);
+  --gradient-main: linear-gradient(135deg, #0a0e1a 0%, #0d1222 100%);
+  --gradient-card: linear-gradient(145deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.7) 100%);
+  --gradient-card-dark: linear-gradient(145deg, rgba(15, 23, 42, 0.9) 0%, rgba(2, 6, 23, 0.8) 100%);
+  --gradient-card-alt: linear-gradient(145deg, rgba(30, 27, 75, 0.8) 0%, rgba(15, 23, 42, 0.7) 100%);
   --gradient-accent: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
   --gradient-green: linear-gradient(135deg, #059669 0%, #10b981 100%);
   --gradient-purple: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
