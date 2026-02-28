@@ -93,6 +93,10 @@ export class Player extends Entity {
         this.x = Math.max(this.width / 2, Math.min(engine.width - this.width / 2, this.x));
         this.y = Math.max(this.height / 2, Math.min(engine.height - this.height / 2, this.y));
 
+        if (engine.mapRenderer) {
+            engine.mapRenderer.pushEntityOut(this);
+        }
+
         this.angle = Math.atan2(this.mouseY - this.y, this.mouseX - this.x);
 
         if (this.shootCooldown > 0) this.shootCooldown -= dt;

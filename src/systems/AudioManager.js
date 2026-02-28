@@ -37,6 +37,23 @@ export class AudioManager {
 
     // --- Sons de jeu ---
 
+    playSplash() {
+        if (!this.enabled || !this.ctx) return;
+        this.resume();
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(800, this.ctx.currentTime + 1.5);
+        gain.gain.setValueAtTime(0, this.ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.4, this.ctx.currentTime + 0.5);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 2.5);
+        osc.connect(gain);
+        gain.connect(this.masterGain);
+        osc.start(this.ctx.currentTime);
+        osc.stop(this.ctx.currentTime + 2.5);
+    }
+
     playShoot() {
         if (!this.enabled || !this.ctx) return;
         this.resume();

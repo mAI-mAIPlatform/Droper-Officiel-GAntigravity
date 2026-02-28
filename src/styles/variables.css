@@ -11,9 +11,9 @@
   --color-bg-input: #151c2e;
 
   /* --- Bordures --- */
-  --color-border: rgba(99, 130, 191, 0.2);
-  --color-border-active: rgba(99, 130, 191, 0.5);
-  --color-border-card: rgba(99, 130, 191, 0.15);
+  --color-border: rgba(255, 255, 255, 0.1);
+  --color-border-active: rgba(255, 255, 255, 0.3);
+  --color-border-card: rgba(255, 255, 255, 0.08);
 
   /* --- Texte --- */
   --color-text-primary: #e8ecf4;
@@ -35,11 +35,11 @@
   --color-rarity-epic: #a855f7;
   --color-rarity-legendary: #fbbf24;
 
-  /* --- Dégradés --- */
+  /* --- Dégradés (Liquid Glass v0.9.0) --- */
   --gradient-main: linear-gradient(135deg, #080c16 0%, #0f172a 100%);
-  --gradient-card: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
-  --gradient-card-dark: linear-gradient(145deg, #0f172a 0%, #020617 100%);
-  --gradient-card-alt: linear-gradient(145deg, #1e1b4b 0%, #0f172a 100%);
+  --gradient-card: linear-gradient(145deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.3) 100%);
+  --gradient-card-dark: linear-gradient(145deg, rgba(15, 23, 42, 0.6) 0%, rgba(2, 6, 23, 0.4) 100%);
+  --gradient-card-alt: linear-gradient(145deg, rgba(30, 27, 75, 0.5) 0%, rgba(15, 23, 42, 0.3) 100%);
   --gradient-accent: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
   --gradient-green: linear-gradient(135deg, #059669 0%, #10b981 100%);
   --gradient-purple: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
@@ -48,7 +48,8 @@
   /* --- Ombres --- */
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.7);
+  --shadow-liquid: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
   --shadow-glow-blue: 0 0 20px rgba(74, 158, 255, 0.15);
   --shadow-glow-purple: 0 0 20px rgba(168, 85, 247, 0.15);
 

@@ -31,10 +31,11 @@ import { EmoteManager } from './systems/EmoteManager.js';
 import { MusicPlayer } from './systems/MusicPlayer.js';
 import { MatchHistoryManager } from './systems/MatchHistoryManager.js';
 import { AdminManager } from './systems/AdminManager.js';
+import { TradeManager } from './systems/TradeManager.js';
 
 class DroperApp {
     constructor() {
-        this.version = '0.8.1 Alpha';
+        this.version = '0.9.0 Alpha';
         this.app = this; // Self reference for managers [v0.3.1]
         this.saveManager = new SaveManager();
         this.playerManager = new PlayerManager(this.saveManager);
@@ -52,6 +53,7 @@ class DroperApp {
         this.friendManager = new FriendManager(this.saveManager, this.chatManager);
         this.skinManager = new SkinManager(this.saveManager, this.economyManager);
         this.emoteManager = new EmoteManager(this.saveManager);
+        this.tradeManager = new TradeManager(this.saveManager);
         this.musicPlayer = new MusicPlayer();
         this.matchHistoryManager = new MatchHistoryManager(this.saveManager);
         this.adminManager = new AdminManager(this);
@@ -127,8 +129,37 @@ class DroperApp {
     }
 }
 
-// Lancement
+// Lancement avec Splash Screen v0.9.0
 document.addEventListener('DOMContentLoaded', () => {
     const app = new DroperApp();
+
+    // Initialise l'audio pour tenter de jouer le Splash FX
+    app.audioManager.init();
+    const tryPlaySplash = () => {
+        app.audioManager.resume();
+        app.audioManager.playSplash();
+        document.removeEventListener('click', tryPlaySplash);
+    };
+    // Joue au 1er clic si le navigateur bloque l'autoplay, sinon tente immédiatement
+    document.addEventListener('click', tryPlaySplash);
+    setTimeout(() => tryPlaySplash(), 100);
+
+    // Initialisation silencieuse derrière le splash
     app.init();
+
+    // Effet Liquid Splash (2 secondes exactes)
+    setTimeout(() => {
+        const splashScreen = document.getElementById('splash-screen');
+        const appElement = document.getElementById('app');
+
+        if (splashScreen) {
+            splashScreen.style.opacity = '0';
+            setTimeout(() => {
+                splashScreen.style.display = 'none';
+                if (appElement) {
+                    appElement.style.opacity = '1';
+                }
+            }, 500); // Temps de la transition CSS
+        }
+    }, 2000);
 });

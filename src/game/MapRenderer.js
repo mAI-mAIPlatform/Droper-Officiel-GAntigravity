@@ -35,17 +35,20 @@ export class MapRenderer {
 
             if (ex + ew > obs.x && ex - ew < obs.x + obs.w &&
                 ey + eh > obs.y && ey - eh < obs.y + obs.h) {
-                // Find smallest push-out
-                const pushLeft = (ex + ew) - obs.x;
-                const pushRight = (obs.x + obs.w) - (ex - ew);
-                const pushUp = (ey + eh) - obs.y;
-                const pushDown = (obs.y + obs.h) - (ey - eh);
 
-                const min = Math.min(pushLeft, pushRight, pushUp, pushDown);
-                if (min === pushLeft) entity.x -= pushLeft;
-                else if (min === pushRight) entity.x += pushRight;
-                else if (min === pushUp) entity.y -= pushUp;
-                else entity.y += pushDown;
+                // Calculer l'overlap sur chaque axe
+                const overlapLeft = (ex + ew) - obs.x;
+                const overlapRight = (obs.x + obs.w) - (ex - ew);
+                const overlapTop = (ey + eh) - obs.y;
+                const overlapBottom = (obs.y + obs.h) - (ey - eh);
+
+                // Trouver le plus petit overlap pour résoudre la collision
+                const minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
+
+                if (minOverlap === overlapLeft) entity.x -= overlapLeft;
+                else if (minOverlap === overlapRight) entity.x += overlapRight;
+                else if (minOverlap === overlapTop) entity.y -= overlapTop;
+                else entity.y += overlapBottom;
             }
         }
     }

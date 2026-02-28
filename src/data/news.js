@@ -4,6 +4,37 @@
 
 export const NEWS_ARTICLES = [
     {
+        id: 'news_v090_alpha',
+        date: '28/02/2026',
+        version: 'v0.9.0 Alpha',
+        title: '🎨 v0.9.0 Alpha — Liquid Glass Update',
+        type: 'update',
+        emoji: '✨',
+        summary: 'Refonte visuelle totale : effets de verre dépoli, ombres dynamiques et écran d\'introduction !',
+        content: [
+            '🖼️ Immersion : Nouveau fond d\'écran nébuleux interactif pour toutes les pages.',
+            '🪞 Liquid Glass : Transparences organiques (blur) et bordures lumineuses sur les cartes de l\'interface.',
+            '🚀 Lancement : Nouvel écran de démarrage (Splash Screen) avec effets sonores dédiés.',
+            '✨ Ombres : Les cartes et fenêtres sont désormais détachées du fond avec la nouvelle ombre liquide.'
+        ],
+    },
+    {
+        id: 'news_v085_alpha',
+        date: '28/02/2026',
+        version: 'v0.8.5 Alpha',
+        title: '🔥 v0.8.5 Alpha — Mega Update Sociale',
+        type: 'update',
+        emoji: '🤝',
+        summary: 'Ajout de la Maîtrise de Héros, des Échanges entre amis, des reconnexions auto et la Physique 2.0 !',
+        content: [
+            '🤝 Échanges : Vous pouvez désormais échanger vos skins et emotes avec vos amis.',
+            '🎖️ Maîtrise : Jouez avec vos héros préférés pour monter de rang et gagner des récompenses exclusives.',
+            '🌐 Réseau : Grosse amélioration des reconnexions en cas de coupure internet.',
+            '🧱 Physique & IA : Les murs sont désormais de vrais obstacles solides. L\'IA bots navigue de manière fluide.',
+            '🎨 Animations : Ajout de dizaines d\'effets visuels pour rendre les menus plus modernes et vivants.'
+        ],
+    },
+    {
         id: 'news_v081_alpha',
         date: '27/02/2026',
         version: 'v0.8.1 Alpha',

@@ -43,22 +43,24 @@ export class ArmoryPage {
                    data-archetype="${hero.archetype.id}"
                    style="cursor: pointer; text-align: center; position: relative;
                           border-color: ${isSelected ? 'var(--color-accent-blue)' : unlocked ? hero.rarity.color : 'var(--color-border-card)'};
+                          box-shadow: ${isSelected ? '0 0 15px rgba(74, 158, 255, 0.4)' : 'none'};
+                          transform: ${isSelected ? 'scale(1.02)' : 'none'};
                           ${!unlocked ? 'opacity: 0.6;' : ''}">
                 ${!unlocked ? '<div class="hero-card__lock">🔒</div>' : ''}
-                ${isSelected ? '<div class="hero-card__selected">✅ ACTIF</div>' : ''}
+                ${isSelected ? '<div class="hero-card__selected" style="animation: pulse 2s infinite;">✅ ACTIF</div>' : ''}
                 
                 <div style="position: absolute; top: 10px; left: 10px; font-size: 1.5rem;" title="Archétype: ${hero.archetype.label}">
                   ${hero.archetype.icon}
                 </div>
 
-                <span style="font-size: 2.5rem;">${hero.emoji}</span>
-                <strong style="font-size: var(--font-size-md); display: block; margin-top: var(--spacing-sm);">
+                <span style="font-size: 2.8rem; display: inline-block; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3)); transition: transform 0.3s ease;" class="hero-emoji-anim">${hero.emoji}</span>
+                <strong style="font-size: var(--font-size-md); display: block; margin-top: var(--spacing-sm); letter-spacing: 0.5px;">
                   ${hero.name}
                 </strong>
-                <span class="badge ${hero.rarity.cssClass}" style="margin-top: var(--spacing-xs);">
+                <span class="badge ${hero.rarity.cssClass}" style="margin-top: var(--spacing-xs); box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
                   ${hero.rarity.label}
                 </span>
-                <div style="font-size: 0.7rem; font-weight: 800; color: var(--color-accent-blue); margin-top: 5px;">
+                <div style="font-size: 0.7rem; font-weight: 800; color: var(--color-accent-blue); margin-top: 5px; text-shadow: 0 0 5px rgba(74, 158, 255, 0.5);">
                   NIVEAU ${hero.state.level}
                 </div>
                 <p style="font-size: var(--font-size-xs); color: var(--color-text-muted); margin-top: var(--spacing-xs);">
@@ -126,25 +128,26 @@ export class ArmoryPage {
         position: relative; 
         margin: -var(--spacing-lg) -var(--spacing-lg) var(--spacing-xl) -var(--spacing-lg);
         height: 250px;
-        background: radial-gradient(circle at center, ${hero.bodyColor}33 0%, transparent 70%);
+        background: radial-gradient(circle at center, ${hero.bodyColor}44 0%, transparent 70%);
         border-bottom: 2px solid ${hero.bodyColor};
         display: flex;
         align-items: center;
         justify-content: center;
         overflow: hidden;
+        animation: pulseBg 3s infinite alternate;
       ">
         ${hero.coverImage
-        ? `<img src="${hero.coverImage}" style="height: 120%; object-fit: contain; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)); transform: scale(1.1);">`
-        : `<span style="font-size: 6rem; filter: drop-shadow(0 5px 15px ${hero.glowColor});">${hero.emoji}</span>`
+        ? `<img src="${hero.coverImage}" style="height: 120%; object-fit: contain; filter: drop-shadow(0 15px 25px rgba(0,0,0,0.7)); transform: scale(1.1); animation: float 6s ease-in-out infinite;">`
+        : `<span style="font-size: 6rem; filter: drop-shadow(0 5px 15px ${hero.glowColor}); animation: float 4s ease-in-out infinite;">${hero.emoji}</span>`
       }
         <!-- Overlay dégradé pour le texte -->
-        <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 100px; background: linear-gradient(to top, var(--color-bg), transparent);"></div>
+        <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 120px; background: linear-gradient(to top, var(--color-bg), transparent);"></div>
         
-        <div style="position: absolute; bottom: 15px; left: 20px;">
-          <h2 style="font-size: var(--font-size-3xl); font-weight: 900; margin: 0; text-transform: uppercase; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.8);">
+        <div style="position: absolute; bottom: 15px; left: 20px; animation: slideInLeft 0.5s ease-out;">
+          <h2 style="font-size: var(--font-size-3xl); font-weight: 900; margin: 0; text-transform: uppercase; color: #fff; text-shadow: 0 4px 15px rgba(0,0,0,0.9); letter-spacing: 2px;">
             ${hero.name}
           </h2>
-          <span class="badge ${hero.rarity.cssClass}" style="box-shadow: 0 2px 10px rgba(0,0,0,0.5);">${hero.rarity.label}</span>
+          <span class="badge ${hero.rarity.cssClass}" style="box-shadow: 0 4px 12px rgba(0,0,0,0.6); margin-top: 5px;">${hero.rarity.label}</span>
         </div>
       </div>
 
@@ -156,6 +159,23 @@ export class ArmoryPage {
       <p style="color: var(--color-text-secondary); text-align: center; margin-bottom: var(--spacing-xl);">
         ${hero.description}
       </p>
+
+      <!-- [v0.8.5] MAÎTRISE DE HÉROS -->
+      ${unlocked ? `
+      <div class="card anim-scale-in" style="margin-bottom: var(--spacing-xl); text-align: center; padding: 15px; border-color: var(--color-accent-gold); background: linear-gradient(180deg, rgba(234, 179, 8, 0.1), transparent);">
+        <h3 style="color: var(--color-accent-gold); font-size: 0.8rem; margin-bottom: 5px;">🎖️ MAÎTRISE DU HÉROS</h3>
+        <div style="font-size: 1.2rem; font-weight: 900; color: #fff; letter-spacing: 1px;">
+           RANG : <span style="color: var(--color-accent-gold);">${hero.state.masteryTier || 'DÉBUTANT'}</span>
+        </div>
+        <div style="font-size: 0.8rem; color: var(--color-text-muted); margin-top: 5px;">
+           Victoires Totales : <strong>${hero.state.wins || 0}</strong>
+        </div>
+        <div class="progress-bar" style="height: 4px; margin-top: 10px;">
+           <div class="progress-bar__fill" style="width: ${Math.min(100, (hero.state.wins || 0))}%; background: var(--color-accent-gold);"></div>
+        </div>
+        <div style="font-size: 0.6rem; color: var(--color-text-muted); text-align: right; margin-top: 3px;">Prochain Palier : ${hero.state.wins < 5 ? 5 : hero.state.wins < 20 ? 20 : hero.state.wins < 50 ? 50 : 100}</div>
+      </div>
+      ` : ''}
 
       <!-- Stats -->
       <div class="grid-2" style="gap: var(--spacing-md); margin-bottom: var(--spacing-xl);">

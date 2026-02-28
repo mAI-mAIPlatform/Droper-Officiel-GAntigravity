@@ -27,6 +27,7 @@ export class SocialPage {
                 <div id="social-tab-content" class="anim-fade-in">
                     ${this.renderActiveTab()}
                 </div>
+                ${this.renderTradeModal()}
             </div>
         `;
     }
@@ -69,9 +70,10 @@ export class SocialPage {
                                         <div style="font-size: 0.6rem; color: ${friend.online ? 'var(--color-accent-green)' : 'var(--color-text-muted)'};">
                                             ${friend.online ? '• En ligne' : '• Hors ligne'}
                                         </div>
-                                    </div>
+                                <div class="row" style="gap: 5px;">
+                                    <button class="btn btn--primary btn--icon anim-pulse-btn" onclick="window.app.uiManager.showTradeModal('${friend.tag}', '${friend.name}')" title="Échanger un cosmétique" style="font-size: 0.9rem;">🤝</button>
+                                    <button class="btn btn--ghost btn--icon" title="Chatter">💬</button>
                                 </div>
-                                <button class="btn btn--ghost btn--icon">💬</button>
                             </div>
                         `).join('')}
                     </div>
@@ -146,6 +148,7 @@ export class SocialPage {
         // Search Input
         const searchInput = document.getElementById('friend-search-input');
         if (searchInput) {
+            searchInput.focus();
             searchInput.oninput = (e) => {
                 this.searchTerm = e.target.value;
             };
@@ -158,6 +161,68 @@ export class SocialPage {
         if (searchBtn) {
             searchBtn.onclick = () => this.refresh();
         }
+
+        // --- Modale d'Échange (Hooks) ---
+        window.app.uiManager = window.app.uiManager || {};
+        window.app.uiManager.showTradeModal = (tag, name) => {
+            document.getElementById('trade-modal').style.display = 'flex';
+            document.getElementById('trade-modal-title').innerText = `ÉCHANGER AVEC ${name.toUpperCase()}`;
+            document.getElementById('trade-target-tag').value = tag;
+        };
+
+        const tradeSend = document.getElementById('btn-trade-send');
+        if (tradeSend) {
+            tradeSend.onclick = () => {
+                const tag = document.getElementById('trade-target-tag').value;
+                document.getElementById('trade-modal').style.display = 'none';
+
+                // On simule l'envoi de l'échange via le TradeManager
+                if (window.app.tradeManager) {
+                    // Sélection factice pour Alpha (idéalement liée à l'inventaire)
+                    const myFakeItem = { id: 'skin_sniper_gold', name: 'Sniper Or' };
+                    const theirFakeItem = { id: 'emote_gg', name: 'Emote GG' };
+
+                    window.app.tradeManager.proposeTrade(tag, myFakeItem, theirFakeItem);
+                }
+            };
+        }
+
+        const tradeCancel = document.getElementById('btn-trade-cancel');
+        if (tradeCancel) {
+            tradeCancel.onclick = () => document.getElementById('trade-modal').style.display = 'none';
+        }
+    }
+
+    renderTradeModal() {
+        return `
+            <div id="trade-modal" class="modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9999; align-items: center; justify-content: center;">
+                <div class="card anim-scale-in" style="width: 90%; max-width: 400px; padding: 20px; text-align: center; border: 2px solid var(--color-accent-purple); box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);">
+                    <h2 id="trade-modal-title" style="margin-bottom: 20px; color: var(--color-accent-purple);">ÉCHANGER</h2>
+                    <input type="hidden" id="trade-target-tag">
+                    
+                    <div class="row row--between" style="margin-bottom: 20px; align-items: stretch;">
+                        <div class="card" style="flex: 1; margin-right: 10px; border: 1px dashed var(--color-text-muted); cursor: pointer;">
+                            <div style="font-size: 2rem; margin-bottom: 5px;">📦</div>
+                            <div style="font-size: 0.7rem; color: var(--color-text-muted);">Ton Offre<br>(Clique pour choisir)</div>
+                        </div>
+                        <div style="font-size: 1.5rem; display: flex; align-items: center;">🔁</div>
+                        <div class="card" style="flex: 1; margin-left: 10px; border: 1px dashed var(--color-text-muted); cursor: pointer;">
+                            <div style="font-size: 2rem; margin-bottom: 5px;">❓</div>
+                            <div style="font-size: 0.7rem; color: var(--color-text-muted);">Ce que tu veux</div>
+                        </div>
+                    </div>
+
+                    <p style="font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 20px;">
+                        <em>En Alpha, la sélection des objets est simulée aléatoirement.</em>
+                    </p>
+
+                    <div class="row" style="gap: 10px; justify-content: center;">
+                        <button id="btn-trade-cancel" class="btn btn--outline" style="flex: 1;">ANNULER</button>
+                        <button id="btn-trade-send" class="btn btn--primary" style="flex: 1;">PROPOSER</button>
+                    </div>
+                </div>
+            </div>
+        `;
     }
 
     refresh() {

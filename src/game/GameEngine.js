@@ -908,11 +908,16 @@ export class GameEngine {
         if (this.app.networkManager && this.app.networkManager.isConnected) {
             this.app.networkManager.send({
                 type: 'match_result',
-                score: this.score, // Use this.score
-                kills: this.kills, // Use this.kills
-                duration: Math.floor(this.gameTime), // Use this.gameTime
+                score: this.score,
+                kills: this.kills,
+                duration: Math.floor(this.gameTime),
                 modeId: this.app.selectedMode
             });
+        }
+
+        // [NEW] v0.8.5 — Maîtrise de Héros : Comptabiliser la victoire
+        if (won && this.player && this.player.hero) {
+            this.app.heroManager?.addWin?.(this.player.hero.id);
         }
 
         // Enregistrer dans l'historique

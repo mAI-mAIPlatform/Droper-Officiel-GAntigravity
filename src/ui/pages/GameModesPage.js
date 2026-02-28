@@ -23,11 +23,17 @@ export class GameModesPage {
 
         <div class="grid-2" style="gap: var(--spacing-lg);">
           ${GAME_MODES.map((mode, i) => `
-            <div class="card mode-card anim-fade-in-up anim-delay-${Math.min(i + 1, 6)}"
+            <div class="card mode-card anim-fade-in-up anim-delay-${Math.min(i + 4, 8)}"
                  data-mode-id="${mode.id}"
-                 style="cursor: pointer; border-color: ${mode.color}; transition: transform 0.2s;">
-              <div class="row" style="gap: var(--spacing-md); margin-bottom: var(--spacing-md);">
-                <span style="font-size: 2.5rem;">${mode.emoji}</span>
+                 style="cursor: pointer; border-color: ${mode.color}; position: relative; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s;"
+                 onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 8px 25px rgba(0,0,0,0.5)';"
+                 onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';">
+                 
+              <!-- Fond dégradé dynamique -->
+              <div style="position: absolute; top:0; right:0; bottom:0; width: 40%; background: linear-gradient(to right, transparent, ${mode.color}22); pointer-events: none;"></div>
+              
+              <div class="row" style="gap: var(--spacing-md); margin-bottom: var(--spacing-md); position: relative; z-index: 1;">
+                <span style="font-size: 3rem; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));">${mode.emoji}</span>
                 <div>
                   <strong style="font-size: var(--font-size-lg); display: block;">${mode.name}</strong>
                   <span class="badge" style="background: ${mode.color}; color: white; font-size: var(--font-size-xs);">

@@ -104,11 +104,19 @@ export class ShopPage {
           : 'var(--color-accent-gold)';
 
     return `
-      <div class="card" style="text-align: center; ${isClaimed ? 'opacity: 0.5;' : ''}">
-        <span style="font-size: 2.2rem;">${offer.emoji}</span>
+      <div class="card card--offer anim-scale-in" data-offer-id="${offer.id}" style="
+        border: 2px solid ${borderColor}; 
+        box-shadow: 0 4px 15px ${glowColor}; 
+        position: relative; 
+        overflow: hidden;
+        transition: transform 0.2s, box-shadow 0.2s;
+        ${isClaimed ? 'opacity: 0.5;' : ''}
+      " onmouseover="if(!${isClaimed}) { this.style.transform='scale(1.03)'; this.style.boxShadow='0 8px 25px ${glowColor}'; }" 
+        onmouseout="if(!${isClaimed}) { this.style.transform='scale(1)'; this.style.boxShadow='0 4px 15px ${glowColor}'; }">
+        <span style="font-size: 2.2rem; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4)); animation: float 4s ease-in-out infinite;">${offer.emoji}</span>
         <strong style="font-size: var(--font-size-md); display: block; margin-top: var(--spacing-sm);">${offer.name}</strong>
         <p style="font-size: var(--font-size-xs); color: var(--color-text-muted); margin-top: var(--spacing-xs);">${offer.description}</p>
-        <button class="btn" data-buy-id="${offer.id}" style="
+        <button class="btn btn--shine" data-buy-id="${offer.id}" style="
           margin-top: var(--spacing-md); width: 100%;
           background: ${costColor}; color: white; font-weight: 700;
           opacity: ${canAfford ? 1 : 0.5};

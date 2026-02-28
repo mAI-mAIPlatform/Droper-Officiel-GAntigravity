@@ -17,10 +17,16 @@ export class MultiplayerManager {
         this.onMatchEnd = null;
         this.searching = false;
         this.serverUrl = 'ws://localhost:3001';
+        this.reconnectAttempts = 0;
+        this.isReconnecting = false;
+        this._onlineGameActive = false;
     }
 
     connect(serverUrl) {
         if (serverUrl) this.serverUrl = serverUrl;
+
+        // Éviter les reconnexions multiples simultanées
+        if (this.isReconnecting) return Promise.resolve(false);
 
         return new Promise((resolve) => {
             try {
@@ -28,6 +34,8 @@ export class MultiplayerManager {
 
                 this.ws.onopen = () => {
                     this.connected = true;
+                    this.isReconnecting = false;
+                    this.reconnectAttempts = 0;
                     this.playerId = this.app.playerManager.tag;
                     toast.success('🌐 Connecté au serveur !');
                     resolve(true);
@@ -45,9 +53,19 @@ export class MultiplayerManager {
                 this.ws.onclose = () => {
                     this.connected = false;
                     this.searching = false;
-                    if (this.roomId) {
+                    this.roomId = null;
+
+                    if (this.app.uiManager && this.app.uiManager.currentPageId === 'game' && this._onlineGameActive) {
+                        toast.error('🔌 Déconnecté du serveur en pleine partie');
+                        this.app.uiManager.showPage('lobby');
+                        this._onlineGameActive = false;
+                    } else if (!this.isReconnecting) {
                         toast.info('🔌 Déconnecté du serveur');
                     }
+
+                    // Auto-reconnect
+                    this.attemptReconnect();
+                    resolve(false);
                 };
 
                 this.ws.onerror = () => {
@@ -65,6 +83,22 @@ export class MultiplayerManager {
                 resolve(false);
             }
         });
+    }
+
+    attemptReconnect() {
+        if (this.reconnectAttempts >= 3) {
+            toast.error('❌ Échec de reconnexion au serveur.');
+            this.isReconnecting = false;
+            return;
+        }
+
+        this.isReconnecting = true;
+        this.reconnectAttempts = (this.reconnectAttempts || 0) + 1;
+        toast.info(`🔄 Tentative de reconnexion (${this.reconnectAttempts}/3)...`);
+
+        setTimeout(() => {
+            this.connect();
+        }, 3000); // Wait 3s before retrying
     }
 
     async searchMatch(modeId) {
@@ -106,6 +140,7 @@ export class MultiplayerManager {
             case 'match_found':
                 this.searching = false;
                 this.roomId = msg.roomId;
+                this._onlineGameActive = true;
                 toast.success('⚔️ Match trouvé !');
                 if (this._matchResolve) {
                     this._matchResolve({ online: true, roomId: msg.roomId, players: msg.players });
@@ -124,6 +159,7 @@ export class MultiplayerManager {
             case 'match_end':
                 if (this.onMatchEnd) this.onMatchEnd(msg.data);
                 this.roomId = null;
+                this._onlineGameActive = false;
                 break;
 
             case 'player_left':

@@ -12,7 +12,10 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎮</text></svg>">
 </head>
 <body>
-  <div id="app"></div>
+  <div id="splash-screen" style="position: fixed; inset: 0; background: #0a0e1a; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: opacity 0.5s ease;">
+    <img src="/assets/launch/image.png" alt="Droper Logo" style="max-width: 80%; max-height: 80%; filter: drop-shadow(0 0 20px rgba(74, 158, 255, 0.5)); transform: scale(1); animation: scaleIn 2s ease-out;" />
+  </div>
+  <div id="app" style="opacity: 0; transition: opacity 0.5s ease;"></div>
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>

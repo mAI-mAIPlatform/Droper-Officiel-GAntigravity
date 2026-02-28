@@ -40,6 +40,10 @@ export class BotAI {
         const nx = dist > 0 ? dx / dist : 0;
         const ny = dist > 0 ? dy / dist : 0;
 
+        // Modificateurs de vélocité
+        let prevX = this.entity.x;
+        let prevY = this.entity.y;
+
         // Mode-specific behavior
         if (modeContext) {
             this.modeBehavior(dt, engine, modeContext, target, dist, nx, ny);
@@ -53,9 +57,21 @@ export class BotAI {
             this.shootTimer = this.entity.shootRate || 1.5;
         }
 
-        // Clamp
+        // Clamp & Collisions Murs (Physique v0.8.5)
         this.entity.x = Math.max(this.entity.width, Math.min(engine.width - this.entity.width, this.entity.x));
         this.entity.y = Math.max(this.entity.height, Math.min(engine.height - this.entity.height, this.entity.y));
+
+        if (engine.mapRenderer) {
+            engine.mapRenderer.pushEntityOut(this.entity);
+        }
+
+        // Anti-blocage Bot : si après update la position a très peu changé (< 1px) alors qu'il voulait bouger, c'est qu'il est coincé.
+        const actualDist = Math.hypot(this.entity.x - prevX, this.entity.y - prevY);
+        if (actualDist < 1 && this.targetPos) {
+            // Glissement / Reset target
+            this.strafeAngle += 1; // Tourne à 90 deg environ
+            this.targetPos = null; // Force a re-role in wander
+        }
     }
 
     findTarget(engine) {
