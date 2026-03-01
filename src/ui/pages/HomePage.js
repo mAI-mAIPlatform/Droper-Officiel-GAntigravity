@@ -163,16 +163,7 @@ export class HomePage {
           </div>
         </div>
 
-        <!-- Contrôles -->
-        <div class="card anim-fade-in-up anim-delay-4">
-          <div style="font-size: var(--font-size-xs); color: var(--color-accent-blue); text-transform: uppercase; font-weight: 700; letter-spacing: 1px; margin-bottom: var(--spacing-md);">🎮 Contrôles</div>
-          <div class="grid-2" style="gap: var(--spacing-sm);">
-            <div style="font-size: var(--font-size-sm); color: var(--color-text-secondary);"><strong style="color: var(--color-text-primary);">WASD / Flèches</strong> — Déplacement</div>
-            <div style="font-size: var(--font-size-sm); color: var(--color-text-secondary);"><strong style="color: var(--color-text-primary);">Souris</strong> — Viser</div>
-            <div style="font-size: var(--font-size-sm); color: var(--color-text-secondary);"><strong style="color: var(--color-text-primary);">Clic Gauche</strong> — Tirer</div>
-            <div style="font-size: var(--font-size-sm); color: var(--color-text-secondary);"><strong style="color: var(--color-text-primary);">Échap</strong> — Pause</div>
-          </div>
-        </div>
+
       </div>
     `;
   }

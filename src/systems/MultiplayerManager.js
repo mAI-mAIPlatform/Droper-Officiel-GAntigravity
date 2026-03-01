@@ -55,9 +55,9 @@ export class MultiplayerManager {
                     this.searching = false;
                     this.roomId = null;
 
-                    if (this.app.uiManager && this.app.uiManager.currentPageId === 'game' && this._onlineGameActive) {
+                    if (window.location.hash === '#game' && this._onlineGameActive) {
                         toast.error('🔌 Déconnecté du serveur en pleine partie');
-                        this.app.uiManager.showPage('lobby');
+                        window.location.hash = '#modes';
                         this._onlineGameActive = false;
                     } else if (!this.isReconnecting) {
                         toast.info('🔌 Déconnecté du serveur');

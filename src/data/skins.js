@@ -52,9 +52,51 @@ export const SKINS = {
         { id: 'volt_default', name: 'Standard', heroId: 'volt', bodyColor: '#60a5fa', glowColor: '#3b82f6', trailColor: 'rgba(96,165,250,0.3)', rarity: RARITIES.COMMON, price: 0, owned: true },
         { id: 'volt_overload', name: 'Surcharge', heroId: 'volt', bodyColor: '#fbbf24', glowColor: '#ef4444', trailColor: 'rgba(251,191,36,0.5)', rarity: RARITIES.LEGENDARY, price: 5000, owned: false },
     ],
-    blade: [
-        { id: 'blade_default', name: 'Standard', heroId: 'blade', bodyColor: '#94a3b8', glowColor: '#475569', trailColor: 'rgba(148,163,184,0.3)', rarity: RARITIES.COMMON, price: 0, owned: true },
-        { id: 'blade_shadow', name: 'Ombre Mora', heroId: 'blade', bodyColor: '#0f172a', glowColor: '#334155', trailColor: 'rgba(15,23,42,0.6)', rarity: RARITIES.MYTHIC, price: 4000, owned: false },
+    brave: [
+        { id: 'brave_default', name: 'Standard', heroId: 'brave', bodyColor: '#94a3b8', glowColor: '#475569', trailColor: 'rgba(148,163,184,0.3)', rarity: RARITIES.COMMON, price: 0, owned: true },
+        { id: 'brave_shadow', name: 'Ombre Mora', heroId: 'brave', bodyColor: '#0f172a', glowColor: '#334155', trailColor: 'rgba(15,23,42,0.6)', rarity: RARITIES.MYTHIC, price: 4000, owned: false },
+        { id: 'brave_crimson', name: 'Lame Écarlate', heroId: 'brave', bodyColor: '#dc2626', glowColor: '#991b1b', trailColor: 'rgba(220,38,38,0.4)', rarity: RARITIES.EPIC, price: 2000, owned: false },
+    ],
+    cyber_ninja: [
+        { id: 'cyber_ninja_default', name: 'Standard', heroId: 'cyber_ninja', bodyColor: '#10b981', glowColor: '#059669', trailColor: 'rgba(16,185,129,0.4)', rarity: RARITIES.COMMON, price: 0, owned: true },
+        { id: 'cyber_ninja_blood', name: 'Ninja Sanglant', heroId: 'cyber_ninja', bodyColor: '#ef4444', glowColor: '#b91c1c', trailColor: 'rgba(239,68,68,0.4)', rarity: RARITIES.RARE, price: 1000, owned: false },
+        { id: 'cyber_ninja_ice', name: 'Frost Ninja', heroId: 'cyber_ninja', bodyColor: '#7dd3fc', glowColor: '#0284c7', trailColor: 'rgba(125,211,252,0.3)', rarity: RARITIES.EPIC, price: 2000, owned: false },
+    ],
+    overlord: [
+        { id: 'overlord_default', name: 'Standard', heroId: 'overlord', bodyColor: '#f43f5e', glowColor: '#e11d48', trailColor: 'rgba(244,63,94,0.4)', rarity: RARITIES.COMMON, price: 0, owned: true },
+        { id: 'overlord_void', name: 'Seigneur du Vide', heroId: 'overlord', bodyColor: '#1e1b4b', glowColor: '#6366f1', trailColor: 'rgba(99,102,241,0.5)', rarity: RARITIES.LEGENDARY, price: 5000, owned: false },
+    ],
+    nova: [
+        { id: 'nova_default', name: 'Standard', heroId: 'nova', bodyColor: '#fde047', glowColor: '#eab308', trailColor: 'rgba(253,224,71,0.4)', rarity: RARITIES.COMMON, price: 0, owned: true },
+        { id: 'nova_nebula', name: 'Nébuleuse', heroId: 'nova', bodyColor: '#c084fc', glowColor: '#a855f7', trailColor: 'rgba(192,132,252,0.4)', rarity: RARITIES.EPIC, price: 2000, owned: false },
+        { id: 'nova_supernova', name: 'Supernova', heroId: 'nova', bodyColor: '#ffffff', glowColor: '#fbbf24', trailColor: 'rgba(255,255,255,0.5)', rarity: RARITIES.ULTRA, price: 7000, owned: false },
+    ],
+    rex: [
+        { id: 'rex_default', name: 'Standard', heroId: 'rex', bodyColor: '#4d7c0f', glowColor: '#365314', trailColor: 'rgba(77,124,15,0.3)', rarity: RARITIES.COMMON, price: 0, owned: true },
+        { id: 'rex_alpha', name: 'Alpha Prédateur', heroId: 'rex', bodyColor: '#1c1917', glowColor: '#ef4444', trailColor: 'rgba(28,25,23,0.5)', rarity: RARITIES.MYTHIC, price: 4000, owned: false },
+    ],
+    viper: [
+        { id: 'viper_default', name: 'Standard', heroId: 'viper', bodyColor: '#10b981', glowColor: '#059669', trailColor: 'rgba(16,185,129,0.3)', rarity: RARITIES.COMMON, price: 0, owned: true },
+        { id: 'viper_king_cobra', name: 'King Cobra', heroId: 'viper', bodyColor: '#854d0e', glowColor: '#a16207', trailColor: 'rgba(133,77,14,0.4)', rarity: RARITIES.EPIC, price: 2000, owned: false },
+        { id: 'viper_mamba', name: 'Black Mamba', heroId: 'viper', bodyColor: '#0f172a', glowColor: '#22c55e', trailColor: 'rgba(15,23,42,0.5)', rarity: RARITIES.LEGENDARY, price: 5000, owned: false },
+    ],
+    glitch: [
+        { id: 'glitch_default', name: 'Standard', heroId: 'glitch', bodyColor: '#d946ef', glowColor: '#c026d3', trailColor: 'rgba(217,70,239,0.4)', rarity: RARITIES.COMMON, price: 0, owned: true },
+        { id: 'glitch_matrix', name: 'Matrice', heroId: 'glitch', bodyColor: '#22c55e', glowColor: '#0f172a', trailColor: 'rgba(34,197,94,0.4)', rarity: RARITIES.RARE, price: 1000, owned: false },
+        { id: 'glitch_corrupted', name: 'Corrompu', heroId: 'glitch', bodyColor: '#ef4444', glowColor: '#7f1d1d', trailColor: 'rgba(239,68,68,0.5)', rarity: RARITIES.MYTHIC, price: 4000, owned: false },
+    ],
+    solar: [
+        { id: 'solar_default', name: 'Standard', heroId: 'solar', bodyColor: '#f97316', glowColor: '#ea580c', trailColor: 'rgba(249,115,22,0.3)', rarity: RARITIES.COMMON, price: 0, owned: true },
+        { id: 'solar_eclipse', name: 'Éclipse', heroId: 'solar', bodyColor: '#1e293b', glowColor: '#f97316', trailColor: 'rgba(30,41,59,0.5)', rarity: RARITIES.EPIC, price: 2000, owned: false },
+    ],
+    astro: [
+        { id: 'astro_default', name: 'Standard', heroId: 'astro', bodyColor: '#ffffff', glowColor: '#3b82f6', trailColor: 'rgba(59,130,246,0.4)', rarity: RARITIES.COMMON, price: 0, owned: true },
+        { id: 'astro_nebula', name: 'Explorateur Nébuleux', heroId: 'astro', bodyColor: '#a855f7', glowColor: '#7c3aed', trailColor: 'rgba(168,85,247,0.4)', rarity: RARITIES.LEGENDARY, price: 5000, owned: false },
+    ],
+    glacier: [
+        { id: 'glacier_default', name: 'Standard', heroId: 'glacier', bodyColor: '#bae6fd', glowColor: '#0ea5e9', trailColor: 'rgba(186,230,253,0.4)', rarity: RARITIES.COMMON, price: 0, owned: true },
+        { id: 'glacier_blizzard', name: 'Blizzard', heroId: 'glacier', bodyColor: '#ffffff', glowColor: '#38bdf8', trailColor: 'rgba(255,255,255,0.5)', rarity: RARITIES.MYTHIC, price: 4000, owned: false },
+        { id: 'glacier_volcanic_ice', name: 'Glace Volcanique', heroId: 'glacier', bodyColor: '#ef4444', glowColor: '#bae6fd', trailColor: 'rgba(239,68,68,0.3)', rarity: RARITIES.ULTRA, price: 7000, owned: false },
     ],
 };
 

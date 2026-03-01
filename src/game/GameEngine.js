@@ -12,6 +12,8 @@ import { EmojiSystem } from './EmojiSystem.js';
 import { AnimationManager } from './AnimationManager.js';
 import { Payload } from './Payload.js';
 import { Enemy } from './Enemy.js';
+import { WeatherSystem } from './WeatherSystem.js';
+import { ReplaySystem } from '../systems/ReplaySystem.js';
 
 export class GameEngine {
     constructor(app) {
@@ -41,7 +43,13 @@ export class GameEngine {
         this.animationManager = new AnimationManager(this);
         this.payload = null;
         this.bossEntity = null;
+        this.weatherSystem = new WeatherSystem(this);
         this.audioManager = app ? app.audioManager : null;
+
+        // Replay & Achievements (v0.9.7)
+        this.replaySystem = new ReplaySystem(this);
+        this._replayState = null;
+        this.isReplaying = false;
 
         // --- CAVEAUX SYSTEM ---
         this.gasCenter = { x: 0, y: 0 };
@@ -191,6 +199,9 @@ export class GameEngine {
             this.audioManager.init();
         }
 
+        // Weather
+        this.weatherSystem.init();
+
         console.log('🎮 GameEngine v0.2.1 initialisé.');
     }
 
@@ -255,6 +266,9 @@ export class GameEngine {
         this.emojiSystem.clear();
         this.particles.clear();
         this.waveManager.reset();
+
+        // Start recording replay
+        this.replaySystem.startRecording();
 
         // Mode specific init
         const mode = this.app.selectedMode;
@@ -362,8 +376,11 @@ export class GameEngine {
                 this.fpsTimer = 0;
             }
 
-            if (!this.paused && !this.gameOver) {
+            if (!this.paused && !this.gameOver && !this.isReplaying) {
                 this.update(this.deltaTime);
+                this.replaySystem.update(this.deltaTime); // Record frame
+            } else if (this.isReplaying) {
+                this.replaySystem.update(this.deltaTime); // Playback frame
             }
 
             this.draw();
@@ -412,8 +429,17 @@ export class GameEngine {
 
         // Joueur
         if (this.player && this.player.alive) {
+            const oldX = this.player.x;
+            const oldY = this.player.y;
+
             this.player.update(dt, this);
             this.checkWallCollision(this.player);
+
+            // Achievements - Distance
+            if (this.app.achievementManager) {
+                const dist = Math.hypot(this.player.x - oldX, this.player.y - oldY);
+                if (dist > 0) this.app.achievementManager.onMove(dist);
+            }
 
             // Tir automatique (maintien clic gauche)
             if (this.mouseDown && this.player.canShoot()) {
@@ -486,6 +512,11 @@ export class GameEngine {
 
         // Particules
         this.particles.update(dt);
+
+        // Weather
+        if (this.weatherSystem) {
+            this.weatherSystem.update(dt);
+        }
 
         // Drops
         this.dropSystem.update(dt);
@@ -634,17 +665,44 @@ export class GameEngine {
         this.drawSeasonalBorders(ctx);
 
         // Entités
-        for (const entity of this.entities) {
-            if (config.godMode && entity.type === 'player') {
-                entity.hp = entity.maxHp;
+        if (this.isReplaying && this._replayState) {
+            // Draw REPLAY STATE
+            for (const e of this._replayState.entities) {
+                // Fake sprite renderer or basic shapes for now since they are simple objects
+                if (e.type === 'player') {
+                    ctx.fillStyle = e.color || '#fff';
+                    ctx.beginPath(); ctx.arc(e.x, e.y, 16, 0, Math.PI * 2); ctx.fill();
+                    // Simple cannon
+                    ctx.strokeStyle = '#fff'; ctx.lineWidth = 4;
+                    ctx.beginPath(); ctx.moveTo(e.x, e.y); ctx.lineTo(e.x + Math.cos(e.angle) * 25, e.y + Math.sin(e.angle) * 25); ctx.stroke();
+                } else if (e.type === 'enemy' || e.type === 'boss') {
+                    ctx.fillStyle = e.color || '#ef4444';
+                    ctx.beginPath(); ctx.arc(e.x, e.y, 14, 0, Math.PI * 2); ctx.fill();
+                } else if (e.type === 'bot') {
+                    ctx.fillStyle = e._isAlly ? '#22c55e' : '#ef4444';
+                    ctx.beginPath(); ctx.arc(e.x, e.y, 16, 0, Math.PI * 2); ctx.fill();
+                }
             }
 
-            entity.draw(ctx, this.spriteRenderer);
-        }
+            // Replay Bullets
+            for (const b of this._replayState.bullets) {
+                ctx.fillStyle = b.color || '#fff';
+                ctx.beginPath(); ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2); ctx.fill();
+            }
 
-        // Joueur
-        if (this.player && this.player.alive) {
-            this.player.draw(ctx, this.spriteRenderer);
+        } else {
+            // NORMAL DRAW
+            for (const entity of this.entities) {
+                if (config.godMode && entity.type === 'player') {
+                    entity.hp = entity.maxHp;
+                }
+                entity.draw(ctx, this.spriteRenderer);
+            }
+
+            // Joueur
+            if (this.player && this.player.alive) {
+                this.player.draw(ctx, this.spriteRenderer);
+            }
         }
 
         // Drops
@@ -843,6 +901,11 @@ export class GameEngine {
         this.kills++;
         this.score += enemy.xpReward;
 
+        // Achievements
+        if (this.app.achievementManager) {
+            this.app.achievementManager.onKill();
+        }
+
         // Charger l'Ultimate du joueur sur le kill
         if (this.player && this.player.alive) {
             this.player.addUltimateCharge(enemy.xpReward * 2);
@@ -895,6 +958,19 @@ export class GameEngine {
 
         const isRanked = (this.app.selectedMode === 'ranked');
         const won = this.player && this.player.hp > 0;
+
+        // Stop recording
+        this.replaySystem.stopRecording();
+
+        // Achievements
+        if (this.app.achievementManager) {
+            this.app.achievementManager.onMatchEnd(
+                this.app.selectedMode,
+                this.gameTime,
+                this.player ? this.player.maxHp - this.player.hp : 0,
+                won
+            );
+        }
 
         // Sauvegarder les stats classiques
         const stats = this.app.playerManager.getStats();

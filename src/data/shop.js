@@ -42,6 +42,24 @@ export const SHOP_OFFERS = [
         cost: { type: 'gems', amount: 200 },
         category: 'hero',
     },
+    {
+        id: 'pack_astro',
+        name: 'Pack Astro',
+        emoji: '🚀',
+        description: 'Débloque Astro + 10 Fragments.',
+        reward: { type: 'hero_pack', heroId: 'astro', fragments: 10 },
+        cost: { type: 'gems', amount: 400 },
+        category: 'hero',
+    },
+    {
+        id: 'pack_glacier',
+        name: 'Pack Glacier',
+        emoji: '❄️',
+        description: 'Débloque Glacier + 10 Fragments.',
+        reward: { type: 'hero_pack', heroId: 'glacier', fragments: 10 },
+        cost: { type: 'gems', amount: 350 },
+        category: 'hero',
+    },
 
     // --- CAISSES ---
     {
@@ -109,6 +127,24 @@ export const SHOP_OFFERS = [
         description: 'Tout pour bien commencer.',
         reward: { type: 'mixed', coins: 2000, gems: 50 },
         cost: { type: 'gems', amount: 100 },
+        category: 'boost',
+    },
+    {
+        id: 'starter_pro',
+        name: 'Starter Pro',
+        emoji: '🛡️',
+        description: 'Pour les compétiteurs sérieux.',
+        reward: { type: 'mixed', coins: 10000, gems: 250 },
+        cost: { type: 'gems', amount: 400 },
+        category: 'boost',
+    },
+    {
+        id: 'starter_elite',
+        name: 'Starter Elite',
+        emoji: '👑',
+        description: 'Le pack ultime du champion.',
+        reward: { type: 'mixed', coins: 50000, gems: 1000 },
+        cost: { type: 'gems', amount: 1200 },
         category: 'boost',
     },
     {

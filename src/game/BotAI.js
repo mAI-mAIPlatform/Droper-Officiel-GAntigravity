@@ -102,7 +102,8 @@ export class BotAI {
     }
 
     defaultBehavior(dt, engine, target, dist, nx, ny) {
-        const speed = this.entity.speed || 100;
+        const weatherMult = engine.weatherSystem ? engine.weatherSystem.getSpeedMultiplier() : 1.0;
+        const speed = (this.entity.speed || 100) * weatherMult;
         const preferredDist = this.entity.preferredDist || 180;
         const healthPct = this.entity.hp / this.entity.maxHp;
 

@@ -32,10 +32,11 @@ import { MusicPlayer } from './systems/MusicPlayer.js';
 import { MatchHistoryManager } from './systems/MatchHistoryManager.js';
 import { AdminManager } from './systems/AdminManager.js';
 import { TradeManager } from './systems/TradeManager.js';
+import { DailyRewardManager } from './systems/DailyRewardManager.js';
 
 class DroperApp {
     constructor() {
-        this.version = '0.9.0 Alpha';
+        this.version = '0.9.2 Alpha';
         this.app = this; // Self reference for managers [v0.3.1]
         this.saveManager = new SaveManager();
         this.playerManager = new PlayerManager(this.saveManager);
@@ -56,6 +57,7 @@ class DroperApp {
         this.tradeManager = new TradeManager(this.saveManager);
         this.musicPlayer = new MusicPlayer();
         this.matchHistoryManager = new MatchHistoryManager(this.saveManager);
+        this.dailyRewardManager = new DailyRewardManager(this);
         this.adminManager = new AdminManager(this);
 
         // Wiring [v0.3.1]
@@ -86,6 +88,7 @@ class DroperApp {
         this.inventoryManager.load();
         this.recordManager.load();
         this.matchHistoryManager.load();
+        this.dailyRewardManager.init();
 
         // Wire managers
         this.seasonPassManager.setInventoryManager(this.inventoryManager);

@@ -40,12 +40,14 @@ export class HeroManager {
             equippedPower: null,
             chips: [],
             equippedChips: [],
-            superchargeUnlocked: false // NEW v0.4.0
+            superchargeUnlocked: false, // NEW v0.4.0
+            wins: 0, // NEW v0.9.2
+            masteryTier: 'DÉBUTANT' // NEW v0.9.2
         };
 
         if (!saved) return defaults;
 
-        // Migration: garantit que les tableaux existent toujours
+        // Migration: garantit que les champs existent toujours
         return {
             ...defaults,
             ...saved,
@@ -92,6 +94,26 @@ export class HeroManager {
         this.data[heroId] = state;
         this.persist();
         return state;
+    }
+
+    addWin(heroId) {
+        const state = this.getHeroState(heroId);
+        if (!state.unlocked) return;
+
+        state.wins = (state.wins || 0) + 1;
+        state.masteryTier = this.calculateMasteryTier(state.wins);
+
+        this.data[heroId] = state;
+        this.persist();
+        return state;
+    }
+
+    calculateMasteryTier(wins) {
+        if (wins >= 50) return 'LÉGENDE';
+        if (wins >= 30) return 'MAÎTRE';
+        if (wins >= 15) return 'EXPERT';
+        if (wins >= 5) return 'APPRENTI';
+        return 'DÉBUTANT';
     }
 
     calculateXpToNext(level) {

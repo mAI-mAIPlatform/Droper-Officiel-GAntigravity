@@ -3,6 +3,7 @@
    ============================ */
 
 import { GameEngine } from '../../game/GameEngine.js';
+import { toast } from '../components/ToastManager.js';
 
 export class GamePage {
   constructor(app) {
@@ -48,9 +49,10 @@ export class GamePage {
           <div class="game-over__content">
             <h1 class="game-over__title">💀 GAME OVER</h1>
             <div class="game-over__stats" id="game-over-stats"></div>
-            <div style="display: flex; gap: 12px;">
-              <button class="btn btn--accent" id="btn-restart" style="flex: 1;">🔄 Rejouer</button>
-              <button class="btn btn--purple" id="btn-back-menu" style="flex: 1;">🏠 Menu</button>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
+              <button class="btn btn--accent" id="btn-restart" style="flex: 1; min-width: 140px;">🔄 Rejouer</button>
+              <button class="btn btn--outline" id="btn-replay" style="flex: 1; min-width: 140px;">⏪ Revoir (10s)</button>
+              <button class="btn btn--purple" id="btn-back-menu" style="flex: 1; min-width: 140px;">🏠 Menu</button>
             </div>
           </div>
         </div>
@@ -68,6 +70,19 @@ export class GamePage {
             gap: 10px;
             z-index: 100;
         "></div>
+        
+        <!-- Replay VHS Overlay -->
+        <div id="replay-overlay" style="display: none; position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; background: repeating-linear-gradient(rgba(0,0,0,0) 0px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0) 4px); z-index: 50;">
+            <div style="position: absolute; top: 20px; left: 20px; color: #ff0033; font-family: monospace; font-size: 24px; font-weight: bold; animation: blink 1s infinite;">
+                🔴 REC
+            </div>
+            <div style="position: absolute; bottom: 80px; width: 100%; text-align: center;">
+                 <button class="btn btn--outline" id="btn-stop-replay" style="pointer-events: auto; background: rgba(0,0,0,0.5);">⏹ Arrêter Replay</button>
+            </div>
+            <style>
+                @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
+            </style>
+        </div>
       </div>
     `;
   }
@@ -101,6 +116,8 @@ export class GamePage {
     // Bouton restart
     document.getElementById('btn-restart')?.addEventListener('click', () => {
       document.getElementById('game-over-overlay').style.display = 'none';
+      if (this.engine.isReplaying) this.engine.replaySystem.stopPlayback();
+      document.getElementById('replay-overlay').style.display = 'none';
       this.engine.startGame();
     });
 
@@ -108,6 +125,24 @@ export class GamePage {
     document.getElementById('btn-back-menu')?.addEventListener('click', () => {
       this.destroy();
       window.location.hash = '#accueil';
+    });
+
+    // Bouton Replay
+    document.getElementById('btn-replay')?.addEventListener('click', () => {
+      if (this.engine.replaySystem && this.engine.replaySystem.history.length > 0) {
+        document.getElementById('game-over-overlay').style.display = 'none';
+        document.getElementById('replay-overlay').style.display = 'block';
+        this.engine.replaySystem.startPlayback();
+      } else {
+        toast.warn('Aucun replay disponible.');
+      }
+    });
+
+    // Bouton Stop Replay
+    document.getElementById('btn-stop-replay')?.addEventListener('click', () => {
+      this.engine.replaySystem.stopPlayback();
+      document.getElementById('replay-overlay').style.display = 'none';
+      document.getElementById('game-over-overlay').style.display = 'flex'; // Retour au Game Over
     });
   }
 

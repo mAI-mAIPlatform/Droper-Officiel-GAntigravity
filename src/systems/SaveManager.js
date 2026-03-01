@@ -111,7 +111,12 @@ export class SaveManager {
             shop: {
                 claimedOffers: [],
                 lastFreeGemsClaim: null,
-                safe: { upgradesLeft: 5, lastClaim: 0, currentRarity: 1 }
+                safe: { upgradesLeft: 5, lastClaim: 0, currentRarity: 1 },
+                dailyRewards: {
+                    lastClaimDate: null,
+                    consecutiveDays: 0,
+                    claimedToday: false
+                }
             },
             seasonPass: {
                 seasonId: 'season_1',
@@ -152,6 +157,7 @@ export class SaveManager {
                 items: [], // Array of item IDs
                 skins: {}, // Object: { heroId: [skinIds] }
             },
+            customMaps: [], // v0.4.5 — Maps créées par le joueur
         };
     }
 

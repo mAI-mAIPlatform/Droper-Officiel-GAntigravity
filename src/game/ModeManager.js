@@ -12,6 +12,8 @@ import { CyberBallMode } from './modes/CyberBallMode.js';
 import { PrimeDigitaleMode } from './modes/PrimeDigitaleMode.js';
 import { ZoneSurchargeMode } from './modes/ZoneSurchargeMode.js';
 import { RankedMode } from './modes/RankedMode.js';
+import { LaveFlashMode } from './modes/LaveFlashMode.js';
+import { KillLifeMode } from './modes/KillLifeMode.js';
 
 const MODE_CLASSES = {
     nanopuces: NanopucesMode,
@@ -21,6 +23,8 @@ const MODE_CLASSES = {
     prime_digitale: PrimeDigitaleMode,
     zone_surcharge: ZoneSurchargeMode,
     ranked: RankedMode,
+    lave_flash: LaveFlashMode,
+    kill_life: KillLifeMode,
 };
 
 export class ModeManager {

@@ -6,18 +6,22 @@ export class PlayerManager {
     constructor(saveManager) {
         this.save = saveManager;
         this.data = null;
+        this.selectedHeroDetails = 'soldier'; // NEW v0.9.2
     }
 
     load() {
         this.data = this.save.get('player') || {
             username: 'Joueur',
+            tag: '#0000',
+            bio: 'Nouveau joueur Droper',
             level: 1,
             xp: 0,
             xpToNext: 100,
             reputation: 100,
             rankPoints: 0,
             rank: 'Bronze I',
-            selectedHero: 'soldier'
+            selectedHero: 'soldier',
+            avatarEmoji: '👤'
         };
 
         // Sécurité v0.3.1 : s'assurer que selectedHero existe pour les anciens comptes

@@ -1,20 +1,21 @@
 /* ============================
-   DROPER — Composant HeroCard
+   DROPER — Composant HeroCard (v0.4.5)
    ============================ */
 
 export class HeroCard {
-    constructor(hero, heroState, options = {}) {
-        this.hero = hero;
-        this.state = heroState;
-        this.onClick = options.onClick || null;
-        this.selected = options.selected || false;
-    }
+  constructor(hero, heroState, options = {}) {
+    this.hero = hero;
+    this.state = heroState;
+    this.onClick = options.onClick || null;
+    this.selected = options.selected || false;
+  }
 
-    render() {
-        const isUnlocked = this.state.unlocked;
-        const level = this.state.level || 1;
+  render() {
+    const isUnlocked = this.state.unlocked;
+    const level = this.state.level || 1;
+    const iconPath = `/assets/icones/heroes/${this.hero.id}.png`;
 
-        return `
+    return `
       <div class="card card--hero anim-fade-in-up ${this.selected ? 'anim-glow' : ''} ${!isUnlocked ? 'card--locked' : ''}"
            data-hero-id="${this.hero.id}"
            style="${!isUnlocked ? 'opacity: 0.5; pointer-events: none;' : ''}
@@ -24,7 +25,10 @@ export class HeroCard {
           ${this.hero.rarity.label}
         </span>
         <div class="icon-circle icon-circle--large">
-          ${this.hero.emoji}
+          <img src="${iconPath}" alt="${this.hero.name}" loading="lazy"
+               style="width: 100%; height: 100%; object-fit: contain;"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';" />
+          <span style="display: none; font-size: 2rem;">${this.hero.emoji}</span>
         </div>
         <strong style="font-size: var(--font-size-lg); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">
           ${this.hero.name}
@@ -35,5 +39,5 @@ export class HeroCard {
         <span class="badge badge--level">Niv. ${level}</span>
       </div>
     `;
-    }
+  }
 }

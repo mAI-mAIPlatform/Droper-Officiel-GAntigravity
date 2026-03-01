@@ -206,6 +206,65 @@ export class ParticleSystem {
         }
     }
 
+    spawnLegendaryAura(x, y) {
+        // Aura dorée montante
+        for (let i = 0; i < 2; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const radius = 15 + Math.random() * 10;
+            this.particles.push(new Particle(x + Math.cos(angle) * radius, y + Math.sin(angle) * radius, {
+                vx: (Math.random() - 0.5) * 15,
+                vy: -50 - Math.random() * 50,
+                lifetime: 0.8,
+                color: '#fbbf24', // Gold
+                size: 3 + Math.random() * 2,
+                friction: 0.96,
+                shrink: true
+            }));
+        }
+        // Étincelles occasionnelles
+        if (Math.random() > 0.8) {
+            const angle = Math.random() * Math.PI * 2;
+            const radius = 25;
+            this.particles.push(new Particle(x + Math.cos(angle) * radius, y + Math.sin(angle) * radius, {
+                vx: 0,
+                vy: 0,
+                lifetime: 0.4,
+                color: '#ffffff',
+                size: 2,
+                friction: 1,
+                shrink: true
+            }));
+        }
+    }
+
+    spawnRain(width, height) {
+        for (let i = 0; i < 5; i++) {
+            this.particles.push(new Particle(Math.random() * width, -10, {
+                vx: 100,
+                vy: 800,
+                lifetime: 1.5,
+                color: 'rgba(173, 216, 230, 0.4)', // LightBlue
+                size: 1,
+                friction: 1,
+                shrink: false
+            }));
+        }
+    }
+
+    spawnSnow(width, height) {
+        if (Math.random() > 0.5) {
+            this.particles.push(new Particle(Math.random() * width, -10, {
+                vx: (Math.random() - 0.5) * 50,
+                vy: 100 + Math.random() * 50,
+                lifetime: 5,
+                color: '#ffffff',
+                size: 2 + Math.random() * 2,
+                friction: 0.99,
+                shrink: false
+            }));
+        }
+    }
+
     clear() {
         this.particles = [];
     }

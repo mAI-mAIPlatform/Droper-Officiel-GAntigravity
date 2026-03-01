@@ -19,7 +19,9 @@ import { LobbyPage } from './ui/pages/LobbyPage.js';
 import { RankedPage } from './ui/pages/RankedPage.js';
 import { SocialPage } from './ui/pages/SocialPage.js';
 // SkinsPage removed in favor of CollectionPage
+import { HeroDetailsPage } from './ui/pages/HeroDetailsPage.js';
 import { AdminConsolePage } from './ui/pages/AdminConsolePage.js';
+import { MapEditorPage } from './ui/pages/MapEditorPage.js';
 
 export class Router {
     constructor(app) {
@@ -51,7 +53,9 @@ export class Router {
             'club': SocialPage,
             'amis': SocialPage,
             'historique': StatsPage,
+            'hero-details': HeroDetailsPage,
             'admin': AdminConsolePage,
+            'editeur-map': MapEditorPage,
         };
 
         this.fullscreenRoutes = ['game'];

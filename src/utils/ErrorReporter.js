@@ -1,4 +1,7 @@
 export class ErrorReporter {
+    static _errorCount = 0;
+    static MAX_ERRORS = 5;
+
     static init() {
         if (window._errorReporterInit) return;
         window._errorReporterInit = true;
@@ -24,6 +27,12 @@ export class ErrorReporter {
 
     static showError(message) {
         if (typeof document === 'undefined') return;
+
+        // Limiter le nombre d'erreurs affichées
+        ErrorReporter._errorCount++;
+        if (ErrorReporter._errorCount > ErrorReporter.MAX_ERRORS) return;
+
+        const timestamp = new Date().toLocaleTimeString('fr-FR');
 
         let container = document.getElementById('error-reporter-container');
         if (!container) {
@@ -52,7 +61,7 @@ export class ErrorReporter {
             const closeBtn = document.createElement('button');
             closeBtn.textContent = '❌';
             closeBtn.style.cssText = `background: transparent; border: none; font-size: 16px; cursor: pointer; color: white;`;
-            closeBtn.onclick = () => { container.remove(); };
+            closeBtn.onclick = () => { container.remove(); ErrorReporter._errorCount = 0; };
             header.appendChild(closeBtn);
 
             const pre = document.createElement('pre');
@@ -66,7 +75,12 @@ export class ErrorReporter {
 
         const pre = container.querySelector('#error-reporter-log');
         if (pre) {
-            pre.textContent += '\n\n> ' + message;
+            pre.textContent += `\n\n[${timestamp}] > ${message}`;
+        }
+
+        if (ErrorReporter._errorCount === ErrorReporter.MAX_ERRORS) {
+            const pre2 = container.querySelector('#error-reporter-log');
+            if (pre2) pre2.textContent += '\n\n⚠️ Limite d\'erreurs atteinte (5). Les erreurs suivantes sont masquées.';
         }
     }
 }

@@ -84,7 +84,8 @@ export class Player extends Entity {
         }
 
         const adminConfig = engine.app?.adminManager?.config || {};
-        let finalSpeed = this.speed * this.activeBoosts.speed;
+        const weatherMult = engine.weatherSystem ? engine.weatherSystem.getSpeedMultiplier() : 1.0;
+        let finalSpeed = this.speed * this.activeBoosts.speed * weatherMult;
         if (adminConfig.playerSpeedBoost) finalSpeed *= adminConfig.playerSpeedBoost;
 
         this.x += dx * finalSpeed * dt;
@@ -156,6 +157,11 @@ export class Player extends Entity {
 
         if (this.ultimateCharge >= this.ultimateMax) this.ultimateReady = true;
         if (this.invincibleTimer > 0) this.invincibleTimer -= dt;
+
+        // v0.9.2 MAÎTRISE LÉGENDAIRE : Aura visuelle constante
+        if (this.hero?.state?.masteryTier === 'LÉGENDE' && engine.particles) {
+            engine.particles.spawnLegendaryAura(this.x, this.y);
+        }
     }
 
     canShoot() {

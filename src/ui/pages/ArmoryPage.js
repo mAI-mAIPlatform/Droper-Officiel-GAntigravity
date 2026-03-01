@@ -53,8 +53,14 @@ export class ArmoryPage {
                   ${hero.archetype.icon}
                 </div>
 
-                <span style="font-size: 2.8rem; display: inline-block; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3)); transition: transform 0.3s ease;" class="hero-emoji-anim">${hero.emoji}</span>
-                <strong style="font-size: var(--font-size-md); display: block; margin-top: var(--spacing-sm); letter-spacing: 0.5px;">
+                <div class="hero-card__visual" style="height: 100px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px;">
+                  ${hero.portrait ?
+          `<img src="${hero.portrait}" loading="lazy" style="height: 100%; object-fit: contain; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));" class="hero-img-anim">` :
+          `<img src="/assets/icones/heroes/${hero.id}.png" loading="lazy" style="height: 80%; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));" class="hero-img-anim" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+           <span style="font-size: 2.8rem; display: none; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));" class="hero-emoji-anim">${hero.emoji}</span>`
+        }
+                </div>
+                <strong style="font-size: var(--font-size-md); display: block; letter-spacing: 0.5px;">
                   ${hero.name}
                 </strong>
                 <span class="badge ${hero.rarity.cssClass}" style="margin-top: var(--spacing-xs); box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
@@ -82,7 +88,8 @@ export class ArmoryPage {
   afterRender() {
     document.querySelectorAll('[data-hero-id]').forEach(card => {
       card.addEventListener('click', () => {
-        this.showHeroModal(card.dataset.heroId);
+        this.app.playerManager.selectedHeroDetails = card.dataset.heroId;
+        window.location.hash = '#hero-details';
       });
     });
 

@@ -7,7 +7,7 @@
     display: flex;
     min-height: 100vh;
     position: relative;
-    background: var(--color-bg-primary) url('/assets/immersive_game_background.png') center/cover fixed no-repeat;
+    background: var(--color-bg-primary);
 }
 
 /* --- Sidebar --- */

@@ -137,6 +137,59 @@ export class ShopPage {
   }
 
   renderDailyReward() {
+    const daily = this.app.dailyRewardManager.getStatus();
+    const rewards = this.app.dailyRewardManager.rewards;
+    const currentDay = (daily.consecutiveDays - (daily.claimedToday ? 1 : 0)) % 7;
+
+    return `
+        <div class="card card--daily-reward anim-fade-in-up" style="background: var(--gradient-card-dark); border: 1px solid rgba(255,255,255,0.1); padding: 15px; margin-bottom: 20px;">
+            <div class="row row--between" style="margin-bottom: 15px;">
+                <h3 style="font-size: 0.85rem; font-weight: 800; color: var(--color-accent-gold); letter-spacing: 0.5px;">🎁 CADEAUX DE CONNEXION</h3>
+                <div style="text-align: right;">
+                    <div style="font-size: 0.75rem; font-weight: 800; color: white;">Série de ${daily.consecutiveDays} Jours</div>
+                    <div style="font-size: 0.6rem; color: var(--color-text-muted);">Récompenses hebdomadaires</div>
+                </div>
+            </div>
+            
+            <div class="row" style="gap: 8px; overflow-x: auto; padding-bottom: 10px; -ms-overflow-style: none; scrollbar-width: none; margin: 0 -5px;">
+                ${rewards.map((r, i) => {
+      const isClaimed = i < currentDay || (i === currentDay && daily.claimedToday);
+      const isCurrent = i === currentDay && !daily.claimedToday;
+      return `
+                        <div class="daily-item ${isCurrent ? 'active' : ''} ${isClaimed ? 'claimed' : ''}" style="
+                            flex: 0 0 62px; aspect-ratio: 1; border-radius: 12px;
+                            background: ${isCurrent ? 'var(--gradient-gold)' : isClaimed ? 'rgba(34, 197, 94, 0.1)' : 'rgba(255,255,255,0.03)'};
+                            border: 2px solid ${isCurrent ? 'var(--color-accent-gold)' : isClaimed ? 'var(--color-accent-green)' : 'rgba(255,255,255,0.05)'};
+                            display: flex; flex-direction: column; align-items: center; justify-content: center;
+                            position: relative; transition: all 0.3s ease;
+                        ">
+                            <span style="font-size: 0.55rem; font-weight: 800; color: ${isCurrent ? 'white' : 'var(--color-text-muted)'}; position: absolute; top: 6px;">J${i + 1}</span>
+                            <span style="font-size: 1.4rem; margin-top: 6px; filter: ${isClaimed ? 'grayscale(0.5)' : 'none'}">${r.emoji}</span>
+                            <span style="font-size: 0.55rem; font-weight: 700; color: ${isCurrent ? 'white' : 'inherit'}; margin-top: 2px;">
+                                ${r.type === 'mixed' ? (r.gems + ' 💎') : (r.amount || r.coins) + (r.type === 'gems' ? ' 💎' : ' 🪙')}
+                            </span>
+                            ${isClaimed ? '<div style="position: absolute; bottom: -4px; right: -4px; background: var(--color-accent-green); border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; border: 2px solid #0a0e1a; font-size: 8px; color: white;">✓</div>' : ''}
+                        </div>
+                    `;
+    }).join('')}
+            </div>
+
+            <button class="btn btn--shine" id="btn-claim-daily" style="
+                width: 100%; margin-top: 12px; height: 40px; font-weight: 900; font-size: 0.8rem;
+                background: ${daily.claimedToday ? 'rgba(255,255,255,0.05)' : 'var(--gradient-gold)'};
+                color: ${daily.claimedToday ? 'var(--color-text-muted)' : 'white'};
+                border: none;
+            " ${daily.claimedToday ? 'disabled' : ''}>
+                ${daily.claimedToday ? 'COMPLÉTÉ' : 'RÉCUPÉRER'}
+            </button>
+        </div>
+
+        <!-- Coffre Fort Existant -->
+        ${this.renderSafeBox()}
+    `;
+  }
+
+  renderSafeBox() {
     const shopData = this.app.saveManager.get('shop') || {};
     const safeData = shopData.safe || { upgradesLeft: 5, lastClaim: 0, currentRarity: 1 };
 
@@ -147,20 +200,20 @@ export class ShopPage {
 
     const now = Date.now();
     const cooldown = 24 * 60 * 60 * 1000;
-    const timeLeft = safeData.lastClaim + cooldown - now;
+    const timeLeft = (safeData.lastClaim || 0) + cooldown - now;
     const canClaimOrUpgrade = timeLeft <= 0;
 
     if (!canClaimOrUpgrade) {
       const hours = Math.floor(timeLeft / (1000 * 60 * 60));
       const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
       return `
-            <div class="card card--daily-reward" style="background: var(--gradient-card-dark); border-style: dashed; border-color: var(--color-border-card);">
+            <div class="card card--daily-reward" style="background: var(--gradient-card-dark); border-style: dashed; border-color: rgba(255,255,255,0.05);">
                 <div class="row row--between" style="align-items: center;">
                     <div>
-                        <div style="font-size: var(--font-size-lg); font-weight: 800; color: var(--color-text-muted);">Coffre-fort ouvert ! 📦</div>
+                        <div style="font-size: var(--font-size-md); font-weight: 800; color: var(--color-text-muted);">Coffre-fort ouvert ! 📦</div>
                         <div style="font-size: var(--font-size-xs); color: var(--color-accent-blue); margin-top: 4px;">Nouveau coffre dans ${hours}h ${minutes}m</div>
                     </div>
-                    <div style="font-size: 2.5rem; opacity: 0.3;">🔒</div>
+                    <div style="font-size: 2rem; opacity: 0.2;">🔒</div>
                 </div>
             </div>
         `;
@@ -173,20 +226,18 @@ export class ShopPage {
         <div class="card card--daily-reward" style="background: var(--gradient-purple); border: 2px solid ${rarity.color}; position:relative; overflow:hidden;">
             <div class="row row--between" style="align-items: center;">
                 <div style="flex: 1;">
-                    <div style="font-size: var(--font-size-lg); font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">COFFRE-FORT ÉVOLUTIF</div>
-                    <div style="font-size: var(--font-size-xs); color: ${rarity.color}; margin-top: 4px; font-weight: bold;">Rareté actuelle: ${rarity.label}</div>
-                    <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+                    <div style="font-size: var(--font-size-md); font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">COFFRE-FORT ÉVOLUTIF</div>
+                    <div style="font-size: var(--font-size-xs); color: ${rarity.color}; margin-top: 4px; font-weight: bold;">Rareté: ${rarity.label}</div>
+                    <div style="margin-top: 15px; display: flex; gap: 8px; flex-wrap: wrap;">
                         <button class="btn btn--sm" id="btn-upgrade-safe" style="background: var(--color-accent-blue); color: white;" ${safeData.upgradesLeft <= 0 ? 'disabled' : ''}>
                           Améliorer (${safeData.upgradesLeft}/5)
                         </button>
                         <button class="btn btn--sm" id="btn-open-safe" style="background: var(--color-accent-green); color: white;">
-                          Ouvrir le coffre
+                          Ouvrir
                         </button>
                     </div>
                 </div>
-                <div style="font-size: 3.5rem; text-align: center; width: 80px;">
-                    📦
-                </div>
+                <div style="font-size: 3rem; text-align: center; width: 60px;">📦</div>
             </div>
         </div>
     `;
@@ -198,6 +249,9 @@ export class ShopPage {
 
     const btnOpen = document.getElementById('btn-open-safe');
     if (btnOpen) btnOpen.addEventListener('click', () => this.handleSafeOpen());
+
+    const btnClaimDaily = document.getElementById('btn-claim-daily');
+    if (btnClaimDaily) btnClaimDaily.addEventListener('click', () => this.handleClaimDaily());
 
     document.querySelectorAll('[data-buy-id]').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -354,6 +408,28 @@ export class ShopPage {
     CrateAnimation.show(rewards, () => {
       this.refresh();
     });
+  }
+
+  handleClaimDaily() {
+    const res = this.app.dailyRewardManager.claim();
+    if (res.success) {
+      toast.reward(`🎁 Récompense récupérée !`);
+      if (this.app.audioManager) this.app.audioManager.playPurchase();
+
+      const rewards = [];
+      if (res.reward.type === 'coins') rewards.push({ type: 'coins', amount: res.reward.amount });
+      if (res.reward.type === 'gems') rewards.push({ type: 'gems', amount: res.reward.amount });
+      if (res.reward.type === 'mixed') {
+        if (res.reward.coins) rewards.push({ type: 'coins', amount: res.reward.coins });
+        if (res.reward.gems) rewards.push({ type: 'gems', amount: res.reward.gems });
+      }
+
+      CrateAnimation.show(rewards, () => {
+        this.refresh();
+      });
+    } else {
+      toast.error(res.reason);
+    }
   }
 
   getStarters() {
