@@ -16,7 +16,7 @@ export class HeroDetailsPage {
         if (!this.hero) return `<div class="page">Héros introuvable</div>`;
 
         const state = this.hero.state;
-        const rarity = RARITIES[this.hero.rarity.toUpperCase()] || RARITIES.COMMON;
+        const rarity = this.hero.rarity || RARITIES.COMMON;
         const masteryColor = this.getMasteryColor(state.masteryTier);
 
         return `
@@ -24,7 +24,7 @@ export class HeroDetailsPage {
                 <div class="page__header row row--between" style="margin-bottom: 20px;">
                     <button class="btn btn--outline" id="btn-back-armory" style="padding: 8px 15px; font-size: 0.7rem;">← ARMURERIE</button>
                     <div class="badge" style="background: ${rarity.color}22; color: ${rarity.color}; border: 1px solid ${rarity.color}; padding: 4px 12px; border-radius: 20px; font-size: 0.65rem; font-weight: 800;">
-                        ${this.hero.rarity.toUpperCase()}
+                        ${rarity.label ? rarity.label.toUpperCase() : 'COMMUN'}
                     </div>
                 </div>
 

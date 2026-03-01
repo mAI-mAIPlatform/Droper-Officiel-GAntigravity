@@ -70,13 +70,19 @@ export class ReplaySystem {
                 heroId: e.hero ? e.hero.id : null,
                 _isAlly: e._isAlly
             })),
-            bullets: this.engine.bullets.map(b => ({
+            bullets: this.engine.entities.filter(e => e.type === 'projectile').map(b => ({
                 x: b.x,
                 y: b.y,
-                radius: b.radius,
-                color: b.color
+                radius: b.radius || 4,
+                color: b.color || '#fff'
             })),
-            particles: this.engine.gameMode.particles ? [...this.engine.gameMode.particles] : []
+            particles: this.engine.particles ? (this.engine.particles.particles || []).map(p => ({
+                x: p.x,
+                y: p.y,
+                size: p.size,
+                color: p.color || '#fff',
+                alpha: p.alpha || 1
+            })) : []
         };
 
         this.history.push(state);
