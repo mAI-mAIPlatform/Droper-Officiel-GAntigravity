@@ -1,5 +1,5 @@
 /* ============================
-   DROPER — Player Entity (v0.9.8)
+   DROPER — Player Entity (v1.0.0)
    ============================ */
 
 import { Entity } from './Entity.js';

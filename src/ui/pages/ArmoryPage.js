@@ -1,5 +1,5 @@
 /* ============================
-   DROPER — Page Armurerie (v0.0.4)
+   DROPER — Page Armurerie (v1.0.0)
    ============================ */
 
 import { toast } from '../components/ToastManager.js';

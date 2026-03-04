@@ -1,5 +1,5 @@
 /* ============================
-  * DROPER — Main Entry Point (v0.1.2 Alpha)
+  * DROPER — Main Entry Point (v1.0.0)
  * (c) 2026 mCompany / Mathias 🚀============================ */
 
 import './styles/variables.css';
@@ -36,7 +36,7 @@ import { DailyRewardManager } from './systems/DailyRewardManager.js';
 
 class DroperApp {
     constructor() {
-        this.version = '0.9.9';
+        this.version = '1.0.0';
         this.app = this; // Self reference for managers [v0.3.1]
         this.saveManager = new SaveManager();
         this.playerManager = new PlayerManager(this.saveManager);
@@ -128,7 +128,7 @@ class DroperApp {
             </div>`;
         }
 
-        console.log(`🎮 Droper v${this.version} Alpha — Initialisé !`);
+        console.log(`🎮 Droper v${this.version} — Initialisé !`);
     }
 }
 

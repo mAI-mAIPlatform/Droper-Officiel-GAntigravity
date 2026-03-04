@@ -4,6 +4,22 @@
 
 export const NEWS_ARTICLES = [
     {
+        id: 'news_v100_launch',
+        date: '04/03/2026',
+        version: 'v1.0.0',
+        title: '🚀 v1.0.0 — Grand Lancement !',
+        type: 'update',
+        emoji: '🎈',
+        summary: 'La version 1.0.0 est là ! Nouveaux modes, Divisions Classées, Skins et Physique rigide.',
+        content: [
+            '🏆 Classé S1 : Nouvelles divisions (Bronze à Pro) et Timeline de progression.',
+            '🎨 Modes : Chaque mode a désormais son propre univers visuel et ses murs (Kill Life, Lave Dyna, CyberBall).',
+            '🎭 Cosmétiques : Catalogue de skins et emotes (touches 1-5 en jeu) enfin disponible.',
+            '🧱 Physique : Système de collision AABB ultra-précis pour empêcher de traverser les murs.',
+            '⚙️ Équilibrage : Réduction de 30% de la vitesse des héros pour plus de stratégie.'
+        ],
+    },
+    {
         id: 'news_v090_alpha',
         date: '28/02/2026',
         version: 'v0.9.0 Alpha',

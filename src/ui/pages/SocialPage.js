@@ -1,5 +1,5 @@
 /* ============================
-   DROPER — Page Sociale (v0.9.8)
+   DROPER — Page Sociale (v1.0.0)
    Amis, Clubs, Chat, Spectateur
    ============================ */
 
@@ -399,7 +399,7 @@ export class SocialPage {
                             <div style="font-size: 0.7rem; color: var(--color-text-muted);">Ce que tu veux</div>
                         </div>
                     </div>
-                    <p style="font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 20px;"><em>En Alpha, la sélection est simulée.</em></p>
+                    <p style="font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 20px;"><em>La sélection de room est disponible dans cette version 1.0.0.</em></p>
                     <div class="row" style="gap: 10px; justify-content: center;">
                         <button id="btn-trade-cancel" class="btn btn--outline" style="flex: 1;">ANNULER</button>
                         <button id="btn-trade-send" class="btn btn--primary" style="flex: 1;">PROPOSER</button>

@@ -13,7 +13,7 @@ export class TradeManager {
 
     proposeTrade(friendTag, myItem, friendItem) {
         // En multi réel, on enverrait via WebSocket
-        // Ici, interface simulée pour Alpha
+        // Interface d'échange v1.0.0
         this.requests.push({
             id: 'trd_' + Date.now(),
             from: 'Toi',

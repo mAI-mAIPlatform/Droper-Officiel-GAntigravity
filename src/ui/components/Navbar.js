@@ -1,5 +1,5 @@
 /* ============================
-   DROPER — Composant Sidebar (v0.0.5)
+   DROPER — Composant Sidebar (v1.0.0)
    ============================ */
 
 const NAV_ITEMS = [
@@ -31,12 +31,12 @@ export class Navbar {
     const coins = this.app ? this.app.economyManager.coins : 0;
     const gems = this.app ? this.app.economyManager.gems : 0;
     const records = this.app && this.app.recordManager ? this.app.recordManager.total : 0;
-    const version = this.app ? this.app.version : '0.0.5';
+    const version = this.app ? this.app.version : '1.0.0';
 
     sidebar.innerHTML = `
       <div class="sidebar__logo">
         <div class="sidebar__logo-title">DROPER</div>
-        <div class="sidebar__logo-version">v${version} Alpha</div>
+        <div class="sidebar__logo-version">v${version}</div>
       </div>
 
       <nav class="sidebar__nav">
