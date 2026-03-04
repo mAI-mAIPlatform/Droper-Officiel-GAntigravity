@@ -1,5 +1,5 @@
 /* ============================
-   DROPER — Interface Admin Console (v0.9.8)
+   DROPER — Interface Admin Console (v1.0.0)
    ============================ */
 
 import { HEROES } from '../../data/heroes.js';
@@ -26,7 +26,7 @@ export class AdminConsolePage {
                             <button id="btn-login-admin" class="btn btn--accent" style="width: 100%; margin-top: 10px;">VALIDER L'ACCÈS</button>
                         </div>
                     </div>
-                    <p style="text-align: center; font-size: 0.6rem; color: var(--color-text-muted);">Console v0.2.6 — Système Htths_Tss</p>
+                    <p style="text-align: center; font-size: 0.6rem; color: var(--color-text-muted);">Console v1.0.0 — Système Htths_Tss</p>
                 </div>
             `;
         }
@@ -37,7 +37,7 @@ export class AdminConsolePage {
             <div class="page page--admin">
                 <div class="page__header row row--between">
                     <h1 class="section-title">
-                        <span class="section-title__prefix">///</span> CONSOLE MANAGER v0.9.8
+                        <span class="section-title__prefix">///</span> CONSOLE MANAGER v1.0.0
                     </h1>
                     <button id="btn-logout-admin" class="btn btn--ghost" style="font-size: 0.7rem;">DÉCONNEXION</button>
                 </div>

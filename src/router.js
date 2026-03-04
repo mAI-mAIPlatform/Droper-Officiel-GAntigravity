@@ -1,5 +1,5 @@
 /* ============================
-   DROPER — Router SPA (v0.0.5)
+   DROPER — Router SPA (v1.0.0)
    ============================ */
 
 import { Navbar } from './ui/components/Navbar.js';

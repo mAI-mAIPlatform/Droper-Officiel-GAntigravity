@@ -1,5 +1,5 @@
 /* ============================
-   DROPER — Page Boutique (v0.0.4 — achats uniques + caisse animée)
+   DROPER — Page Boutique (v1.0.0)
    ============================ */
 
 import { SHOP_OFFERS, getOffersByCategory } from '../../data/shop.js';

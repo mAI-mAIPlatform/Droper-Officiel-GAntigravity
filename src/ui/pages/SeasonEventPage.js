@@ -1,5 +1,5 @@
 /* ============================
-   DROPER — Page Événement Saison 1 (v0.0.4 — lore chapitres)
+   DROPER — Page Événement Saison 1 (v1.0.0)
    ============================ */
 
 import { SEASON_1 } from '../../data/season1.js';

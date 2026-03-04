@@ -1,5 +1,5 @@
 /* ============================
-   DROPER — Page Pass de Saison (v0.0.4 + Éveil Pass)
+   DROPER — Page Pass de Saison (v1.0.0)
    ============================ */
 
 import { SEASON_PASS } from '../../data/seasonpass.js';

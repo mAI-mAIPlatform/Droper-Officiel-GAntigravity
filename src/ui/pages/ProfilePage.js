@@ -1,5 +1,5 @@
 /* ============================
-   DROPER — Page Profil (v0.9.9)
+   DROPER — Page Profil (v1.0.0)
    ============================ */
 
 import { toast } from '../components/ToastManager.js';

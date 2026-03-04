@@ -1,5 +1,5 @@
 /* ============================
-   DROPER — Page Sélection de Mode (v0.9.7-beta)
+   DROPER — Page Sélection de Mode (v1.0.0)
    ============================ */
 
 import { GAME_MODES } from '../../data/gamemodes.js';

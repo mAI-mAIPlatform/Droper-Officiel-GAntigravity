@@ -1,5 +1,5 @@
 /* ============================
-   DROPER — Hero Details Page (v0.9.2)
+   DROPER — Hero Details Page (v1.0.0)
    ============================ */
 
 import { getHeroById, RARITIES } from '../../data/heroes.js';

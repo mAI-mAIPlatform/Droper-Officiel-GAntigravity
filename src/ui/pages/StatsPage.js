@@ -1,5 +1,5 @@
 /* ============================
-   DROPER — Page Statistiques (v0.9.6)
+   DROPER — Page Statistiques (v1.0.0)
    Filtres, graphes, classements
    ============================ */
 
