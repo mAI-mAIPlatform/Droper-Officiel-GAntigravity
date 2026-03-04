@@ -175,6 +175,33 @@ export class SocialPage {
                         <div style="height: 100%; width: ${Math.min(100, (club.trophies / 2000) * 100)}%; background: linear-gradient(90deg, #fbbf24, #f59e0b); border-radius: 6px; transition: width 0.5s;"></div>
                     </div>
                     <div style="font-size: 0.6rem; color: var(--color-text-muted); text-align: right;">Objectif: 2000 🏆</div>
+
+                    <!-- Tournoi de Club -->
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05);">
+                        <div class="row row--between" style="align-items: center;">
+                            <div>
+                                <h3 style="font-size: 0.8rem; margin: 0; color: var(--color-accent-blue);">⚔️ TOURNOI INTER-CLUBS</h3>
+                                <div style="font-size: 0.65rem; color: var(--color-text-muted); margin-top: 2px;">Saison actuelle : Ligue Or</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 0.9rem; font-weight: 800; color: white;">#4 <span style="font-size: 0.6rem; color: var(--color-text-muted);">Mondial</span></div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 10px; font-size: 0.65rem; display: flex; gap: 8px;">
+                            <div style="flex: 1; min-width: 0; background: rgba(255,255,255,0.03); padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="color: var(--color-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">1. Les Titans</div>
+                                <div style="font-weight: 800; color: var(--color-accent-gold);">🏆 ${(club.trophies + 450).toLocaleString()}</div>
+                            </div>
+                            <div style="flex: 1; min-width: 0; background: rgba(74, 158, 255, 0.1); padding: 8px; border-radius: 6px; border: 1px solid var(--color-accent-blue);">
+                                <div style="color: white; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">4. ${club.name}</div>
+                                <div style="font-weight: 800; color: var(--color-accent-gold);">🏆 ${club.trophies.toLocaleString()}</div>
+                            </div>
+                            <div style="flex: 1; min-width: 0; background: rgba(255,255,255,0.03); padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="color: var(--color-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">5. Cyber Ops</div>
+                                <div style="font-weight: 800; color: var(--color-text-secondary);">🏆 ${Math.max(0, club.trophies - 150).toLocaleString()}</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Membres -->

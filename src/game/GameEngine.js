@@ -15,6 +15,7 @@ import { Enemy } from './Enemy.js';
 import { WeatherSystem } from './WeatherSystem.js';
 import { ReplaySystem } from '../systems/ReplaySystem.js';
 import { AntiCheatLogger } from '../systems/AntiCheatLogger.js';
+import { NetworkSync } from './NetworkSync.js';
 
 export class GameEngine {
     constructor(app) {
@@ -52,6 +53,7 @@ export class GameEngine {
         this._replayState = null;
         this.isReplaying = false;
         this.antiCheat = new AntiCheatLogger(this);
+        this.networkSync = new NetworkSync(this.app); // v0.9.9 Multiplayer
 
         // --- CAVEAUX SYSTEM ---
         this.gasCenter = { x: 0, y: 0 };
@@ -326,6 +328,7 @@ export class GameEngine {
         if (this.running) return;
         this.running = true;
         this.lastTime = performance.now();
+        this.networkSync.connect();
         try {
             this.loop(this.lastTime);
         } catch (e) {
@@ -431,7 +434,9 @@ export class GameEngine {
         }
 
         // Joueur
+        this.networkSync.update(dt);
         if (this.player && this.player.alive) {
+            this.networkSync.sendLocalState(this.player);
             const oldX = this.player.x;
             const oldY = this.player.y;
 
@@ -707,6 +712,8 @@ export class GameEngine {
                 this.player.draw(ctx, this.spriteRenderer);
             }
         }
+
+        this.networkSync.draw(ctx);
 
         // Drops
         this.dropSystem.draw(ctx);

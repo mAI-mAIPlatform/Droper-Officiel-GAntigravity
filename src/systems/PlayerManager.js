@@ -29,6 +29,9 @@ export class PlayerManager {
             this.data.selectedHero = 'soldier';
         }
 
+        if (!this.data.equippedAura) this.data.equippedAura = 'none';
+        if (!this.data.equippedTrail) this.data.equippedTrail = 'none';
+
         // v0.5.0 Custom Image URLs
         if (typeof this.data.customAvatarUrl === 'undefined') {
             this.data.customAvatarUrl = null;
@@ -52,6 +55,18 @@ export class PlayerManager {
     get avatarEmoji() { return this.data.avatarEmoji; }
     get customAvatarUrl() { return this.data.customAvatarUrl; }
     get customBannerUrl() { return this.data.customBannerUrl; }
+    get equippedAura() { return this.data.equippedAura; }
+    get equippedTrail() { return this.data.equippedTrail; }
+
+    equipAura(id) {
+        this.data.equippedAura = id;
+        this.persist();
+    }
+
+    equipTrail(id) {
+        this.data.equippedTrail = id;
+        this.persist();
+    }
 
     setAvatarUrl(url) {
         this.data.customAvatarUrl = url;

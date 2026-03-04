@@ -329,23 +329,31 @@ export class StatsPage {
 
         const bestStreak = this.app.matchHistoryManager.getBestWinStreaks();
 
-        // SIMULATED GLOBAL LEADERBOARD
+        // SIMULATED GLOBAL LEADERBOARD -> REAL FIREBASE LEADERBOARD
         let globalUI = '';
         if (this.leaderboardType === 'global') {
-            const playerKills = this.app.playerManager.getStats().kills || 0;
-            const fakePlayers = [
-                { name: 'DarkSlayer', value: Math.max(playerKills + 500, 1500) },
-                { name: 'NinjaPro', value: Math.max(playerKills + 200, 1200) },
-                { name: 'TTV_NoobMaster', value: Math.max(playerKills + 50, 800) },
-                { name: 'Vous (Local)', value: playerKills, isHighlighted: true },
-                { name: 'Xx_Sniper_xX', value: Math.max(playerKills - 100, 500) },
-                { name: 'CasualGamer', value: Math.max(playerKills - 300, 100) },
-            ].sort((a, b) => b.value - a.value);
+            if (!this.globalLeaderboardData) {
+                globalUI = '<div style="text-align:center; padding: 20px; color: var(--color-text-muted);">Chargement du classement mondial... 🌍</div>';
 
-            const globalLeaderboard = new LeaderboardWidget('Classement Mondial (Kills)',
-                fakePlayers, { valueLabel: 'kills', maxEntries: 10, highlightColor: 'var(--color-accent-cyan)' }
-            );
-            globalUI = globalLeaderboard.render();
+                // Fetch depuis Firebase via SaveManager/DatabaseAdapter
+                this.app.saveManager.db.getLeaderboard().then(data => {
+                    const tag = this.app.playerManager.data.tag;
+                    this.globalLeaderboardData = data.map((d, i) => ({
+                        name: d.username,
+                        value: d.kills,
+                        emoji: d.avatar || '👤',
+                        isHighlighted: d.tag === tag
+                    }));
+                    // Si le joueur n'est pas dans le top, on pourrait rajouter sa position ici,
+                    // mais pour l'instant on affiche le Top 100.
+                    this.refresh();
+                });
+            } else {
+                const globalLeaderboard = new LeaderboardWidget('Classement Mondial (Kills)',
+                    this.globalLeaderboardData, { valueLabel: 'kills', maxEntries: 100, highlightColor: 'var(--color-accent-cyan)' }
+                );
+                globalUI = globalLeaderboard.render();
+            }
         }
 
         return `

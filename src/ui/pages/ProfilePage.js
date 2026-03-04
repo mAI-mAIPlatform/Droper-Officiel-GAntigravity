@@ -1,8 +1,10 @@
 /* ============================
-   DROPER — Page Profil (v0.0.4)
+   DROPER — Page Profil (v0.9.9)
    ============================ */
 
 import { toast } from '../components/ToastManager.js';
+import { AURAS } from '../../data/auras.js';
+import { TRAILS } from '../../data/trails.js';
 
 export class ProfilePage {
   constructor(app) {
@@ -14,6 +16,7 @@ export class ProfilePage {
     const stats = player.getStats();
     const hero = this.app.heroManager.getFullHero(player.selectedHero);
     const economy = this.app.economyManager;
+    const inventory = this.app.inventoryManager; // NEEDED for unlocking cosmetics
     const xpPct = player.xpToNext > 0 ? (player.xp / player.xpToNext * 100) : 0;
 
     return `
@@ -84,6 +87,44 @@ export class ProfilePage {
             <button class="btn btn--outline btn--sm" id="btn-edit-name" style="margin-top: 15px; width: 100%;">
               ✏️ Modifier le pseudo
             </button>
+          </div>
+        </div>
+
+        <!-- Cosmétiques -->
+        <div class="section anim-fade-in-up anim-delay-1" style="margin-top: var(--spacing-xl);">
+          <h2 class="section-title" style="margin-bottom: var(--spacing-lg);">✨ COSMÉTIQUES</h2>
+          <div class="grid-2">
+            <!-- Auras -->
+            <div class="card">
+              <h3 style="margin-bottom: 10px; font-size: var(--font-size-md);">Auras</h3>
+              <div class="row" style="gap: 10px; flex-wrap: wrap;">
+                ${AURAS.map(a => {
+          const unlocked = a.id === 'none' || (inventory.data.unlockedCosmetics && inventory.data.unlockedCosmetics.includes(a.id));
+          return `
+                  <div class="cosmetic-btn cosmetic-aura ${player.equippedAura === a.id ? 'active' : ''}" data-id="${a.id}" data-unlocked="${unlocked}" style="text-align: center; cursor: ${unlocked ? 'pointer' : 'not-allowed'}; padding: 10px; background: ${player.equippedAura === a.id ? 'var(--color-bg)' : 'var(--color-surface)'}; border: 1px solid ${player.equippedAura === a.id ? 'var(--color-accent-blue)' : 'var(--color-border)'}; border-radius: 8px; flex: 1; min-width: 60px; opacity: ${unlocked ? 1 : 0.5}; position: relative;">
+                    <div style="font-size: 1.5rem; margin-bottom: 5px;">${a.emoji}</div>
+                    <div style="font-size: 0.6rem; color: var(--color-text-muted);">${a.name}</div>
+                    ${!unlocked ? '<span style="position: absolute; top: -5px; right: -5px; background: var(--color-bg); border-radius: 50%; padding: 2px;">🔒</span>' : ''}
+                  </div>
+                `}).join('')}
+              </div>
+            </div>
+
+             <!-- Trails -->
+            <div class="card">
+              <h3 style="margin-bottom: 10px; font-size: var(--font-size-md);">Traces de pas</h3>
+              <div class="row" style="gap: 10px; flex-wrap: wrap;">
+                ${TRAILS.map(t => {
+            const unlocked = t.id === 'none' || (inventory.data.unlockedCosmetics && inventory.data.unlockedCosmetics.includes(t.id));
+            return `
+                  <div class="cosmetic-btn cosmetic-trail ${player.equippedTrail === t.id ? 'active' : ''}" data-id="${t.id}" data-unlocked="${unlocked}" style="text-align: center; cursor: ${unlocked ? 'pointer' : 'not-allowed'}; padding: 10px; background: ${player.equippedTrail === t.id ? 'var(--color-bg)' : 'var(--color-surface)'}; border: 1px solid ${player.equippedTrail === t.id ? 'var(--color-accent-blue)' : 'var(--color-border)'}; border-radius: 8px; flex: 1; min-width: 60px; opacity: ${unlocked ? 1 : 0.5}; position: relative;">
+                    <div style="font-size: 1.5rem; margin-bottom: 5px;">${t.emoji}</div>
+                    <div style="font-size: 0.6rem; color: var(--color-text-muted);">${t.name}</div>
+                    ${!unlocked ? '<span style="position: absolute; top: -5px; right: -5px; background: var(--color-bg); border-radius: 50%; padding: 2px;">🔒</span>' : ''}
+                  </div>
+                `}).join('')}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -245,12 +286,30 @@ export class ProfilePage {
       }
     });
 
-    // Volume
     document.getElementById('volume-slider')?.addEventListener('input', (e) => {
       const vol = parseInt(e.target.value) / 100;
       if (this.app.audioManager) {
         this.app.audioManager.setVolume(vol);
       }
+    });
+
+    // Cosmétiques
+    document.querySelectorAll('.cosmetic-aura').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        this.app.playerManager.equipAura(id);
+        toast.success('✨ Aura équipée');
+        this.refresh();
+      });
+    });
+
+    document.querySelectorAll('.cosmetic-trail').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        this.app.playerManager.equipTrail(id);
+        toast.success('👣 Trace équipée');
+        this.refresh();
+      });
     });
   }
 

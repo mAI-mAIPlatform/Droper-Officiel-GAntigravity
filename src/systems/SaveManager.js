@@ -38,21 +38,64 @@ class DatabaseAdapter {
         localStorage.removeItem(key);
     }
 
-    async syncToCloud() {
-        if (this.type === 'local') {
+    async syncToCloud(fullData) {
+        if (!window.db) {
+            // Pas de Firebase configuré, fallback local
             this.syncStatus = 'synced';
             this.lastSyncTime = Date.now();
             return;
         }
         try {
             this.syncStatus = 'syncing';
-            // Simulated cloud sync delay
-            await new Promise(r => setTimeout(r, 500));
+            const { doc, setDoc } = window.firebase;
+
+            // On utilise le tag du joueur comme ID unique (à remplacer par auth.uid si Authentication est ajouté)
+            const userId = fullData?.player?.tag?.replace('#', '') || 'anonymous';
+
+            await setDoc(doc(window.db, "saves", userId), fullData);
+
+            // Mise à jour spécifique pour le Leaderboard (plus léger)
+            if (fullData.player && fullData.stats) {
+                await setDoc(doc(window.db, "leaderboard", userId), {
+                    username: fullData.player.username,
+                    tag: fullData.player.tag,
+                    kills: fullData.stats.kills || 0,
+                    score: fullData.stats.maxWave || 0,
+                    avatar: fullData.player.avatarEmoji,
+                    updatedAt: Date.now()
+                });
+            }
+
             this.syncStatus = 'synced';
             this.lastSyncTime = Date.now();
         } catch (e) {
             this.syncStatus = 'error';
             console.error('❌ Sync cloud échouée', e);
+        }
+    }
+
+    async getLeaderboard() {
+        if (!window.db) {
+            // Fallback (mocks)
+            return [
+                { username: 'ProGamer', kills: 15420, score: 85, avatar: '🔥' },
+                { username: 'ShadowNinja', kills: 12300, score: 72, avatar: '🥷' },
+                { username: 'JoueurLocal', kills: 50, score: 10, avatar: '👤' } // Simulation
+            ];
+        }
+
+        try {
+            const { collection, query, orderBy, limit, getDocs } = window.firebase;
+            const q = query(collection(window.db, "leaderboard"), orderBy("kills", "desc"), limit(100));
+            const querySnapshot = await getDocs(q);
+            const leaders = [];
+            querySnapshot.forEach((doc) => {
+                leaders.push(doc.data());
+            });
+            return leaders;
+        } catch (e) {
+            console.error("Erreur chargement Leaderboard", e);
+            return [];
         }
     }
 
@@ -115,6 +158,10 @@ export class SaveManager {
             localStorage.setItem(SAVE_KEY, jsonStr);
             // 🔒 Signer les données
             localStorage.setItem(CHECKSUM_KEY, this._generateChecksum(jsonStr));
+
+            // 🔥 Sync vers Firebase
+            this.db.syncToCloud(this.data);
+
         } catch (e) {
             console.error('❌ Erreur de sauvegarde', e);
         }

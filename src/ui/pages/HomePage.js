@@ -22,6 +22,14 @@ export class HomePage {
     const recentDrops = inventory.getRecentDrops(4);
     const xpPct = player.xpToNext > 0 ? (player.xp / player.xpToNext * 100) : 0;
 
+    const questManager = this.app.questManager;
+    const dailyQuests = questManager ? questManager.getDailyQuests() : [];
+    const uncompletedQuests = dailyQuests.filter(q => q.progress < q.target);
+    const firstQuest = uncompletedQuests[0] || dailyQuests[0];
+
+    const clubMgr = this.app.clubManager;
+    const club = clubMgr ? clubMgr.club : null;
+
     return `
       <div class="page">
         <!-- Bannière Saison 1 -->
@@ -100,15 +108,35 @@ export class HomePage {
             <a href="#pass-saison" style="margin-top: var(--spacing-md); color: var(--color-accent-gold); font-size: var(--font-size-xs); font-weight: 600;">Voir l'aventure →</a>
           </div>
 
-          <!-- Challenge du jour -->
-          <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
-            <div>
-              <div style="font-size: var(--font-size-xs); color: #fbbf24; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; margin-bottom: var(--spacing-sm);">🔥 Challenge</div>
-              <div style="font-size: var(--font-size-md); font-weight: 700;">${challenge.title}</div>
+          <!-- Quêtes & Social -->
+          <div class="stack" style="gap: var(--spacing-md);">
+            <!-- Quête à la une -->
+            <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; padding: 15px;">
+              <div>
+                <div style="font-size: var(--font-size-xs); color: var(--color-accent-green); text-transform: uppercase; font-weight: 700; letter-spacing: 1px; margin-bottom: 5px;">✅ Quête en cours</div>
+                <div style="font-size: 0.85rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${firstQuest ? firstQuest.title : 'Toutes terminées !'}</div>
+                ${firstQuest ? `
+                  <div class="progress-bar" style="height: 4px; margin: 8px 0;">
+                    <div class="progress-bar__fill" style="width: ${(firstQuest.progress / firstQuest.target) * 100}%; background: var(--color-accent-green);"></div>
+                  </div>
+                  <div style="font-size: 0.65rem; color: var(--color-text-muted);">${firstQuest.progress} / ${firstQuest.target}</div>
+                ` : ''}
+              </div>
+              <a href="#quetes" class="btn btn--outline" style="margin-top: 10px; padding: 6px; font-size: 0.7rem;">VOIR TOUT</a>
             </div>
-            <div style="margin-top: var(--spacing-md);">
-              <div class="badge badge--common" style="background: rgba(251, 191, 36, 0.1); color: #fbbf24;">${challenge.reward.amount} ${challenge.reward.emoji}</div>
-              <a href="#game" class="btn btn--accent" style="margin-top: var(--spacing-sm); padding: 8px;">DÉFI</a>
+
+            <!-- Club -->
+            <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; padding: 15px; background: rgba(74, 158, 255, 0.05); border-color: rgba(74, 158, 255, 0.2);">
+              <div>
+                <div style="font-size: var(--font-size-xs); color: var(--color-accent-blue); text-transform: uppercase; font-weight: 700; letter-spacing: 1px; margin-bottom: 5px;">🏠 Mon Club</div>
+                ${club ? `
+                  <div style="font-size: 0.85rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${club.emoji} ${club.name}</div>
+                  <div style="font-size: 0.7rem; color: var(--color-accent-gold); margin-top: 2px;">🏆 ${club.trophies} Trophées</div>
+                ` : `
+                  <div style="font-size: 0.8rem; font-weight: 700; color: var(--color-text-muted);">Aucun club rejoint</div>
+                `}
+              </div>
+              <a href="#social" class="btn btn--accent" style="margin-top: 10px; padding: 6px; font-size: 0.7rem;">${club ? 'LE CLUB' : 'REJOINDRE'}</a>
             </div>
           </div>
         </div>

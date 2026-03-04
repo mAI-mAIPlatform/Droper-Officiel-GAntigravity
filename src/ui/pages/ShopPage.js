@@ -20,6 +20,7 @@ export class ShopPage {
       { key: 'special', title: '🎁 OFFRES SPÉCIALES', columns: 'grid-2' },
       { key: 'starter', title: '🛡️ STARTERS', columns: 'grid-3' },
       { key: 'flash', title: '🔥 OFFRES FLASH 🔥', columns: 'grid-3' },
+      { key: 'cosmetic', title: '✨ COSMÉTIQUES', columns: 'grid-3' },
       { key: 'hero', title: '⚔️ PACKS HÉROS', columns: 'grid-2' },
       { key: 'crate', title: '📦 CAISSES', columns: 'grid-2' },
       { key: 'season', title: '🌅 SAISON 1 — L\'ÉVEIL', columns: 'grid-2' },
@@ -350,6 +351,14 @@ export class ShopPage {
         inventory.addItem('fragment_hero', reward.fragments);
         rewards.push({ type: 'item', itemId: 'fragment_hero', amount: reward.fragments });
       }
+    } else if (reward.type === 'cosmetic') {
+      const unlocks = inventory.data.unlockedCosmetics || [];
+      if (!unlocks.includes(reward.cosmId)) {
+        unlocks.push(reward.cosmId);
+        inventory.data.unlockedCosmetics = unlocks;
+        inventory.save.set('inventory', inventory.data);
+      }
+      toast.success(`✨ Cosmétique ${offer.name} débloqué !`);
     }
 
     return rewards;

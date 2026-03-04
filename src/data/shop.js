@@ -182,6 +182,35 @@ export const SHOP_OFFERS = [
         cost: { type: 'coins', amount: 150 },
         category: 'chips',
     },
+
+    // --- COSMETIQUES (v0.9.9) ---
+    {
+        id: 'cosm_aura_neon',
+        name: 'Aura Néon',
+        emoji: '💜',
+        description: 'Débloque l\'Aura Néon Pulse.',
+        reward: { type: 'cosmetic', cosmType: 'aura', cosmId: 'neon' },
+        cost: { type: 'gems', amount: 150 },
+        category: 'cosmetic',
+    },
+    {
+        id: 'cosm_trail_stars',
+        name: 'Trace Étoiles',
+        emoji: '✨',
+        description: 'Débloque la Trace Étoiles Filantes.',
+        reward: { type: 'cosmetic', cosmType: 'trail', cosmId: 'stars_trail' },
+        cost: { type: 'gems', amount: 150 },
+        category: 'cosmetic',
+    },
+    {
+        id: 'cosm_aura_shadow',
+        name: 'Aura Ombre',
+        emoji: '🖤',
+        description: 'Débloque l\'Aura Ombre Noire.',
+        reward: { type: 'cosmetic', cosmType: 'aura', cosmId: 'shadow' },
+        cost: { type: 'gems', amount: 250 },
+        category: 'cosmetic',
+    },
 ];
 
 export function getOffersByCategory(category) {

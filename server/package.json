@@ -9,9 +9,14 @@
         "dev": "nodemon index.js"
     },
     "dependencies": {
+        "express": "^5.2.1",
+        "socket.io": "^4.8.3",
         "ws": "^8.16.0"
     },
     "devDependencies": {
         "nodemon": "^3.1.0"
-    }
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC"
 }

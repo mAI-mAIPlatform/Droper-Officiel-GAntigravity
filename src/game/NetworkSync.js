@@ -13,8 +13,63 @@ const SYNC_CONFIG = {
 };
 
 export class NetworkSync {
-    constructor() {
+    constructor(app) {
+        this.app = app;
         this.remotePlayers = new Map();
+        this.socket = null;
+        this.lastSendTime = 0;
+    }
+
+    connect() {
+        if (typeof io !== 'undefined') {
+            const player = this.app.playerManager;
+            const hero = this.app.heroManager.getFullHero(player.selectedHero);
+
+            this.socket = io('http://localhost:3000');
+
+            this.socket.on('connect', () => {
+                console.log('🔗 WebSocket connecté !');
+                this.socket.emit('join_game', {
+                    hp: hero ? hero.stats.hp : 100,
+                    maxHp: hero ? hero.stats.hp : 100,
+                    color: hero ? hero.glowColor : '#ffffff',
+                    alive: true,
+                    username: player.username
+                });
+            });
+
+            this.socket.on('game_state', (players) => {
+                players.forEach(p => this.updateRemotePlayer(p.id, p));
+            });
+
+            this.socket.on('player_joined', (p) => {
+                this.updateRemotePlayer(p.id, p);
+            });
+
+            this.socket.on('player_moved', (data) => {
+                this.updateRemotePlayer(data.id, data);
+            });
+
+            this.socket.on('player_left', (id) => {
+                this.removeRemotePlayer(id);
+            });
+        }
+    }
+
+    sendLocalState(playerEntity) {
+        if (!this.socket || !this.socket.connected || !playerEntity) return;
+
+        const now = Date.now();
+        if (now - this.lastSendTime > 50) { // Limit to 20 updates per second
+            this.socket.emit('player_move', {
+                x: playerEntity.x,
+                y: playerEntity.y,
+                angle: playerEntity.angle,
+                hp: playerEntity.hp,
+                alive: playerEntity.alive
+            });
+            this.lastSendTime = now;
+        }
     }
 
     updateRemotePlayer(playerId, data) {
