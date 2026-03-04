@@ -3,16 +3,16 @@
    ============================ */
 
 export class RankedPage {
-    constructor(app) {
-        this.app = app;
-    }
+  constructor(app) {
+    this.app = app;
+  }
 
-    render() {
-        const player = this.app.playerManager.data;
-        const rank = player.rank || 'Bronze I';
-        const points = player.rankPoints || 0;
+  render() {
+    const player = this.app.playerManager.data;
+    const rank = player.rank || 'Bronze I';
+    const points = player.rankPoints || 0;
 
-        return `
+    return `
       <div class="page ranked-page">
         <div class="page__header">
           <h1 class="section-title">
@@ -61,47 +61,109 @@ export class RankedPage {
           </div>
         </div>
 
+        <!-- Timeline des prochains Rangs -->
+        <h3 style="margin-bottom: 10px; font-size: 1rem; color: var(--color-accent-blue);">PROGRESSION LIGUE</h3>
+        <div class="ranked-timeline" style="
+            display: flex; gap: 15px; overflow-x: auto; padding-bottom: 15px; margin-bottom: var(--spacing-xl);
+            scrollbar-width: thin; scrollbar-color: var(--color-accent-blue) rgba(255,255,255,0.05);
+        ">
+            ${this.renderUpcomingRanks(points)}
+        </div>
+
         <div class="grid-3" style="gap: var(--spacing-lg);">
             ${this.renderLeagueCard('Bronze', '🥉', 'Le début du chemin.')}
             ${this.renderLeagueCard('Argent', '🥈', 'Tu commences à comprendre.')}
             ${this.renderLeagueCard('Or', '🥇', 'Un compétiteur sérieux.')}
-            ${this.renderLeagueCard('Platine', '💎', 'L\'élite approche.')}
-            ${this.renderLeagueCard('Diamant', '✨', 'Maîtrise totale.')}
-            ${this.renderLeagueCard('Légende', '👑', 'Le sommet absolu.')}
-        </div>
+            ${this.renderLeagueCard('Mythique', '🔮', 'L\\'élite approche.')}
+            ${ this.renderLeagueCard('Légendaire', '👑', 'Maîtrise totale.') }
+            ${ this.renderLeagueCard('Pro', '🏆', 'Le sommet absolu.') }
+        </div >
 
-        <div style="margin-top: var(--spacing-2xl); text-align: center;">
-            <button class="btn btn--accent btn--lg" id="btn-play-ranked" style="padding: 15px 50px; font-size: 1.2rem; box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);">
-                ⚔️ RECHERCHER UNE PARTIE
-            </button>
-        </div>
+      <div style="margin-top: var(--spacing-2xl); text-align: center;">
+        <button class="btn btn--accent btn--lg" id="btn-play-ranked" style="padding: 15px 50px; font-size: 1.2rem; box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);">
+          ⚔️ RECHERCHER UNE PARTIE
+        </button>
       </div>
-    `;
+      </div >
+      `;
     }
 
     getRankEmoji(rank) {
         if (rank.includes('Bronze')) return '🥉';
         if (rank.includes('Argent')) return '🥈';
         if (rank.includes('Or')) return '🥇';
-        if (rank.includes('Platine')) return '💎';
-        if (rank.includes('Diamant')) return '✨';
-        return '👑';
+        if (rank.includes('Mythique')) return '🔮';
+        if (rank.includes('Légendaire')) return '👑';
+        return '🏆';
     }
 
     getNextRank(rank) {
-        const ranks = ['Bronze I', 'Bronze II', 'Bronze III', 'Argent I', 'Argent II', 'Argent III', 'Or I', 'Or II', 'Or III', 'Platine I', 'Platine II', 'Platine III', 'Diamant I', 'Diamant II', 'Diamant Suprême', 'Légende'];
+        const ranks = [
+            'Bronze I', 'Bronze II', 'Bronze III', 
+            'Argent I', 'Argent II', 'Argent III', 
+            'Or I', 'Or II', 'Or III', 
+            'Mythique I', 'Mythique II', 'Mythique III', 
+            'Légendaire I', 'Légendaire II', 'Légendaire III', 
+            'Pro I', 'Pro II', 'Pro III'
+        ];
         const idx = ranks.indexOf(rank);
         return idx < ranks.length - 1 ? ranks[idx + 1] : 'MAX';
     }
 
     renderLeagueCard(name, emoji, desc) {
         return `
-        <div class="card" style="text-align: center; background: rgba(255,255,255,0.02);">
+      < div class= "card" style = "text-align: center; background: rgba(255,255,255,0.02);" >
             <div style="font-size: 2rem; margin-bottom: 10px;">${emoji}</div>
             <strong style="display: block; font-size: 1.1rem; margin-bottom: 5px;">${name}</strong>
             <p style="font-size: 0.7rem; color: var(--color-text-muted);">${desc}</p>
-        </div>
+        </div >
       `;
+    }
+
+    renderUpcomingRanks(currentPoints) {
+        // import { LEAGUES } from '../../data/leagues.js'; // imported dynamically via system if needed. We'll reconstruct here or fetch.
+        // For simplicity UI visually, let's build the array:
+        const ranksData = [
+            { id: 'b1', name: 'Bronze I', emoji: '🥉', points: 0, color: '#cd7f32' },
+            { id: 'b2', name: 'Bronze II', emoji: '🥉', points: 30, color: '#cd7f32' },
+            { id: 'b3', name: 'Bronze III', emoji: '🥉', points: 70, color: '#cd7f32' },
+            { id: 'a1', name: 'Argent I', emoji: '🥈', points: 120, color: '#c0c0c0' },
+            { id: 'a2', name: 'Argent II', emoji: '🥈', points: 180, color: '#c0c0c0' },
+            { id: 'a3', name: 'Argent III', emoji: '🥈', points: 260, color: '#c0c0c0' },
+            { id: 'o1', name: 'Or I', emoji: '🥇', points: 360, color: '#fbbf24' },
+            { id: 'o2', name: 'Or II', emoji: '🥇', points: 480, color: '#fbbf24' },
+            { id: 'o3', name: 'Or III', emoji: '🥇', points: 620, color: '#fbbf24' },
+            { id: 'm1', name: 'Mythique I', emoji: '🔮', points: 1500, color: '#8b5cf6' },
+            { id: 'm2', name: 'Mythique II', emoji: '🔮', points: 1800, color: '#8b5cf6' },
+            { id: 'm3', name: 'Mythique III', emoji: '🔮', points: 2200, color: '#8b5cf6' },
+            { id: 'l1', name: 'Légendaire I', emoji: '👑', points: 2800, color: '#ef4444' },
+            { id: 'l2', name: 'Légendaire II', emoji: '👑', points: 3500, color: '#ef4444' },
+            { id: 'l3', name: 'Légendaire III', emoji: '👑', points: 4200, color: '#ef4444' },
+            { id: 'p1', name: 'Pro I', emoji: '🏆', points: 5000, color: '#10b981' },
+            { id: 'p2', name: 'Pro II', emoji: '🏆', points: 6000, color: '#10b981' },
+            { id: 'p3', name: 'Pro III', emoji: '🏆', points: 7500, color: '#10b981' }
+        ];
+
+        // Only show upcoming 5 ranks
+        const upcoming = ranksData.filter(r => r.points > currentPoints).slice(0, 5);
+        if (upcoming.length === 0) return `< div style = "color: var(--color-text-muted);" > Vous avez atteint le sommet!</div > `;
+
+        return upcoming.map((r, i) => `
+    < div style = "
+                min - width: 120px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid ${ r.color } 44;
+    border - radius: 12px;
+    padding: 15px;
+    text - align: center;
+    opacity: ${ 1 - (i * 0.15) };
+    position: relative;
+    ">
+      < div style = "font-size: 1.5rem; margin-bottom: 5px; filter: drop-shadow(0 0 5px ${r.color});" > ${ r.emoji }</div >
+                <div style="font-size: 0.8rem; font-weight: 800; color: ${r.color};">${r.name}</div>
+                <div style="font-size: 0.65rem; color: var(--color-text-muted); margin-top: 5px;">${r.points} RP</div>
+            </div >
+      `).join('');
     }
 
     afterRender() {

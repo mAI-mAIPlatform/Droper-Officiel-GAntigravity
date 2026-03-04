@@ -33,7 +33,7 @@ export class Player extends Entity {
 
         this.hero = heroData;
         const baseSpeed = heroData ? heroData.stats.speed * 30 + 100 : 200;
-        this.speed = baseSpeed * 0.6; // Reduced to 60% speed v0.3.0
+        this.speed = baseSpeed * 0.6 * 0.7; // Reduced to 60% previously, now reduced by another 30% for v1.0.0
         this.shootCooldown = 0;
         this.shootRate = 0.18;
         this.mouseX = 0;
@@ -79,6 +79,11 @@ export class Player extends Entity {
         this._gameTime = 0;
         this._lastTrailX = x;
         this._lastTrailY = y;
+
+        // v1.0.0 Cosmetics
+        this.equippedSkin = heroData?.skin || 'default';
+        this.equippedEmote = 'none';
+        this.activeEmoteTimer = 0;
     }
 
     update(dt, engine) {
@@ -112,17 +117,23 @@ export class Player extends Entity {
 
         if (this.shootCooldown > 0) this.shootCooldown -= dt;
 
-        if ((engine.isKeyDown('KeyR') || this.ammo <= 0) && this.ammo < this.maxAmmo) {
+        if ((engine.isKeyDown('KeyR') || this.ammo <= 0) && this.ammo < this.maxAmmo && !this.isReloading) {
             this.isReloading = true;
+            this.reloadTimer = 1.0 / this.activeBoosts.reloadSpeed; // Initialize reload timer
         }
 
-        if (this.isReloading || this.ammo < this.maxAmmo) {
-            this.reloadTimer += dt * this.activeBoosts.reloadSpeed;
-            if (this.reloadTimer >= 1.0) {
-                this.ammo++;
-                this.reloadTimer = 0;
-                if (this.ammo === this.maxAmmo) this.isReloading = false;
+        // Ammo UI logic handled in HUD
+        if (this.isReloading && this.ammo < this.maxAmmo) {
+            this.reloadTimer -= dt;
+            if (this.reloadTimer <= 0) {
+                this.ammo = this.maxAmmo;
+                this.isReloading = false;
             }
+        }
+
+        // Emote timer
+        if (this.activeEmoteTimer > 0) {
+            this.activeEmoteTimer -= dt;
         }
 
         if (this.powerActive) {
@@ -209,6 +220,9 @@ export class Player extends Entity {
         this.shootCooldown = this.getShootRate();
         this.ammo--;
 
+        const spawnX = this.x + Math.cos(this.angle) * 20;
+        const spawnY = this.y + Math.sin(this.angle) * 20;
+
         if (this.superchargeActive) {
             // v0.4.0 360 Degree Wave Shot
             const bullets = [];
@@ -216,8 +230,8 @@ export class Player extends Entity {
             for (let i = 0; i < numBullets; i++) {
                 const angle = (i * Math.PI * 2) / numBullets;
                 bullets.push({
-                    x: this.x + Math.cos(angle) * 20,
-                    y: this.y + Math.sin(angle) * 20,
+                    x: spawnX,
+                    y: spawnY,
                     angle: angle,
                     damage: this.attack * this.activeBoosts.damage,
                     speed: 600,
@@ -228,13 +242,19 @@ export class Player extends Entity {
         }
 
         return {
-            x: this.x + Math.cos(this.angle) * 20,
-            y: this.y + Math.sin(this.angle) * 20,
+            x: spawnX,
+            y: spawnY,
             angle: this.angle,
             damage: this.attack * this.activeBoosts.damage,
             speed: 600,
             owner: 'player',
         };
+    }
+
+    triggerEmote(emoteId) {
+        if (!emoteId || emoteId === 'none') return;
+        this.equippedEmote = emoteId;
+        this.activeEmoteTimer = 3.0; // Emote visible for 3 seconds
     }
 
     activateSupercharge() {
@@ -325,7 +345,7 @@ export class Player extends Entity {
 
         const state = this.shootCooldown > this.shootRate * 0.7 ? 'shoot' : 'idle';
         if (spriteRenderer) {
-            spriteRenderer.drawPlayer(ctx, this.x, this.y, this.angle, state, this.color);
+            spriteRenderer.drawPlayer(ctx, this.x, this.y, this.angle, state, this.color, this.equippedSkin);
         } else {
             ctx.save();
             ctx.translate(this.x, this.y); ctx.rotate(this.angle);
@@ -343,5 +363,22 @@ export class Player extends Entity {
         // Munitions
         ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(barX, this.y + 32, barW, barH);
         ctx.fillStyle = '#fbbf24'; ctx.fillRect(barX, this.y + 32, barW * (this.ammo / this.maxAmmo), barH);
+
+        // Emote Drawing
+        if (this.activeEmoteTimer > 0 && this.equippedEmote && this.equippedEmote !== 'none') {
+            const bounce = Math.sin(this.activeEmoteTimer * 5) * 5;
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '24px "Inter"';
+            ctx.textAlign = 'center';
+
+            let emoji = '💬';
+            if (this.equippedEmote === 'emote_gg') emoji = '👍';
+            if (this.equippedEmote === 'emote_rage') emoji = '🤬';
+            if (this.equippedEmote === 'emote_cry') emoji = '😭';
+            if (this.equippedEmote === 'emote_laugh') emoji = '😂';
+            if (this.equippedEmote === 'emote_halo') emoji = '😇';
+
+            ctx.fillText(emoji, this.x, this.y - 30 + bounce);
+        }
     }
 }

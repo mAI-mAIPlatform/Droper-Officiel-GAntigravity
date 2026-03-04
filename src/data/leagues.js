@@ -36,23 +36,27 @@ export const LEAGUES = [
         ],
     },
     {
-        id: 'diamond', name: 'Diamant', emoji: '💎', color: '#a855f7',
+        id: 'mythic', name: 'Mythique', emoji: '🔮', color: '#8b5cf6',
         divisions: [
-            { div: 1, label: 'Diamant I', threshold: 1500, botMult: 2.6, reward: { type: 'gems', amount: 50, emoji: '💎' } },
-            { div: 2, label: 'Diamant II', threshold: 1800, botMult: 2.75, reward: { type: 'item', itemId: 'fragment_hero', amount: 10, emoji: '🧩' } },
-            { div: 3, label: 'Diamant III', threshold: 2200, botMult: 2.9, reward: { type: 'item', itemId: 'crate_epic', amount: 2, emoji: '✨' } },
+            { div: 1, label: 'Mythique I', threshold: 1500, botMult: 2.6, reward: { type: 'gems', amount: 50, emoji: '💎' } },
+            { div: 2, label: 'Mythique II', threshold: 1800, botMult: 2.75, reward: { type: 'item', itemId: 'fragment_hero', amount: 10, emoji: '🧩' } },
+            { div: 3, label: 'Mythique III', threshold: 2200, botMult: 2.9, reward: { type: 'item', itemId: 'crate_epic', amount: 2, emoji: '✨' } },
         ],
     },
     {
-        id: 'master', name: 'Maître', emoji: '🔥', color: '#ef4444',
+        id: 'legendary', name: 'Légendaire', emoji: '👑', color: '#ef4444',
         divisions: [
-            { div: 1, label: 'Maître', threshold: 2800, botMult: 3.0, reward: { type: 'mixed', coins: 1000, gems: 50, emoji: '🔥' } },
+            { div: 1, label: 'Légendaire I', threshold: 2800, botMult: 3.0, reward: { type: 'mixed', coins: 1000, gems: 50, emoji: '🔥' } },
+            { div: 2, label: 'Légendaire II', threshold: 3500, botMult: 3.2, reward: { type: 'mixed', coins: 1500, gems: 75, emoji: '🔥' } },
+            { div: 3, label: 'Légendaire III', threshold: 4200, botMult: 3.4, reward: { type: 'mixed', coins: 2000, gems: 100, emoji: '👑' } },
         ],
     },
     {
-        id: 'legend', name: 'Légende', emoji: '👑', color: '#dc2626',
+        id: 'pro', name: 'Pro', emoji: '🏆', color: '#10b981',
         divisions: [
-            { div: 1, label: 'Légende', threshold: 3500, botMult: 3.3, reward: { type: 'mixed', coins: 2000, gems: 100, emoji: '👑' } },
+            { div: 1, label: 'Pro I', threshold: 5000, botMult: 3.6, reward: { type: 'mixed', coins: 2500, gems: 150, emoji: '🏆' } },
+            { div: 2, label: 'Pro II', threshold: 6000, botMult: 3.8, reward: { type: 'mixed', coins: 3000, gems: 200, emoji: '🏆' } },
+            { div: 3, label: 'Pro III', threshold: 7500, botMult: 4.0, reward: { type: 'mixed', coins: 5000, gems: 300, emoji: '🏆' } },
         ],
     },
 ];

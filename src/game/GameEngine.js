@@ -1,5 +1,5 @@
 /* ============================
-   DROPER — Game Engine 2D (v0.0.4)
+   DROPER — Game Engine 2D (v1.0.0)
    ============================ */
 
 import { Player } from './Player.js';
@@ -16,6 +16,12 @@ import { WeatherSystem } from './WeatherSystem.js';
 import { ReplaySystem } from '../systems/ReplaySystem.js';
 import { AntiCheatLogger } from '../systems/AntiCheatLogger.js';
 import { NetworkSync } from './NetworkSync.js';
+
+// Modes v1.0.0
+import { BaseGameMode } from './modes/BaseGameMode.js';
+import { KillLifeMode } from './modes/KillLifeMode.js';
+import { LaveDynaMode } from './modes/LaveDynaMode.js';
+import { CyberBallMode } from './modes/CyberBallMode.js';
 
 export class GameEngine {
     constructor(app) {
@@ -34,6 +40,7 @@ export class GameEngine {
         this.kills = 0;
         this.gameTime = 0;
         this.walls = [];
+        this.currentMode = null; // Instantiated mode object v1.0.0
 
         // Sous-systèmes
         this.player = null;
@@ -246,81 +253,64 @@ export class GameEngine {
     }
 
     startGame() {
-        // Créer le joueur avec sécurité [v0.3.0]
-        const heroId = this.app.playerManager.selectedHero || 'soldier';
-        const heroData = this.app.heroManager.getFullHero(heroId);
+        const modeId = this.app.selectedMode;
 
-        if (!heroData) {
-            console.warn("HeroData introuvable pour:", heroId, "Utilisation du soldier par défaut.");
-        }
+        // Factory de modes v1.0.0
+        if (modeId === 'kill_life') this.currentMode = new KillLifeMode(this);
+        else if (modeId === 'lave_dyna') this.currentMode = new LaveDynaMode(this);
+        else if (modeId === 'cyberball') this.currentMode = new CyberBallMode(this);
+        else this.currentMode = new BaseGameMode(this);
 
-        this.player = new Player(heroData, this.width / 2, this.height / 2);
-        this.player.mouseX = this.width / 2;
-        this.player.mouseY = this.height / 2;
+        this.currentMode.applyTheme();
+        this.generateMap(modeId);
 
-        // Reset
-        this.entities = [];
+        this.running = true;
+        this.paused = false;
+        this.gameOver = false;
         this.score = 0;
         this.kills = 0;
-        this.wave = 0;
         this.gameTime = 0;
-        this.gameOver = false;
-        this.paused = false;
-        this.dropSystem.clear();
-        this.emojiSystem.clear();
-        this.particles.clear();
-        this.waveManager.reset();
+        this.wave = 0;
+        this.entities = [];
+        this.stars = this.generateStars();
 
-        // Start recording replay
-        this.replaySystem.startRecording();
+        // Joueur
+        const selectedHero = this.app.heroManager?.selectedHero;
+        this.player = new Player(selectedHero, this.width / 2, this.height / 2);
+        this.entities.push(this.player);
 
-        // Mode specific init
-        const mode = this.app.selectedMode;
-
-        // Map generation
-        this.generateMap(mode);
-        if (mode === 'boss_hunt') {
-            this.bossEntity = new Enemy('mega_boss', this.width / 2, 200);
-            this.entities.push(this.bossEntity);
-        } else if (mode === 'payload') {
-            this.payload = new Payload(200, this.height / 2);
-        } else if (mode === 'caveaux') {
-            this.isCaveaux = true;
-            this.gasCenter = { x: this.width / 2, y: this.height / 2 };
-            this.gasRadius = 2500; // Start larger than map
-            this.targetGasRadius = 2500;
+        // Vagues
+        this.waveManager = new WaveManager(this);
+        if (this.app.selectedMode !== 'payload' && this.app.selectedMode !== 'boss_hunt') {
+            this.waveManager.start();
         }
 
-        // Animation d'entrée avant de démarrer réellement
-        this.animationManager.triggerIntro(() => {
-            this.running = true;
-            this.lastTime = performance.now();
-            requestAnimationFrame((t) => this.loop(t));
+        // Payload
+        if (this.app.selectedMode === 'payload') {
+            this.payload = new Payload(this);
+        }
 
-            if (this.audioManager && this.app.selectedMode) {
-                this.app.musicPlayer.play(this.app.selectedMode);
-            }
-        });
+        this.start();
     }
 
-    generateMap(mode) {
-        this.walls = [];
-        const margin = 100;
-
-        // Murs de base (quelques obstacles centraux)
-        if (mode === 'boss_hunt') {
-            // Arène plus ouverte pour le boss
-            this.walls.push({ x: this.width * 0.25, y: this.height * 0.25, w: 40, h: 40 });
-            this.walls.push({ x: this.width * 0.75, y: this.height * 0.25, w: 40, h: 40 });
-            this.walls.push({ x: this.width * 0.25, y: this.height * 0.75, w: 40, h: 40 });
-            this.walls.push({ x: this.width * 0.75, y: this.height * 0.75, w: 40, h: 40 });
+    generateMap(modeId) {
+        if (this.currentMode) {
+            this.walls = this.currentMode.generateMap();
         } else {
-            // Obstacles standards
-            this.walls.push({ x: this.width / 2 - 100, y: this.height / 2 - 150, w: 200, h: 30 }); // Horiz haut
-            this.walls.push({ x: this.width / 2 - 100, y: this.height / 2 + 120, w: 200, h: 30 }); // Horiz bas
-
-            this.walls.push({ x: margin, y: this.height / 2 - 100, w: 30, h: 200 }); // Vert gauche
-            this.walls.push({ x: this.width - margin - 30, y: this.height / 2 - 100, w: 30, h: 200 }); // Vert droite
+            this.walls = [];
+            // Fallback
+            const margin = 100;
+            if (modeId === 'boss_hunt') {
+                this.walls.push({ x: this.width * 0.25, y: this.height * 0.25, w: 40, h: 40 });
+                this.walls.push({ x: this.width * 0.75, y: this.height * 0.25, w: 40, h: 40 });
+                this.walls.push({ x: this.width * 0.25, y: this.height * 0.75, w: 40, h: 40 });
+                this.walls.push({ x: this.width * 0.75, y: this.height * 0.75, w: 40, h: 40 });
+            } else {
+                this.walls.push({ x: this.width / 2 - 100, y: this.height / 2 - 150, w: 200, h: 30 });
+                this.walls.push({ x: this.width / 2 - 100, y: this.height / 2 + 120, w: 200, h: 30 });
+                this.walls.push({ x: margin, y: this.height / 2 - 100, w: 30, h: 200 });
+                this.walls.push({ x: this.width - margin - 30, y: this.height / 2 - 100, w: 30, h: 200 });
+            }
         }
     }
 
@@ -587,24 +577,33 @@ export class GameEngine {
     }
 
     checkWallCollision(entity) {
-        const r = entity.radius || 10;
+        // v1.0.0 Refonte Collisions Rigides (AABB vs AABB)
+        const halfW = entity.width / 2;
+        const halfH = entity.height / 2;
+
         for (const wall of this.walls) {
-            // Collision Cercle-AABB (approximatif)
-            const closestX = Math.max(wall.x, Math.min(entity.x, wall.x + wall.w));
-            const closestY = Math.max(wall.y, Math.min(entity.y, wall.y + wall.h));
+            // Check bounding box overlap
+            if (entity.x + halfW > wall.x && entity.x - halfW < wall.x + wall.w &&
+                entity.y + halfH > wall.y && entity.y - halfH < wall.y + wall.h) {
 
-            const dx = entity.x - closestX;
-            const dy = entity.y - closestY;
-            const dist = Math.hypot(dx, dy);
+                // Calculer les distances de pénétration sur les 4 axes
+                const penLeft = (entity.x + halfW) - wall.x;
+                const penRight = (wall.x + wall.w) - (entity.x - halfW);
+                const penTop = (entity.y + halfH) - wall.y;
+                const penBottom = (wall.y + wall.h) - (entity.y - halfH);
 
-            if (dist < r) {
-                // Repousser l'entité
-                const overlap = r - dist;
-                if (dist === 0) { // Cas rare où l'entité est pile au centre
-                    entity.x -= 1;
-                } else {
-                    entity.x += (dx / dist) * overlap;
-                    entity.y += (dy / dist) * overlap;
+                // Trouver la pénétration la plus faible (l'axe par lequel on doit repousser)
+                const minPen = Math.min(penLeft, penRight, penTop, penBottom);
+
+                // Résolution rigide
+                if (minPen === penLeft) {
+                    entity.x = wall.x - halfW;
+                } else if (minPen === penRight) {
+                    entity.x = wall.x + wall.w + halfW;
+                } else if (minPen === penTop) {
+                    entity.y = wall.y - halfH;
+                } else if (minPen === penBottom) {
+                    entity.y = wall.y + wall.h + halfH;
                 }
             }
         }
@@ -1064,10 +1063,6 @@ export class GameEngine {
 
     addEntity(entity) {
         this.entities.push(entity);
-    }
-
-    isKeyDown(code) {
-        return !!this.keys[code];
     }
 
     destroy() {

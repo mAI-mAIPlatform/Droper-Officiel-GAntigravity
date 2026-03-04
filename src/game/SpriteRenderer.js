@@ -17,13 +17,40 @@ export class SpriteRenderer {
     }
 
     // === JOUEUR ===
-    drawPlayer(ctx, x, y, angle, state = 'idle', color = '#4a9eff') {
+    drawPlayer(ctx, x, y, angle, state = 'idle', color = '#4a9eff', skin = 'default') {
         ctx.save();
         ctx.translate(x, y);
         ctx.rotate(angle);
 
         const pulse = 1 + Math.sin(this.time * 4) * 0.03;
         const breathe = Math.sin(this.time * 2) * 1.5;
+
+        // Custom skin handling
+        let mainColor = color;
+        let wingColor = shadeColor(color, -20);
+        let cockpitColor = 'rgba(255,255,255,0.25)';
+
+        if (skin === 'skin_cyber_ninja_neon') {
+            mainColor = '#0f172a';
+            wingColor = '#10b981'; // Neon green
+            cockpitColor = 'rgba(16, 185, 129, 0.4)';
+        } else if (skin === 'skin_titan_gold') {
+            mainColor = '#fbbf24'; // Gold
+            wingColor = '#b45309';
+            cockpitColor = 'rgba(255, 255, 255, 0.5)';
+        } else if (skin === 'skin_glacier_ice') {
+            mainColor = '#e0f2fe';
+            wingColor = '#38bdf8'; // Crystal blue
+            cockpitColor = 'rgba(56, 189, 248, 0.5)';
+        } else if (skin === 'skin_astro_void') {
+            mainColor = '#1e1e2f';
+            wingColor = '#a855f7'; // Purple void
+            cockpitColor = 'rgba(0, 0, 0, 0.8)';
+        } else if (skin === 'skin_champion_s1') {
+            mainColor = '#ffffff';
+            wingColor = '#f59e0b'; // Gold
+            cockpitColor = 'rgba(245, 158, 11, 0.6)';
+        }
 
         // Thruster glow
         const thrusterFlicker = 0.5 + Math.random() * 0.3;
@@ -33,27 +60,44 @@ export class SpriteRenderer {
         ctx.fill();
 
         // Wings
-        ctx.fillStyle = shadeColor(color, -20);
+        ctx.fillStyle = wingColor;
         ctx.beginPath();
-        ctx.moveTo(-8, -14 * pulse);
-        ctx.lineTo(4, -8);
-        ctx.lineTo(-2, 0);
-        ctx.lineTo(4, 8);
-        ctx.moveTo(-8, 14 * pulse);
-        ctx.lineTo(4, 8);
+        if (skin === 'skin_cyber_ninja_neon' || skin === 'skin_champion_s1') {
+            // Swept-forward aggressive wings
+            ctx.moveTo(-8, -16 * pulse);
+            ctx.lineTo(8, -8);
+            ctx.lineTo(-2, 0);
+            ctx.lineTo(8, 8);
+            ctx.moveTo(-8, 16 * pulse);
+            ctx.lineTo(8, 8);
+        } else {
+            ctx.moveTo(-8, -14 * pulse);
+            ctx.lineTo(4, -8);
+            ctx.lineTo(-2, 0);
+            ctx.lineTo(4, 8);
+            ctx.moveTo(-8, 14 * pulse);
+            ctx.lineTo(4, 8);
+        }
         ctx.fill();
 
         // Body
-        ctx.fillStyle = color;
+        ctx.fillStyle = mainColor;
         ctx.beginPath();
-        ctx.moveTo(20, 0);
-        ctx.lineTo(-10, -10 + breathe);
-        ctx.quadraticCurveTo(-14, 0, -10, 10 - breathe);
+        if (skin === 'skin_titan_gold' || skin === 'skin_champion_s1') {
+            // Bulkier body
+            ctx.moveTo(22, 0);
+            ctx.lineTo(-12, -12 + breathe);
+            ctx.lineTo(-12, 12 - breathe);
+        } else {
+            ctx.moveTo(20, 0);
+            ctx.lineTo(-10, -10 + breathe);
+            ctx.quadraticCurveTo(-14, 0, -10, 10 - breathe);
+        }
         ctx.closePath();
         ctx.fill();
 
         // Cockpit
-        ctx.fillStyle = 'rgba(255,255,255,0.25)';
+        ctx.fillStyle = cockpitColor;
         ctx.beginPath();
         ctx.ellipse(4, 0, 5, 3.5, 0, 0, TWO_PI);
         ctx.fill();

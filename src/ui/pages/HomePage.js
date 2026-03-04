@@ -1,5 +1,5 @@
 /* ============================
-   DROPER — Page Accueil (v0.0.3)
+   DROPER — Page Accueil (v1.0.0)
    ============================ */
 
 import { SEASON_1 } from '../../data/season1.js';
@@ -21,6 +21,11 @@ export class HomePage {
     const inventory = this.app.inventoryManager;
     const recentDrops = inventory.getRecentDrops(4);
     const xpPct = player.xpToNext > 0 ? (player.xp / player.xpToNext * 100) : 0;
+
+    // Ranked Info v1.0.0
+    const rankedPass = this.app.seasonPassManager.data.rankedPass || {};
+    const leagueMgr = this.app.rankedModeManager;
+    const currentLeague = leagueMgr ? leagueMgr.getCurrentLeague() : { name: 'Bronze I', emoji: '🥉' };
 
     const questManager = this.app.questManager;
     const dailyQuests = questManager ? questManager.getDailyQuests() : [];
@@ -84,59 +89,61 @@ export class HomePage {
 
         <!-- Stats + Héros + Pass -->
         <div class="grid-3 anim-fade-in-up anim-delay-2" style="margin-bottom: var(--spacing-xl);">
-          <!-- Héros Actif -->
-          <div class="card card--hero" style="background: var(--gradient-card-alt);">
-            <div style="font-size: var(--font-size-xs); color: var(--color-accent-blue); text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">Héros Actif</div>
-            <div class="icon-circle icon-circle--large" style="background: rgba(74, 158, 255, 0.1); border: 1px solid rgba(74, 158, 255, 0.2); shadow: 0 0 15px rgba(74, 158, 255, 0.2);">
-                <span style="font-size: 3rem;">${hero ? hero.emoji : '❓'}</span>
+          <!-- Héros & Ranked -->
+          <div class="stack" style="gap: var(--spacing-md);">
+            <div class="card card--hero" style="background: var(--gradient-card-alt); padding: 15px;">
+              <div style="font-size: var(--font-size-xs); color: var(--color-accent-blue); text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">Héros Actif</div>
+              <div class="row" style="gap: var(--spacing-md); margin-top: 5px;">
+                 <div class="icon-circle" style="width: 60px; height: 60px; background: rgba(74, 158, 255, 0.1);">
+                    <span style="font-size: 2rem;">${hero ? hero.emoji : '❓'}</span>
+                 </div>
+                 <div>
+                    <div style="font-size: var(--font-size-md); font-weight: 800; text-transform: uppercase;">${hero ? hero.name : 'Aucun'}</div>
+                    ${hero ? `<span class="badge ${hero.rarity.cssClass}">${hero.rarity.label}</span>` : ''}
+                 </div>
+              </div>
+              <a href="#armurerie" class="btn btn--sm btn--outline" style="margin-top: 10px; width: 100%; font-size: 0.65rem;">PERSONNALISER</a>
             </div>
-            <div style="font-size: var(--font-size-md); font-weight: 800; text-transform: uppercase;">${hero ? hero.name : 'Aucun'}</div>
-            ${hero ? `<div><span class="badge ${hero.rarity.cssClass}">${hero.rarity.label}</span></div>` : ''}
-            <a href="#armurerie" class="btn btn--sm btn--purple" style="margin-top: auto; padding: 6px 12px; font-size: 0.7rem;">Changer</a>
+
+            <div class="card" style="padding: 15px; background: rgba(251, 191, 36, 0.05); border-color: rgba(251, 191, 36, 0.2);">
+              <div style="font-size: var(--font-size-xs); color: var(--color-accent-gold); text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">🏆 Mode Classé</div>
+              <div class="row" style="gap: var(--spacing-sm); margin: 8px 0;">
+                <span style="font-size: 1.5rem;">${currentLeague.emoji}</span>
+                <span style="font-size: var(--font-size-md); font-weight: 800;">${currentLeague.name}</span>
+              </div>
+              <a href="#ranked" class="btn btn--sm btn--gold" style="width: 100%; font-size: 0.65rem;">CLASSEMENT</a>
+            </div>
           </div>
 
-          <!-- Pass Saison -->
-          <div class="card" style="text-align: center; display: flex; flex-direction: column; justify-content: center;">
-            <div style="font-size: var(--font-size-xs); color: var(--color-accent-gold); text-transform: uppercase; font-weight: 700; letter-spacing: 1px; margin-bottom: var(--spacing-sm);">⭐ Pass Saison 1</div>
+          <!-- Pass Saison (Regular) -->
+          <div class="card" style="text-align: center; display: flex; flex-direction: column; justify-content: center; border: 2px solid var(--color-accent-gold); background: rgba(251, 191, 36, 0.03);">
+            <div style="font-size: var(--font-size-xs); color: var(--color-accent-gold); text-transform: uppercase; font-weight: 700; letter-spacing: 1px; margin-bottom: var(--spacing-sm);">⭐ Pass S1 : Néon Voyage</div>
             <strong style="font-size: var(--font-size-2xl); color: var(--color-accent-gold);">Palier ${sp.currentTier}</strong>
-            <div class="progress-bar" style="height: 6px; margin: var(--spacing-sm) 0;">
+            <div class="progress-bar" style="height: 8px; margin: var(--spacing-md) 0;">
               <div class="progress-bar__fill" style="width: ${(sp.xpProgress / sp.xpToNextTier) * 100}%; background: var(--gradient-gold);"></div>
             </div>
             <div style="font-size: var(--font-size-xs); color: var(--color-text-muted);">
-              ${sp.xpProgress} / ${sp.xpToNextTier} XP
+              ${sp.xpProgress} / ${sp.xpToNextTier} XP pour le prochain cadeau
             </div>
-            <a href="#pass-saison" style="margin-top: var(--spacing-md); color: var(--color-accent-gold); font-size: var(--font-size-xs); font-weight: 600;">Voir l'aventure →</a>
+            <a href="#pass-saison" class="btn btn--shine btn--sm" style="margin-top: 15px; background: var(--gradient-gold); color: black;">VOIR LE PASS</a>
           </div>
 
-          <!-- Quêtes & Social -->
+          <!-- Boutique & Quêtes -->
           <div class="stack" style="gap: var(--spacing-md);">
-            <!-- Quête à la une -->
-            <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; padding: 15px;">
-              <div>
-                <div style="font-size: var(--font-size-xs); color: var(--color-accent-green); text-transform: uppercase; font-weight: 700; letter-spacing: 1px; margin-bottom: 5px;">✅ Quête en cours</div>
-                <div style="font-size: 0.85rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${firstQuest ? firstQuest.title : 'Toutes terminées !'}</div>
-                ${firstQuest ? `
-                  <div class="progress-bar" style="height: 4px; margin: 8px 0;">
-                    <div class="progress-bar__fill" style="width: ${(firstQuest.progress / firstQuest.target) * 100}%; background: var(--color-accent-green);"></div>
-                  </div>
-                  <div style="font-size: 0.65rem; color: var(--color-text-muted);">${firstQuest.progress} / ${firstQuest.target}</div>
-                ` : ''}
-              </div>
-              <a href="#quetes" class="btn btn--outline" style="margin-top: 10px; padding: 6px; font-size: 0.7rem;">VOIR TOUT</a>
+            <div class="card" style="background: var(--gradient-purple); border: none; padding: 15px; cursor: pointer;" onclick="window.location.hash='#shop'">
+               <div style="font-size: var(--font-size-xs); color: rgba(255,255,255,0.8); text-transform: uppercase; font-weight: 700;">🎁 Boutique</div>
+               <div style="font-size: 0.9rem; font-weight: 800; color: white; margin-top: 5px;">Skins & Emotes Limités</div>
             </div>
 
-            <!-- Club -->
-            <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; padding: 15px; background: rgba(74, 158, 255, 0.05); border-color: rgba(74, 158, 255, 0.2);">
-              <div>
-                <div style="font-size: var(--font-size-xs); color: var(--color-accent-blue); text-transform: uppercase; font-weight: 700; letter-spacing: 1px; margin-bottom: 5px;">🏠 Mon Club</div>
-                ${club ? `
-                  <div style="font-size: 0.85rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${club.emoji} ${club.name}</div>
-                  <div style="font-size: 0.7rem; color: var(--color-accent-gold); margin-top: 2px;">🏆 ${club.trophies} Trophées</div>
-                ` : `
-                  <div style="font-size: 0.8rem; font-weight: 700; color: var(--color-text-muted);">Aucun club rejoint</div>
-                `}
-              </div>
-              <a href="#social" class="btn btn--accent" style="margin-top: 10px; padding: 6px; font-size: 0.7rem;">${club ? 'LE CLUB' : 'REJOINDRE'}</a>
+            <div class="card" style="padding: 15px;">
+              <div style="font-size: var(--font-size-xs); color: var(--color-accent-green); text-transform: uppercase; font-weight: 700; letter-spacing: 1px; margin-bottom: 5px;">✅ Objectif Quotidien</div>
+              <div style="font-size: 0.85rem; font-weight: 700;">${firstQuest ? firstQuest.title : 'Tout est fait !'}</div>
+              ${firstQuest ? `
+                <div class="progress-bar" style="height: 4px; margin: 8px 0;">
+                  <div class="progress-bar__fill" style="width: ${(firstQuest.progress / firstQuest.target) * 100}%; background: var(--color-accent-green);"></div>
+                </div>
+              ` : ''}
+              <a href="#quetes" style="font-size: 0.7rem; color: var(--color-text-muted); text-decoration: underline;">Toutes mes quêtes →</a>
             </div>
           </div>
         </div>

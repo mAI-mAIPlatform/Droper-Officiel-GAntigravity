@@ -1,5 +1,5 @@
 /* ============================
-   DROPER — Save Manager (v0.9.8)
+   DROPER — Save Manager (v1.0.0)
    + DatabaseAdapter pour migration future
    ============================ */
 
@@ -257,10 +257,13 @@ export class SaveManager {
                 chats: {},
             },
             skins: {
-                owned: {},
-                equipped: {},
+                owned: ['soldier_default', 'drone_default'],
+                equipped: { soldier: 'soldier_default', drone: 'drone_default' },
             },
-            emotes: null,
+            emotes: {
+                owned: ['emoji_gg', 'emoji_ok'],
+                equipped: ['emoji_gg', 'emoji_ok', null, null, null],
+            },
             matchHistory: [],
             favorites: {
                 items: [], // Array of item IDs

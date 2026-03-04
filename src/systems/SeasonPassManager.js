@@ -4,6 +4,7 @@
 
 import { SEASON_PASS } from '../data/seasonpass.js';
 import { EVEIL_PASS } from '../data/eveilpass.js';
+import { RANKED_PASS } from '../data/rankedpass.js';
 import { toast } from '../ui/components/ToastManager.js';
 
 export class SeasonPassManager {
@@ -39,6 +40,12 @@ export class SeasonPassManager {
                 tokens: 0,
                 claimedTiers: [],
             },
+            rankedPass: {
+                seasonId: RANKED_PASS.id,
+                premium: false,
+                claimedFree: [],
+                claimedPremium: [],
+            }
         };
     }
 
@@ -165,6 +172,70 @@ export class SeasonPassManager {
         return {
             claimed: this.data.eveil.claimedTiers.includes(tier),
             canClaim: this.canClaimEveil(tier),
+        };
+    }
+
+    // === Ranked Pass ===
+    get isRankedPremium() {
+        return this.data.rankedPass ? this.data.rankedPass.premium : false;
+    }
+
+    activateRankedPremium() {
+        if (!this.data.rankedPass) this.data.rankedPass = { seasonId: RANKED_PASS.id, premium: true, claimedFree: [], claimedPremium: [] };
+        this.data.rankedPass.premium = true;
+        this.persist();
+        toast.success('👑 Pass Classé Premium activé !');
+    }
+
+    getRankedCurrentTier(playerRankPoints) {
+        let currentTier = 0;
+        let points = playerRankPoints;
+        while (points >= RANKED_PASS.xpPerTier && currentTier < RANKED_PASS.maxTier) {
+            currentTier++;
+            points -= RANKED_PASS.xpPerTier;
+        }
+        return currentTier;
+    }
+
+    canClaimRankedFree(tier, playerPoints) {
+        if (!this.data.rankedPass) return false;
+        const currentTier = this.getRankedCurrentTier(playerPoints);
+        return tier <= currentTier && !this.data.rankedPass.claimedFree.includes(tier);
+    }
+
+    canClaimRankedPremium(tier, playerPoints) {
+        if (!this.data.rankedPass) return false;
+        const currentTier = this.getRankedCurrentTier(playerPoints);
+        return this.isRankedPremium && tier <= currentTier && !this.data.rankedPass.claimedPremium.includes(tier);
+    }
+
+    claimRankedFree(tier, playerPoints) {
+        if (!this.canClaimRankedFree(tier, playerPoints)) return false;
+        const tierData = RANKED_PASS.tiers.find(t => t.tier === tier);
+        if (!tierData || !tierData.free) return false;
+        this.processReward(tierData.free);
+        this.data.rankedPass.claimedFree.push(tier);
+        this.persist();
+        return true;
+    }
+
+    claimRankedPremium(tier, playerPoints) {
+        if (!this.canClaimRankedPremium(tier, playerPoints)) return false;
+        const tierData = RANKED_PASS.tiers.find(t => t.tier === tier);
+        if (!tierData || !tierData.premium) return false;
+        this.processReward(tierData.premium);
+        this.data.rankedPass.claimedPremium.push(tier);
+        this.persist();
+        return true;
+    }
+
+    getRankedTierStatus(tier, playerPoints) {
+        if (!this.data.rankedPass) return { reached: false, freeClaimed: false, premiumClaimed: false };
+        const currentTier = this.getRankedCurrentTier(playerPoints);
+        return {
+            reached: tier <= currentTier,
+            freeClaimed: this.data.rankedPass.claimedFree.includes(tier),
+            premiumClaimed: this.data.rankedPass.claimedPremium.includes(tier),
         };
     }
 }
