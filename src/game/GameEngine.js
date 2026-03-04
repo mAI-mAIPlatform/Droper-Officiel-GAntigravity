@@ -14,6 +14,7 @@ import { Payload } from './Payload.js';
 import { Enemy } from './Enemy.js';
 import { WeatherSystem } from './WeatherSystem.js';
 import { ReplaySystem } from '../systems/ReplaySystem.js';
+import { AntiCheatLogger } from '../systems/AntiCheatLogger.js';
 
 export class GameEngine {
     constructor(app) {
@@ -50,6 +51,7 @@ export class GameEngine {
         this.replaySystem = new ReplaySystem(this);
         this._replayState = null;
         this.isReplaying = false;
+        this.antiCheat = new AntiCheatLogger(this);
 
         // --- CAVEAUX SYSTEM ---
         this.gasCenter = { x: 0, y: 0 };
@@ -379,6 +381,7 @@ export class GameEngine {
             if (!this.paused && !this.gameOver && !this.isReplaying) {
                 this.update(this.deltaTime);
                 this.replaySystem.update(this.deltaTime); // Record frame
+                this.antiCheat.check(this.deltaTime); // v0.9.8 Anti-Cheat
             } else if (this.isReplaying) {
                 this.replaySystem.update(this.deltaTime); // Playback frame
             }

@@ -1,8 +1,10 @@
 /* ============================
-   DROPER — Player Entity
+   DROPER — Player Entity (v0.9.8)
    ============================ */
 
 import { Entity } from './Entity.js';
+import { getAuraById } from '../data/auras.js';
+import { getTrailById } from '../data/trails.js';
 
 export class Player extends Entity {
     constructor(heroData, x, y) {
@@ -69,6 +71,14 @@ export class Player extends Entity {
         // NEW v0.4.0
         this.superchargeActive = false;
         this.superchargeTimer = 0;
+
+        // v0.9.8 Cosmetics
+        this.equippedAura = 'none';
+        this.equippedTrail = 'none';
+        this._trailParticles = [];
+        this._gameTime = 0;
+        this._lastTrailX = x;
+        this._lastTrailY = y;
     }
 
     update(dt, engine) {
@@ -162,6 +172,25 @@ export class Player extends Entity {
         if (this.hero?.state?.masteryTier === 'LÉGENDE' && engine.particles) {
             engine.particles.spawnLegendaryAura(this.x, this.y);
         }
+
+        // v0.9.8 Trail particles
+        this._gameTime += dt;
+        const movedDist = Math.sqrt((this.x - this._lastTrailX) ** 2 + (this.y - this._lastTrailY) ** 2);
+        if (movedDist > 3 && this.equippedTrail !== 'none') {
+            const trail = getTrailById(this.equippedTrail);
+            const p = trail.spawnParticle(this.x, this.y);
+            if (p) this._trailParticles.push(p);
+            this._lastTrailX = this.x;
+            this._lastTrailY = this.y;
+        }
+        // Update trail particles
+        this._trailParticles = this._trailParticles.filter(p => {
+            p.life -= dt;
+            p.x += (p.vx || 0) * dt;
+            p.y += (p.vy || 0) * dt;
+            return p.life > 0;
+        });
+        if (this._trailParticles.length > 60) this._trailParticles.splice(0, this._trailParticles.length - 60);
     }
 
     canShoot() {
@@ -272,6 +301,28 @@ export class Player extends Entity {
     draw(ctx, spriteRenderer) {
         if (!this.alive) return;
         if (this.invincibleTimer > 0 && Math.floor(this.invincibleTimer * 10) % 2 === 0) return;
+
+        // v0.9.8 Draw trail particles BEHIND player
+        for (const p of this._trailParticles) {
+            const alpha = Math.max(0, p.life / (p.maxLife || 1));
+            ctx.globalAlpha = alpha;
+            ctx.fillStyle = p.color || '#fff';
+            if (p.isSquare) {
+                ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
+            } else {
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
+            }
+            ctx.globalAlpha = 1;
+        }
+
+        // v0.9.8 Draw aura BEHIND player
+        if (this.equippedAura && this.equippedAura !== 'none') {
+            const aura = getAuraById(this.equippedAura);
+            ctx.save();
+            aura.draw(ctx, this.x, this.y, this._gameTime);
+            ctx.restore();
+        }
+
         const state = this.shootCooldown > this.shootRate * 0.7 ? 'shoot' : 'idle';
         if (spriteRenderer) {
             spriteRenderer.drawPlayer(ctx, this.x, this.y, this.angle, state, this.color);

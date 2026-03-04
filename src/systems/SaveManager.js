@@ -1,14 +1,76 @@
 /* ============================
-   DROPER — Save Manager
+   DROPER — Save Manager (v0.9.8)
+   + DatabaseAdapter pour migration future
    ============================ */
 
 const SAVE_KEY = 'droper_save_v1';
 const CHECKSUM_KEY = 'droper_checksum';
 const INTEGRITY_SECRET = 'DrP_s3cur!ty_K3y_v080';
 
+/**
+ * Abstraction DB — Facilite la migration localStorage → Firebase/Supabase
+ */
+class DatabaseAdapter {
+    constructor(type = 'local') {
+        this.type = type; // 'local' | 'firebase' | 'supabase'
+        this.syncStatus = 'idle'; // idle | syncing | synced | error
+        this.lastSyncTime = null;
+    }
+
+    async read(key) {
+        if (this.type === 'local') {
+            return localStorage.getItem(key);
+        }
+        // Future: return await firebase.firestore().doc(`saves/${userId}`).get();
+        return localStorage.getItem(key);
+    }
+
+    async write(key, value) {
+        if (this.type === 'local') {
+            localStorage.setItem(key, value);
+            return;
+        }
+        // Future: await firebase.firestore().doc(`saves/${userId}`).set(JSON.parse(value));
+        localStorage.setItem(key, value);
+    }
+
+    async remove(key) {
+        localStorage.removeItem(key);
+    }
+
+    async syncToCloud() {
+        if (this.type === 'local') {
+            this.syncStatus = 'synced';
+            this.lastSyncTime = Date.now();
+            return;
+        }
+        try {
+            this.syncStatus = 'syncing';
+            // Simulated cloud sync delay
+            await new Promise(r => setTimeout(r, 500));
+            this.syncStatus = 'synced';
+            this.lastSyncTime = Date.now();
+        } catch (e) {
+            this.syncStatus = 'error';
+            console.error('❌ Sync cloud échouée', e);
+        }
+    }
+
+    getSyncBadge() {
+        const badges = {
+            idle: { label: '⏸ Idle', color: '#8b95a8' },
+            syncing: { label: '🔄 Sync...', color: '#fbbf24' },
+            synced: { label: '☁️ Synchronisé', color: '#22c55e' },
+            error: { label: '❌ Erreur', color: '#ef4444' },
+        };
+        return badges[this.syncStatus] || badges.idle;
+    }
+}
+
 export class SaveManager {
     constructor() {
         this.data = {};
+        this.db = new DatabaseAdapter('local');
     }
 
     _generateChecksum(jsonStr) {

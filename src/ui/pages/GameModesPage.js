@@ -1,15 +1,21 @@
 /* ============================
-   DROPER — Page Sélection de Mode
+   DROPER — Page Sélection de Mode (v0.9.7-beta)
    ============================ */
 
 import { GAME_MODES } from '../../data/gamemodes.js';
+import { FlashEventManager } from '../../systems/FlashEventManager.js';
 
 export class GameModesPage {
   constructor(app) {
     this.app = app;
+    this._flashMgr = new FlashEventManager();
   }
 
   render() {
+    const event = this._flashMgr.getCurrentEvent();
+    const nextEvent = this._flashMgr.getNextEvent();
+    const timeLeft = this._flashMgr.getTimeUntilNextEvent();
+
     return `
       <div class="page">
         <div class="page__header">
@@ -19,6 +25,31 @@ export class GameModesPage {
           <p style="color: var(--color-text-muted); margin-top: var(--spacing-xs);">
             Choisis ton mode et affronte les bots !
           </p>
+        </div>
+
+        <!-- ⚡ Flash Event Banner -->
+        <div class="card anim-fade-in-up" data-mode-id="flash_event"
+             style="cursor: pointer; border: 2px solid ${event.color}; margin-bottom: var(--spacing-lg); position: relative; overflow: hidden; background: linear-gradient(135deg, rgba(0,0,0,0.8), ${event.color}22);"
+             onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 0 30px ${event.color}44';"
+             onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';">
+          <div style="position: absolute; top: 8px; right: 12px;">
+            <span class="badge" style="background: ${event.color}; color: white; font-size: var(--font-size-xs); animation: pulse 2s infinite;">
+              ⚡ ÉVÉNEMENT FLASH
+            </span>
+          </div>
+          <div class="row" style="gap: var(--spacing-md); align-items: center;">
+            <span style="font-size: 3.5rem; filter: drop-shadow(0 4px 10px ${event.color}88);">${event.emoji}</span>
+            <div style="flex: 1;">
+              <strong style="font-size: 1.2rem; display: block; color: ${event.color};">${event.name}</strong>
+              <p style="font-size: var(--font-size-sm); color: var(--color-text-secondary); margin: 4px 0 8px;">
+                ${event.description}
+              </p>
+              <div style="font-size: var(--font-size-xs); color: var(--color-text-muted); display: flex; gap: 16px;">
+                <span>⏳ Prochain dans <strong>${timeLeft.hours}h${timeLeft.minutes.toString().padStart(2, '0')}</strong></span>
+                <span>➡️ Suivant : ${nextEvent.emoji} ${nextEvent.name}</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="grid-2" style="gap: var(--spacing-lg);">

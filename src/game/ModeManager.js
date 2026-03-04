@@ -14,6 +14,7 @@ import { ZoneSurchargeMode } from './modes/ZoneSurchargeMode.js';
 import { RankedMode } from './modes/RankedMode.js';
 import { LaveFlashMode } from './modes/LaveFlashMode.js';
 import { KillLifeMode } from './modes/KillLifeMode.js';
+import { FlashEventMode } from './modes/FlashEventMode.js';
 
 const MODE_CLASSES = {
     nanopuces: NanopucesMode,
@@ -25,6 +26,7 @@ const MODE_CLASSES = {
     ranked: RankedMode,
     lave_flash: LaveFlashMode,
     kill_life: KillLifeMode,
+    flash_event: FlashEventMode,
 };
 
 export class ModeManager {
@@ -87,6 +89,16 @@ export class ModeManager {
         const w = this.modeData.mapWidth || this.engine.width;
         const h = this.modeData.mapHeight || this.engine.height;
 
+        // v0.9.8 SBMM — Adapter la difficulté des bots
+        const sbmm = this.engine.app?.matchmakingManager;
+        const diff = sbmm ? sbmm.getDifficultyMultiplier() : { hpMult: 1, attackMult: 1, speedMult: 1, shootRateMult: 1 };
+
+        const baseHp = 100 * diff.hpMult;
+        const baseSpeed = (90 + Math.random() * 40) * diff.speedMult;
+        const baseAttack = 10 * diff.attackMult;
+        const baseShootRate = (1.5 + Math.random() * 0.5) * diff.shootRateMult;
+        const baseBulletDamage = 8 * diff.attackMult;
+
         return {
             type: 'bot',
             alive: true,
@@ -94,17 +106,17 @@ export class ModeManager {
             y: 100 + Math.random() * (h - 200),
             width: 22,
             height: 22,
-            hp: 100,
-            maxHp: 100,
-            speed: 90 + Math.random() * 40,
+            hp: Math.round(baseHp),
+            maxHp: Math.round(baseHp),
+            speed: baseSpeed,
             color: '#8b95a8',
-            attack: 10,
+            attack: Math.round(baseAttack),
             teamId: -1,
             isAlly: false,
             isPlayer: false,
-            shootRate: 1.5 + Math.random() * 0.5,
+            shootRate: baseShootRate,
             bulletSpeed: 200,
-            bulletDamage: 8,
+            bulletDamage: Math.round(baseBulletDamage),
             respawnTimer: 0,
             takeDamage(dmg) {
                 this.hp -= dmg;

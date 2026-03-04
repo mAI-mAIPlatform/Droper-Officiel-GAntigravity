@@ -36,7 +36,7 @@ import { DailyRewardManager } from './systems/DailyRewardManager.js';
 
 class DroperApp {
     constructor() {
-        this.version = '0.9.2 Alpha';
+        this.version = '0.9.9';
         this.app = this; // Self reference for managers [v0.3.1]
         this.saveManager = new SaveManager();
         this.playerManager = new PlayerManager(this.saveManager);

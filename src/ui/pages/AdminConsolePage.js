@@ -1,5 +1,5 @@
 /* ============================
-   DROPER — Interface Admin Console (v0.2.6 Security Update)
+   DROPER — Interface Admin Console (v0.9.8)
    ============================ */
 
 import { HEROES } from '../../data/heroes.js';
@@ -37,13 +37,14 @@ export class AdminConsolePage {
             <div class="page page--admin">
                 <div class="page__header row row--between">
                     <h1 class="section-title">
-                        <span class="section-title__prefix">///</span> CONSOLE MANAGER v0.2.6
+                        <span class="section-title__prefix">///</span> CONSOLE MANAGER v0.9.8
                     </h1>
                     <button id="btn-logout-admin" class="btn btn--ghost" style="font-size: 0.7rem;">DÉCONNEXION</button>
                 </div>
 
                 <div class="row" style="gap: 10px; margin-bottom: 20px;">
                     <button class="btn btn--outline admin-tab ${this.activeTab === 'general' ? 'active' : ''}" data-tab="general">GÉNÉRAL</button>
+                    <button class="btn btn--outline admin-tab ${this.activeTab === 'dashboard' ? 'active' : ''}" data-tab="dashboard">📊 DASHBOARD</button>
                     <button class="btn btn--outline admin-tab ${this.activeTab === 'economy' ? 'active' : ''}" data-tab="economy">ÉCONOMIE</button>
                     <button class="btn btn--outline admin-tab ${this.activeTab === 'starters' ? 'active' : ''}" data-tab="starters">STARTERS</button>
                     <button class="btn btn--outline admin-tab ${this.activeTab === 'event' ? 'active' : ''}" data-tab="event">ÉVÉNEMENTS</button>
@@ -81,6 +82,65 @@ export class AdminConsolePage {
                                 ${this.app.heroManager.allHeroes.map(h => `<option value="${h.id}">${h.emoji} ${h.name}</option>`).join('')}
                             </select>
                             <button id="btn-give-hero" class="btn btn--purple">DÉBLOQUER</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        if (this.activeTab === 'dashboard') {
+            const stats = this.app.saveManager?.data?.stats || {};
+            const acReports = this.app.engine?.antiCheat?.getReports() || [];
+            const sbmmBadge = this.app.matchmakingManager?.getSkillBadge() || { label: 'N/A', emoji: '❓', color: '#8b95a8' };
+            const dbSync = this.app.saveManager?.db?.getSyncBadge() || { label: '⏸ Idle', color: '#8b95a8' };
+
+            return `
+                <div class="admin-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <!-- Stats Chart -->
+                    <div class="card" style="grid-column: span 2;">
+                        <h3 style="margin-bottom: 10px;">📊 Statistiques Joueur</h3>
+                        <canvas id="admin-stats-chart" width="600" height="200" style="width: 100%; border-radius: 8px; background: rgba(0,0,0,0.2);"></canvas>
+                    </div>
+
+                    <!-- SBMM -->
+                    <div class="card">
+                        <h3 style="margin-bottom: 10px;">🎯 SBMM</h3>
+                        <div style="text-align: center; padding: 10px;">
+                            <div style="font-size: 2rem;">${sbmmBadge.emoji}</div>
+                            <div style="font-size: 1.2rem; font-weight: 800; color: ${sbmmBadge.color};">${sbmmBadge.label}</div>
+                            <div style="font-size: 0.65rem; color: var(--color-text-muted); margin-top: 5px;">Rating: ${this.app.matchmakingManager?.skillRating || 'N/A'}</div>
+                        </div>
+                    </div>
+
+                    <!-- DB Sync -->
+                    <div class="card">
+                        <h3 style="margin-bottom: 10px;">☁️ Base de Données</h3>
+                        <div style="text-align: center; padding: 10px;">
+                            <div style="font-size: 1.2rem; font-weight: 700; color: ${dbSync.color};">${dbSync.label}</div>
+                            <div style="font-size: 0.6rem; color: var(--color-text-muted); margin-top: 8px;">Type: ${this.app.saveManager?.db?.type || 'local'}</div>
+                            <button id="btn-force-sync" class="btn btn--outline" style="margin-top: 10px; font-size: 0.7rem;">🔄 FORCER SYNC</button>
+                        </div>
+                    </div>
+
+                    <!-- Anti-Cheat Rapports -->
+                    <div class="card" style="grid-column: span 2;">
+                        <h3 style="margin-bottom: 10px;">🛡️ Rapports Anti-Cheat (${acReports.length})</h3>
+                        <div style="max-height: 200px; overflow-y: auto; font-size: 0.7rem;">
+                            ${acReports.length === 0 ? '<div style="color: var(--color-text-muted); text-align: center; padding: 20px;">Aucun rapport 🎉</div>' :
+                    `<table style="width: 100%; border-collapse: collapse;">
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left;">
+                                    <th style="padding: 6px;">Type</th>
+                                    <th style="padding: 6px;">Détail</th>
+                                    <th style="padding: 6px;">Date</th>
+                                </tr>
+                                ${acReports.slice(-10).reverse().map(r => `
+                                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                        <td style="padding: 6px; color: #ef4444; font-weight: 700;">${r.type}</td>
+                                        <td style="padding: 6px;">${r.detail}</td>
+                                        <td style="padding: 6px; color: var(--color-text-muted);">${new Date(r.timestamp).toLocaleTimeString()}</td>
+                                    </tr>
+                                `).join('')}
+                            </table>`}
                         </div>
                     </div>
                 </div>
@@ -172,6 +232,9 @@ export class AdminConsolePage {
         if (logoutBtn) logoutBtn.onclick = () => { am.logout(); this.refresh(); };
 
         if (am.isAuthenticated) this.setupActions();
+
+        // Draw charts
+        this.drawStatsChart();
     }
 
     setupActions() {
@@ -243,6 +306,68 @@ export class AdminConsolePage {
             const color = document.getElementById('new-skin-color').value;
             if (name) { am.createCustomSkin({ heroId: baseId, name, color }); this.refresh(); }
         };
+    }
+
+    drawStatsChart() {
+        const canvas = document.getElementById('admin-stats-chart');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const stats = this.app.saveManager?.data?.stats || {};
+
+        const data = [
+            { label: 'Kills', value: stats.kills || 0, color: '#ef4444' },
+            { label: 'Parties', value: stats.gamesPlayed || 0, color: '#3b82f6' },
+            { label: 'Victoires', value: stats.wins || 0, color: '#22c55e' },
+            { label: 'Max Vague', value: stats.maxWave || 0, color: '#fbbf24' },
+            { label: 'Temps (min)', value: Math.round((stats.totalPlaytime || 0) / 60), color: '#a855f7' },
+        ];
+
+        const maxVal = Math.max(...data.map(d => d.value), 1);
+        const barW = 60;
+        const gap = 30;
+        const startX = 50;
+        const chartH = 150;
+        const baseY = 180;
+
+        // Background
+        ctx.fillStyle = 'rgba(0,0,0,0.1)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Grid lines
+        ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+        for (let i = 0; i <= 4; i++) {
+            const y = baseY - (chartH / 4) * i;
+            ctx.beginPath(); ctx.moveTo(40, y); ctx.lineTo(canvas.width - 10, y); ctx.stroke();
+        }
+
+        // Bars
+        data.forEach((d, i) => {
+            const x = startX + i * (barW + gap);
+            const h = (d.value / maxVal) * chartH;
+
+            // Gradient bar
+            const grad = ctx.createLinearGradient(x, baseY, x, baseY - h);
+            grad.addColorStop(0, d.color + '44');
+            grad.addColorStop(1, d.color);
+            ctx.fillStyle = grad;
+            ctx.fillRect(x, baseY - h, barW, h);
+
+            // Border
+            ctx.strokeStyle = d.color;
+            ctx.lineWidth = 1;
+            ctx.strokeRect(x, baseY - h, barW, h);
+
+            // Value on top
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 11px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(d.value, x + barW / 2, baseY - h - 6);
+
+            // Label below
+            ctx.fillStyle = '#8b95a8';
+            ctx.font = '9px sans-serif';
+            ctx.fillText(d.label, x + barW / 2, baseY + 14);
+        });
     }
 
     refresh() {

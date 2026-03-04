@@ -1,11 +1,20 @@
 /* ============================
-   DROPER — Network Sync (interpolation & prédiction)
+   DROPER — Network Sync (v0.9.7-beta)
+   Interpolation, Extrapolation, Jitter Buffer, Snapback
    ============================ */
+
+const SYNC_CONFIG = {
+    interpolationDelay: 100,   // ms
+    extrapolationTimeout: 200, // ms — prédire au-delà de ce seuil
+    extrapolationMax: 500,     // ms — ne jamais extrapoler plus loin
+    snapbackThreshold: 250,    // pixels — ignorer les téléportations
+    jitterBufferSize: 5,       // nombre de samples pour lisser
+    staleTimeout: 5000,        // ms — marquer mort si plus de données
+};
 
 export class NetworkSync {
     constructor() {
         this.remotePlayers = new Map();
-        this.interpolationDelay = 100; // ms
     }
 
     updateRemotePlayer(playerId, data) {
@@ -13,18 +22,51 @@ export class NetworkSync {
             this.remotePlayers.set(playerId, {
                 x: data.x, y: data.y, angle: data.angle || 0,
                 targetX: data.x, targetY: data.y, targetAngle: data.angle || 0,
+                vx: 0, vy: 0, // Vélocité estimée
                 hp: data.hp || 100, maxHp: data.maxHp || 100,
                 alive: true, color: data.color || '#ef4444',
                 lastUpdate: Date.now(),
+                jitterBuffer: [], // Buffer de latences
+                latency: 0,
             });
         } else {
             const rp = this.remotePlayers.get(playerId);
+            const now = Date.now();
+            const timeDelta = (now - rp.lastUpdate) / 1000;
+
+            // --- Snapback Protection ---
+            const dx = data.x - rp.targetX;
+            const dy = data.y - rp.targetY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist > SYNC_CONFIG.snapbackThreshold) {
+                // Téléportation détectée — ignorer cet update, ou snap directement
+                console.warn(`🌐 Snapback: ${playerId} téléporté de ${dist.toFixed(0)}px — ignoré.`);
+                rp.lastUpdate = now;
+                return;
+            }
+
+            // Estimer la vélocité
+            if (timeDelta > 0) {
+                rp.vx = dx / timeDelta;
+                rp.vy = dy / timeDelta;
+            }
+
             rp.targetX = data.x;
             rp.targetY = data.y;
             rp.targetAngle = data.angle || rp.targetAngle;
             if (data.hp != null) rp.hp = data.hp;
             if (data.alive != null) rp.alive = data.alive;
-            rp.lastUpdate = Date.now();
+
+            // --- Jitter Buffer ---
+            const latencySample = now - rp.lastUpdate;
+            rp.jitterBuffer.push(latencySample);
+            if (rp.jitterBuffer.length > SYNC_CONFIG.jitterBufferSize) {
+                rp.jitterBuffer.shift();
+            }
+            rp.latency = rp.jitterBuffer.reduce((a, b) => a + b, 0) / rp.jitterBuffer.length;
+
+            rp.lastUpdate = now;
         }
     }
 
@@ -33,20 +75,34 @@ export class NetworkSync {
     }
 
     update(dt) {
+        const now = Date.now();
         const lerpSpeed = 10;
+
         for (const [id, rp] of this.remotePlayers) {
-            // Interpolate position
-            rp.x += (rp.targetX - rp.x) * lerpSpeed * dt;
-            rp.y += (rp.targetY - rp.y) * lerpSpeed * dt;
+            const timeSinceUpdate = now - rp.lastUpdate;
+
+            // --- Extrapolation ---
+            if (timeSinceUpdate > SYNC_CONFIG.extrapolationTimeout &&
+                timeSinceUpdate < SYNC_CONFIG.extrapolationMax) {
+                // Prédire la position via la vélocité estimée
+                const extraDt = dt;
+                rp.targetX += rp.vx * extraDt;
+                rp.targetY += rp.vy * extraDt;
+            }
+
+            // Interpolate position (lissé par le jitter buffer)
+            const adaptiveLerp = lerpSpeed * (1 + Math.min(rp.latency / 200, 1));
+            rp.x += (rp.targetX - rp.x) * adaptiveLerp * dt;
+            rp.y += (rp.targetY - rp.y) * adaptiveLerp * dt;
 
             // Lerp angle
             let angleDiff = rp.targetAngle - rp.angle;
             if (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
             if (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
-            rp.angle += angleDiff * lerpSpeed * dt;
+            rp.angle += angleDiff * adaptiveLerp * dt;
 
             // Timeout: remove stale players
-            if (Date.now() - rp.lastUpdate > 5000) {
+            if (timeSinceUpdate > SYNC_CONFIG.staleTimeout) {
                 rp.alive = false;
             }
         }
@@ -72,11 +128,18 @@ export class NetworkSync {
                 ctx.fillRect(rp.x - barW / 2, rp.y - s - 8, barW * pct, 3);
             }
 
-            // Name
+            // Name + Latency indicator
             ctx.fillStyle = '#ffffff';
             ctx.font = '8px sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText(id, rp.x, rp.y - s - 12);
+
+            // Ping indicator (colored dot)
+            const pingColor = rp.latency < 80 ? '#22c55e' : rp.latency < 150 ? '#fbbf24' : '#ef4444';
+            ctx.fillStyle = pingColor;
+            ctx.beginPath();
+            ctx.arc(rp.x + 15, rp.y - s - 10, 2, 0, Math.PI * 2);
+            ctx.fill();
         }
     }
 
@@ -88,3 +151,4 @@ export class NetworkSync {
         this.remotePlayers.clear();
     }
 }
+

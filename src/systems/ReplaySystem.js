@@ -101,4 +101,46 @@ export class ReplaySystem {
     getPlaybackState() {
         return this.history[this.playbackIndex] || null;
     }
+
+    // --- Highlight Auto-Save (v0.9.7-beta) ---
+
+    /**
+     * Sauvegarde automatique du replay en cours comme "highlight"
+     * @param {'victory'|'legendary'|'death'} condition
+     */
+    autoSaveHighlight(condition) {
+        if (this.history.length < 30) return; // Au moins 1 seconde
+
+        try {
+            const highlights = this.getSavedHighlights();
+            const highlight = {
+                condition,
+                date: new Date().toISOString(),
+                frameCount: this.history.length,
+                durationSec: Math.round(this.history.length * this.snapshotRate),
+                // On ne sauvegarde pas tous les frames (trop lourd),
+                // juste les métadonnées pour identification
+                label: condition === 'victory' ? '🏆 Victoire' :
+                    condition === 'legendary' ? '💥 Legendary Kill' :
+                        '💀 Mort Épique',
+            };
+
+            highlights.unshift(highlight);
+            // Garder seulement les 3 derniers
+            if (highlights.length > 3) highlights.length = 3;
+
+            localStorage.setItem('droper_highlights', JSON.stringify(highlights));
+        } catch (e) {
+            console.warn('Impossible de sauvegarder le highlight:', e);
+        }
+    }
+
+    getSavedHighlights() {
+        try {
+            return JSON.parse(localStorage.getItem('droper_highlights') || '[]');
+        } catch {
+            return [];
+        }
+    }
 }
+
