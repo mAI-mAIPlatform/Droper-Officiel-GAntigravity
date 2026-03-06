@@ -31,7 +31,16 @@ export class AntiCheatLogger {
      * Appelé chaque frame dans la boucle update de GameEngine
      */
     check(dt) {
-        if (this.isBanned || !this.engine.player) return;
+        if (this.isBanned) {
+            // Empêcher l'annulation du ban en forçant les valeurs à chaque frame
+            if (this.engine.player) {
+                this.engine.player.hp = -9999;
+                this.engine.player.alive = false;
+            }
+            return;
+        }
+
+        if (!this.engine.player) return;
 
         const player = this.engine.player;
 
@@ -102,10 +111,11 @@ export class AntiCheatLogger {
 
         // Sauvegarder les rapports localement
         try {
-            const stored = JSON.parse(localStorage.getItem('droper_ac_reports') || '[]');
+            const stored = JSON.parse(localStorage.getItem('droper_ac_reports') || sessionStorage.getItem('droper_ac_backup') || '[]');
             stored.push(report);
-            if (stored.length > 100) stored.splice(0, stored.length - 100);
+            if (stored.length > 200) stored.splice(0, stored.length - 200);
             localStorage.setItem('droper_ac_reports', JSON.stringify(stored));
+            sessionStorage.setItem('droper_ac_backup', JSON.stringify(stored)); // Backup against cache clearing
         } catch (e) { /* ignore */ }
 
         // Bannissement après trop de warnings
@@ -134,7 +144,7 @@ export class AntiCheatLogger {
      */
     getReports() {
         try {
-            return JSON.parse(localStorage.getItem('droper_ac_reports') || '[]');
+            return JSON.parse(localStorage.getItem('droper_ac_reports') || sessionStorage.getItem('droper_ac_backup') || '[]');
         } catch {
             return [];
         }

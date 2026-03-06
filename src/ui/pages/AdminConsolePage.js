@@ -10,6 +10,17 @@ export class AdminConsolePage {
         this.activeTab = 'general';
     }
 
+    escapeHTML(str) {
+        if (!str || typeof str !== 'string') return str || '';
+        return str.replace(/[&<>'"]/g, match => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            "'": '&#39;',
+            '"': '&quot;'
+        }[match]));
+    }
+
     render() {
         const am = this.app.adminManager;
         if (!am.isAuthenticated) {
@@ -135,8 +146,8 @@ export class AdminConsolePage {
                                 </tr>
                                 ${acReports.slice(-10).reverse().map(r => `
                                     <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-                                        <td style="padding: 6px; color: #ef4444; font-weight: 700;">${r.type}</td>
-                                        <td style="padding: 6px;">${r.detail}</td>
+                                        <td style="padding: 6px; color: #ef4444; font-weight: 700;">${this.escapeHTML(r.type)}</td>
+                                        <td style="padding: 6px;">${this.escapeHTML(r.detail)}</td>
                                         <td style="padding: 6px; color: var(--color-text-muted);">${new Date(r.timestamp).toLocaleTimeString()}</td>
                                     </tr>
                                 `).join('')}

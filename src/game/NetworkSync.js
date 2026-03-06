@@ -61,12 +61,17 @@ export class NetworkSync {
 
         const now = Date.now();
         if (now - this.lastSendTime > 50) { // Limit to 20 updates per second
+            // Verification d'intégrité minimale côté client
+            const heroData = this.app.heroManager?.getFullHero(this.app.playerManager?.selectedHero);
+            const verifiedMaxHp = heroData ? heroData.stats.hp : 100;
+            const validHp = Math.min(Math.max(playerEntity.hp, 0), verifiedMaxHp);
+
             this.socket.emit('player_move', {
                 x: playerEntity.x,
                 y: playerEntity.y,
                 angle: playerEntity.angle,
-                hp: playerEntity.hp,
-                alive: playerEntity.alive
+                hp: validHp,
+                alive: playerEntity.alive && validHp > 0
             });
             this.lastSendTime = now;
         }

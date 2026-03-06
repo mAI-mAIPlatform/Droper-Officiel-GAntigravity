@@ -6,11 +6,27 @@ export class EconomyManager {
     constructor(saveManager) {
         this.save = saveManager;
         this.data = null;
+        this._lastTxTimes = []; // Rate limiter array
     }
 
     load() {
         this.data = this.save.get('economy') || { coins: 0, gems: 0, eventTokens: 0 };
         if (this.data.eventTokens === undefined) this.data.eventTokens = 0;
+    }
+
+    _checkRateLimit() {
+        const now = Date.now();
+        // Remove old transactions (older than 1 second)
+        this._lastTxTimes = this._lastTxTimes.filter(t => now - t < 1000);
+
+        // Max 10 transactions par seconde
+        if (this._lastTxTimes.length >= 10) {
+            console.warn("⚠️ Rate limit: trop de transactions en 1 seconde.");
+            return false;
+        }
+
+        this._lastTxTimes.push(now);
+        return true;
     }
 
     persist() {
@@ -28,7 +44,7 @@ export class EconomyManager {
 
     addCoins(amount) {
         amount = Math.floor(amount);
-        if (amount <= 0 || amount > EconomyManager.MAX_COINS_PER_TX) {
+        if (amount <= 0 || amount > EconomyManager.MAX_COINS_PER_TX || !this._checkRateLimit()) {
             console.warn(`⚠️ Transaction pièces suspecte rejetée: ${amount}`);
             return this.data.coins;
         }
@@ -39,7 +55,7 @@ export class EconomyManager {
 
     addGems(amount) {
         amount = Math.floor(amount);
-        if (amount <= 0 || amount > EconomyManager.MAX_GEMS_PER_TX) {
+        if (amount <= 0 || amount > EconomyManager.MAX_GEMS_PER_TX || !this._checkRateLimit()) {
             console.warn(`⚠️ Transaction gemmes suspecte rejetée: ${amount}`);
             return this.data.gems;
         }
@@ -50,7 +66,7 @@ export class EconomyManager {
 
     addEventTokens(amount) {
         amount = Math.floor(amount);
-        if (amount <= 0 || amount > EconomyManager.MAX_TOKENS_PER_TX) {
+        if (amount <= 0 || amount > EconomyManager.MAX_TOKENS_PER_TX || !this._checkRateLimit()) {
             console.warn(`⚠️ Transaction tokens suspecte rejetée: ${amount}`);
             return this.data.eventTokens;
         }

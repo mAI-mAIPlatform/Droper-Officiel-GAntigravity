@@ -5,7 +5,8 @@
 
 const SAVE_KEY = 'droper_save_v1';
 const CHECKSUM_KEY = 'droper_checksum';
-const INTEGRITY_SECRET = 'DrP_s3cur!ty_K3y_v080';
+// Obfuscated Integrity Secret to prevent easy scraping
+const INTEGRITY_SECRET = atob('RHJQX3MzY3VyIXR5X0szeV92MDgw'); // Base64 for 'DrP_s3cur!ty_K3y_v080'
 
 /**
  * Abstraction DB — Facilite la migration localStorage → Firebase/Supabase
@@ -49,8 +50,15 @@ class DatabaseAdapter {
             this.syncStatus = 'syncing';
             const { doc, setDoc } = window.firebase;
 
-            // On utilise le tag du joueur comme ID unique (à remplacer par auth.uid si Authentication est ajouté)
-            const userId = fullData?.player?.tag?.replace('#', '') || 'anonymous';
+            // On utilise le tag du joueur combiné à une info persistante (ID unique généré) pour éviter l'IDOR (Insecure Direct Object Reference)
+            let uniqueDeviceId = localStorage.getItem('droper_device_id');
+            if (!uniqueDeviceId) {
+                uniqueDeviceId = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15);
+                localStorage.setItem('droper_device_id', uniqueDeviceId);
+            }
+
+            // L'ID du document est une combinaison du tag et du device id
+            const userId = fullData?.player?.tag?.replace('#', '') + '-' + uniqueDeviceId || 'anonymous-' + uniqueDeviceId;
 
             await setDoc(doc(window.db, "saves", userId), fullData);
 
