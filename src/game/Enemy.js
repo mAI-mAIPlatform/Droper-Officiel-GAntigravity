@@ -1,5 +1,5 @@
 /* ============================
-   DROPER — Enemy Entity (v0.0.4 — IA intelligente)
+   DROPER — Enemy Entity (v1.1.0 — IA Avancée)
    ============================ */
 
 import { Entity } from './Entity.js';
@@ -92,13 +92,13 @@ export class Enemy extends Entity {
         // Behavior-specific movement
         switch (this.behavior) {
             case 'approach_shoot':
-                this.behaviorApproach(dt, nx, ny, dist);
+                this.behaviorApproach(dt, nx, ny, dist, engine);
                 break;
             case 'strafe':
-                this.behaviorStrafe(dt, nx, ny, dist, player);
+                this.behaviorStrafe(dt, nx, ny, dist, player, engine);
                 break;
             case 'tank':
-                this.behaviorTank(dt, nx, ny, dist);
+                this.behaviorTank(dt, nx, ny, dist, engine);
                 break;
             case 'boss':
                 this.behaviorBoss(dt, nx, ny, dist, player, engine);
@@ -117,56 +117,34 @@ export class Enemy extends Entity {
         }
     }
 
-    behaviorApproach(dt, nx, ny, dist) {
-        // Approach to preferred distance, then hold position with slight drift
+    behaviorApproach(dt, nx, ny, dist, engine) {
         if (dist > this.preferredDist) {
-            this.x += nx * this.speed * dt;
-            this.y += ny * this.speed * dt;
+            this.moveToward(dt, engine.player.x, engine.player.y, engine);
         } else if (dist < this.preferredDist * 0.5) {
-            // Too close, back off
-            this.x -= nx * this.speed * 0.5 * dt;
-            this.y -= ny * this.speed * 0.5 * dt;
+            this.moveToward(dt, this.x - nx * 100, this.y - ny * 100, engine, 0.5);
         } else {
-            // Slight drift
-            this.x += Math.sin(this.wobble * 0.5) * this.speed * 0.2 * dt;
-            this.y += Math.cos(this.wobble * 0.5) * this.speed * 0.2 * dt;
+            const tx = this.x + Math.sin(this.wobble * 0.5) * 50;
+            const ty = this.y + Math.cos(this.wobble * 0.5) * 50;
+            this.moveToward(dt, tx, ty, engine, 0.2);
         }
     }
 
-    behaviorStrafe(dt, nx, ny, dist, player) {
-        // Circle strafe around player
+    behaviorStrafe(dt, nx, ny, dist, player, engine) {
         this.strafeAngle += this.strafeDir * dt * 1.5;
-
-        const targetDist = this.preferredDist;
-        const targetX = player.x + Math.cos(this.strafeAngle) * targetDist;
-        const targetY = player.y + Math.sin(this.strafeAngle) * targetDist;
-
-        const tdx = targetX - this.x;
-        const tdy = targetY - this.y;
-        const tdist = Math.sqrt(tdx * tdx + tdy * tdy);
-
-        if (tdist > 5) {
-            this.x += (tdx / tdist) * this.speed * dt;
-            this.y += (tdy / tdist) * this.speed * dt;
-        }
-
-        // Randomly change direction
+        const targetX = player.x + Math.cos(this.strafeAngle) * this.preferredDist;
+        const targetY = player.y + Math.sin(this.strafeAngle) * this.preferredDist;
+        this.moveToward(dt, targetX, targetY, engine);
         if (Math.random() < 0.003) this.strafeDir *= -1;
     }
 
-    behaviorTank(dt, nx, ny, dist) {
-        // Slow approach, holds ground at range
+    behaviorTank(dt, nx, ny, dist, engine) {
         if (dist > this.preferredDist) {
-            this.x += nx * this.speed * dt;
-            this.y += ny * this.speed * dt;
+            this.moveToward(dt, engine.player.x, engine.player.y, engine);
         }
-        // Tanks don't retreat — they hold position
     }
 
     behaviorBoss(dt, nx, ny, dist, player, engine) {
         this.bossTimer += dt;
-
-        // Phase switching every 5s
         if (this.bossTimer > 5) {
             this.bossTimer = 0;
             this.bossPhase = (this.bossPhase + 1) % 3;
@@ -175,32 +153,73 @@ export class Enemy extends Entity {
         switch (this.bossPhase) {
             case 0: // Approach
                 if (dist > 120) {
-                    this.x += nx * this.speed * 1.5 * dt;
-                    this.y += ny * this.speed * 1.5 * dt;
+                    this.moveToward(dt, player.x, player.y, engine, 1.5);
                 }
                 break;
             case 1: // Circle
                 this.strafeAngle += dt * 0.8;
-                this.x = player.x + Math.cos(this.strafeAngle) * 200;
-                this.y = player.y + Math.sin(this.strafeAngle) * 200;
+                const tx = player.x + Math.cos(this.strafeAngle) * 200;
+                const ty = player.y + Math.sin(this.strafeAngle) * 200;
+                this.moveToward(dt, tx, ty, engine);
                 break;
-            case 2: // Retreat & burst fire
+            case 2: // Retreat
                 if (dist < 250) {
-                    this.x -= nx * this.speed * dt;
-                    this.y -= ny * this.speed * dt;
-                }
-                // Triple fire
-                if (this.shootCooldown <= 0) {
-                    for (let i = -1; i <= 1; i++) {
-                        const spread = i * 0.3;
-                        const bx = nx * Math.cos(spread) - ny * Math.sin(spread);
-                        const by = nx * Math.sin(spread) + ny * Math.cos(spread);
-                        this.shootBullet(engine, bx, by);
-                    }
-                    this.shootCooldown = this.shootRate;
+                    this.moveToward(dt, this.x - nx * 100, this.y - ny * 100, engine);
                 }
                 break;
         }
+
+        if (this.shootCooldown <= 0 && this.bossPhase === 2) {
+            for (let i = -1; i <= 1; i++) {
+                const spread = i * 0.3;
+                const bx = nx * Math.cos(spread) - ny * Math.sin(spread);
+                const by = nx * Math.sin(spread) + ny * Math.cos(spread);
+                this.shootBullet(engine, bx, by);
+            }
+            this.shootCooldown = this.shootRate;
+        }
+    }
+
+    moveToward(dt, tx, ty, engine, speedMult = 1) {
+        const dx = tx - this.x;
+        const dy = ty - this.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist === 0) return;
+
+        let nx = dx / dist;
+        let ny = dy / dist;
+        const speed = this.speed * speedMult;
+
+        if (this.isBlocking(this.x + nx * speed * dt, this.y + ny * speed * dt, engine)) {
+            let found = false;
+            for (let i = 1; i <= 8; i++) {
+                const angle = (i * 30) * (Math.PI / 180);
+                let rx = nx * Math.cos(angle) - ny * Math.sin(angle);
+                let ry = nx * Math.sin(angle) + ny * Math.cos(angle);
+                if (!this.isBlocking(this.x + rx * speed * dt, this.y + ry * speed * dt, engine)) {
+                    nx = rx; ny = ry; found = true; break;
+                }
+                rx = nx * Math.cos(-angle) - ny * Math.sin(-angle);
+                ry = nx * Math.sin(-angle) + ny * Math.cos(-angle);
+                if (!this.isBlocking(this.x + rx * speed * dt, this.y + ry * speed * dt, engine)) {
+                    nx = rx; ny = ry; found = true; break;
+                }
+            }
+            if (!found) return;
+        }
+
+        this.x += nx * speed * dt;
+        this.y += ny * speed * dt;
+    }
+
+    isBlocking(tx, ty, engine) {
+        for (const wall of engine.walls) {
+            if (tx + this.width / 2 > wall.x && tx - this.width / 2 < wall.x + wall.w &&
+                ty + this.height / 2 > wall.y && ty - this.height / 2 < wall.y + wall.h) {
+                return true;
+            }
+        }
+        return false;
     }
 
     shoot(engine, nx, ny) {
