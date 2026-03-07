@@ -54,8 +54,8 @@ export class ArmoryPage {
                 </div>
 
                 <div class="hero-card__visual" style="height: 100px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px;">
-                  ${hero.portrait ?
-          `<img src="${hero.portrait}" loading="lazy" style="height: 100%; object-fit: contain; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));" class="hero-img-anim">` :
+                  ${(hero.portrait || hero.coverImage) ?
+          `<img src="${hero.portrait || hero.coverImage}" loading="lazy" style="height: 100%; object-fit: contain; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));" class="hero-img-anim" onerror="this.src='/assets/icones/heroes/${hero.id}.png'; this.onerror=null;">` :
           `<img src="/assets/icones/heroes/${hero.id}.png" loading="lazy" style="height: 80%; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));" class="hero-img-anim" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
            <span style="font-size: 2.8rem; display: none; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));" class="hero-emoji-anim">${hero.emoji}</span>`
         }

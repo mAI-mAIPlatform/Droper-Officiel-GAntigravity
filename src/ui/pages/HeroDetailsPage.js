@@ -31,7 +31,11 @@ export class HeroDetailsPage {
                 <div class="hero-showcase stack" style="align-items: center; margin-top: 10px;">
                     <div class="hero-image-container" style="position: relative; width: 220px; height: 220px; display: flex; align-items: center; justify-content: center;">
                         <div style="position: absolute; inset: 0; background: radial-gradient(circle, ${this.hero.bodyColor}33 0%, transparent 70%); border-radius: 50%;"></div>
-                        <img src="${this.hero.portrait}" alt="${this.hero.name}" style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)); z-index: 1;" />
+                        ${(this.hero.portrait || this.hero.coverImage) ?
+                `<img src="${this.hero.portrait || this.hero.coverImage}" alt="${this.hero.name}" style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)); z-index: 1;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';" />` :
+                `<div style="display:none"></div>`
+            }
+                        <span style="font-size: 5rem; display: ${(this.hero.portrait || this.hero.coverImage) ? 'none' : 'inline-block'}; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));" class="hero-emoji-anim">${this.hero.emoji}</span>
                         
                         ${state.masteryTier === 'LÉGENDE' ? `
                             <div class="legend-aura-ui" style="position: absolute; inset: -15px; border: 2px solid var(--color-accent-gold); border-radius: 50%; box-shadow: 0 0 20px var(--color-accent-gold); animation: pulse-gold 2s infinite, rotate 10s linear infinite;"></div>
