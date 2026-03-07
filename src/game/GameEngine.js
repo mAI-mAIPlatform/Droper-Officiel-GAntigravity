@@ -1,5 +1,5 @@
 /* ============================
-   DROPER — Game Engine 2D (v1.0.8)
+   DROPER — Game Engine 2D (v1.0.9)
    ============================ */
 
 import { Player } from './Player.js';

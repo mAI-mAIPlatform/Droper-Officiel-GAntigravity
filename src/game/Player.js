@@ -12,8 +12,8 @@ export class Player extends Entity {
             x, y,
             width: 32,
             height: 32,
-            hp: heroData ? heroData.stats.hp : 100,
-            maxHp: heroData ? heroData.stats.hp : 100,
+            hp: heroData ? heroData.stats.hp * 0.8 : 80,
+            maxHp: heroData ? heroData.stats.hp * 0.8 : 80,
             attack: heroData ? heroData.stats.attack : 15,
             defense: heroData ? heroData.stats.defense : 10,
             color: heroData?.bodyColor || '#4a9eff',
@@ -33,7 +33,7 @@ export class Player extends Entity {
 
         this.hero = heroData;
         const baseSpeed = heroData ? heroData.stats.speed * 30 + 100 : 200;
-        this.speed = baseSpeed * 0.6 * 0.7; // Reduced to 60% previously, now reduced by another 30% for v1.0.0
+        this.speed = baseSpeed * 0.6 * 0.7 * 0.7; // v1.0.9 : -30% supplémentaire sur la vitesse et -20% HP
         this.shootCooldown = 0;
         this.shootRate = 0.18;
         this.mouseX = 0;

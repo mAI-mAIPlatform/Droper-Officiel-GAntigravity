@@ -218,7 +218,7 @@ export class Enemy extends Entity {
             owner: 'enemy',
             color: this.color,
         });
-        engine.entities.push(bullet);
+        engine.addEntity(bullet);
     }
 
     draw(ctx, spriteRenderer) {
