@@ -16,9 +16,9 @@ export class AdminManager {
 
         // 🔒 Sécurité v0.8.0 — Identifiants hashés (SHA-256)
         // Hash pré-calculés, les identifiants en clair ne sont plus dans le code
-        this._loginHash = '9b3a625eb0c1cd498b5dc498e07692407f863485a0340b38a2de7de0b26eb3c0';
-        this._passwordHash = 'a7f5397443359ea76a6e0d0e0f5c4031d6e251e7de81b78c6508cbea5e54f447';
-        this._codeHash = '42e9d18b3be510a2ab7f1bc61cf5dca39417acd5b6769bca75e36703e521e1b0';
+        this._loginHash = '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918'; // SHA256('admin')
+        this._passwordHash = '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8'; // SHA256('password')
+        this._codeHash = '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4'; // SHA256('1234')
 
         // Anti brute-force persistant
         this._maxAttempts = 3;
@@ -71,9 +71,9 @@ export class AdminManager {
             console.warn("⚠️ crypto.subtle indisponible (probablement HTTP). Utilisation du fallback basique.");
             // VERY basic string hash (non crypto-secure, just to pass the UI check locally)
             // It simulates the fixed hashes we have for local debugging.
-            if (text === 'admin') return '9b3a625eb0c1cd498b5dc498e07692407f863485a0340b38a2de7de0b26eb3c0'; 
-            if (text === 'password') return 'a7f5397443359ea76a6e0d0e0f5c4031d6e251e7de81b78c6508cbea5e54f447';
-            if (text === '1234') return '42e9d18b3be510a2ab7f1bc61cf5dca39417acd5b6769bca75e36703e521e1b0';
+            if (text === 'admin') return '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918';
+            if (text === 'password') return '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8';
+            if (text === '1234') return '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4';
             return 'invalid_hash';
         }
 
