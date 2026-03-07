@@ -113,6 +113,24 @@ export class FlashEventManager {
 
         toast.info(`⚡ Événement Flash : ${event.emoji} ${event.name} !`);
     }
+
+    forceEvent(eventId) {
+        const event = this.events.find(e => e.id === eventId);
+        if (event) {
+            this.currentEvent = event;
+            toast.success(`Événement forcé : ${event.name}`);
+            return true;
+        }
+        return false;
+    }
+
+    stopCurrentEvent(engine) {
+        this.currentEvent = null;
+        if (engine && engine._flashModifiers) {
+            engine._flashModifiers = {};
+        }
+        toast.info('Événement Flash terminé.');
+    }
 }
 
 export { FLASH_EVENTS };

@@ -78,7 +78,7 @@ export class ShopPage {
     const isClaimed = claimed.includes(offer.id);
     const am = this.app.adminManager;
 
-    const rarityKey = (offer.rarity || 'common').toUpperCase();
+    const rarityKey = (offer.rarity?.toString() || 'common').toUpperCase();
     const rarity = RARITIES[rarityKey] || RARITIES.COMMON;
     const borderColor = rarity.color;
     const glowColor = `${rarity.color}66`; // ~40% d'opacité

@@ -42,7 +42,7 @@ export class RankedPage {
           </div>
           
           <h2 style="font-size: 2.5rem; font-weight: 900; letter-spacing: 2px; color: #fff; margin-bottom: 10px;">
-            ${rank.toUpperCase()}
+            ${(rank?.toString() || 'BRONZE I').toUpperCase()}
           </h2>
           
           <div style="font-size: 1.2rem; color: var(--color-accent-blue); font-weight: 700; margin-bottom: 30px;">

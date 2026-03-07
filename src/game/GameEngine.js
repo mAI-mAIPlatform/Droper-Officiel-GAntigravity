@@ -1,5 +1,5 @@
 /* ============================
-   DROPER — Game Engine 2D (v1.0.0)
+   DROPER — Game Engine 2D (v1.0.4)
    ============================ */
 
 import { Player } from './Player.js';
@@ -13,6 +13,7 @@ import { AnimationManager } from './AnimationManager.js';
 import { Payload } from './Payload.js';
 import { Enemy } from './Enemy.js';
 import { WeatherSystem } from './WeatherSystem.js';
+import { EventManager } from '../systems/events/EventManager.js';
 import { ReplaySystem } from '../systems/ReplaySystem.js';
 import { AntiCheatLogger } from '../systems/AntiCheatLogger.js';
 import { NetworkSync } from './NetworkSync.js';
@@ -61,6 +62,7 @@ export class GameEngine {
         this.isReplaying = false;
         this.antiCheat = new AntiCheatLogger(this);
         this.networkSync = new NetworkSync(this.app); // v0.9.9 Multiplayer
+        this.eventManager = new EventManager(this.app); // v1.0.2 Events
 
         // --- CAVEAUX SYSTEM ---
         this.gasCenter = { x: 0, y: 0 };
@@ -371,6 +373,9 @@ export class GameEngine {
                 this.fpsTimer = 0;
             }
 
+            // Gestion Event
+            if (this.eventManager) this.eventManager.update();
+
             if (!this.paused && !this.gameOver && !this.isReplaying) {
                 this.update(this.deltaTime);
                 this.replaySystem.update(this.deltaTime); // Record frame
@@ -454,21 +459,28 @@ export class GameEngine {
                             this.entities.push(projectile);
                             this.particles.spawnMuzzleFlash(bd.x, bd.y, bd.angle);
                         });
-                        if (this.audioManager) this.audioManager.playShoot();
+                        if (this.audioManager) this.audioManager.playShoot(this.player.x, this.player.y);
                     } else {
                         // Standard single bullet
                         const projectile = new Projectile(bulletData);
                         this.entities.push(projectile);
                         // Muzzle flash
                         this.particles.spawnMuzzleFlash(bulletData.x, bulletData.y, bulletData.angle);
-                        if (this.audioManager) this.audioManager.playShoot();
+                        if (this.audioManager) this.audioManager.playShoot(this.player.x, this.player.y);
                     }
                 }
+            }
+
+            // Set Audio Listener Position
+            if (this.audioManager) {
+                this.audioManager.setListenerPosition(this.player.x, this.player.y);
             }
         }
 
         // Update Entités
         const config = this.app.adminManager?.config || {};
+        const eventModifiers = this.eventManager?.getActiveModifiers() || {};
+        const eventSpeed = eventModifiers.gameSpeed || 1;
 
         // Triggers Admin
         if (config.triggerMapClear) {
@@ -480,10 +492,13 @@ export class GameEngine {
             // Freeze enemies check
             if (config.freezeEnemies && (entity.type === 'enemy' || entity.type === 'boss')) continue;
 
-            // Player Speed Boost
-            let dtMult = dt;
+            // Speed Boost & Event Modifiers
+            let dtMult = dt * eventSpeed;
             if (entity.type === 'player' && config.playerSpeedBoost) {
                 dtMult *= config.playerSpeedBoost;
+            }
+            if ((entity.type === 'enemy' || entity.type === 'boss') && eventModifiers.enemySpeed) {
+                dtMult *= eventModifiers.enemySpeed;
             }
 
             entity.update(dtMult, this);
@@ -652,7 +667,8 @@ export class GameEngine {
         const config = this.app.adminManager?.config || {};
 
         // Effets visuels d'événements
-        if (config.nightMode) {
+        const eventModifiers = this.eventManager?.getActiveModifiers() || {};
+        if (config.nightMode || eventModifiers.nightMode) {
             ctx.fillStyle = 'rgba(0, 0, 20, 0.4)';
             ctx.fillRect(0, 0, this.width, this.height);
         }

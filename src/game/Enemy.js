@@ -205,7 +205,7 @@ export class Enemy extends Entity {
 
     shoot(engine, nx, ny) {
         this.shootBullet(engine, nx, ny);
-        if (engine.audioManager) engine.audioManager.playShoot();
+        if (engine.audioManager) engine.audioManager.playShoot(this.x, this.y);
     }
 
     shootBullet(engine, dirX, dirY) {

@@ -8,6 +8,40 @@ export class AudioManager {
         this.masterGain = null;
         this.enabled = true;
         this.volume = 0.3;
+        this.listenerX = 0;
+        this.listenerY = 0;
+        this.screenWidth = window.innerWidth;
+    }
+
+    setListenerPosition(x, y) {
+        this.listenerX = x;
+        this.listenerY = y;
+    }
+
+    _createSpatialPanner(sourceX, sourceY) {
+        if (!this.ctx || !this.ctx.createStereoPanner) return this.masterGain;
+
+        // Calcul simple du pan stéréo basé sur la distance X relative à l'écran
+        const dx = sourceX - this.listenerX;
+        const maxDist = this.screenWidth / 1.5; // Distance où le son est 100% d'un côté
+        let panValue = Math.max(-1, Math.min(1, dx / maxDist));
+
+        // Calcul du volume basé sur la distance totale (atténuation)
+        const dy = sourceY - this.listenerY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const maxHearDist = this.screenWidth * 1.5; // Plus on est loin, moins on entend
+        let distanceGainValue = Math.max(0, 1 - (dist / maxHearDist));
+
+        const panner = this.ctx.createStereoPanner();
+        panner.pan.value = panValue;
+
+        const distanceGain = this.ctx.createGain();
+        distanceGain.gain.value = distanceGainValue;
+
+        panner.connect(distanceGain);
+        distanceGain.connect(this.masterGain);
+
+        return panner;
     }
 
     init() {
@@ -54,7 +88,7 @@ export class AudioManager {
         osc.stop(this.ctx.currentTime + 2.5);
     }
 
-    playShoot() {
+    playShoot(x = null, y = null) {
         if (!this.enabled || !this.ctx) return;
         this.resume();
         const osc = this.ctx.createOscillator();
@@ -65,12 +99,19 @@ export class AudioManager {
         gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.08);
         osc.connect(gain);
-        gain.connect(this.masterGain);
+
+        if (x !== null && y !== null) {
+            const panner = this._createSpatialPanner(x, y);
+            gain.connect(panner);
+        } else {
+            gain.connect(this.masterGain);
+        }
+
         osc.start(this.ctx.currentTime);
         osc.stop(this.ctx.currentTime + 0.08);
     }
 
-    playHit() {
+    playHit(x = null, y = null) {
         if (!this.enabled || !this.ctx) return;
         this.resume();
         const osc = this.ctx.createOscillator();
@@ -81,12 +122,19 @@ export class AudioManager {
         gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.1);
         osc.connect(gain);
-        gain.connect(this.masterGain);
+
+        if (x !== null && y !== null) {
+            const panner = this._createSpatialPanner(x, y);
+            gain.connect(panner);
+        } else {
+            gain.connect(this.masterGain);
+        }
+
         osc.start(this.ctx.currentTime);
         osc.stop(this.ctx.currentTime + 0.1);
     }
 
-    playEnemyDeath() {
+    playEnemyDeath(x = null, y = null) {
         if (!this.enabled || !this.ctx) return;
         this.resume();
         const osc = this.ctx.createOscillator();
@@ -97,7 +145,13 @@ export class AudioManager {
         gain.gain.setValueAtTime(0.18, this.ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.25);
         osc.connect(gain);
-        gain.connect(this.masterGain);
+
+        let outputDest = this.masterGain;
+        if (x !== null && y !== null) {
+            outputDest = this._createSpatialPanner(x, y);
+        }
+        gain.connect(outputDest);
+
         osc.start(this.ctx.currentTime);
         osc.stop(this.ctx.currentTime + 0.25);
 
@@ -113,7 +167,7 @@ export class AudioManager {
         noiseGain.gain.setValueAtTime(0.08, this.ctx.currentTime);
         noiseGain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.15);
         noise.connect(noiseGain);
-        noiseGain.connect(this.masterGain);
+        noiseGain.connect(outputDest);
         noise.start(this.ctx.currentTime);
     }
 

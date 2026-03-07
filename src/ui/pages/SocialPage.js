@@ -166,7 +166,10 @@ export class SocialPage {
                         </div>
                         <div style="text-align: right;">
                             <div style="font-size: 1.3rem; font-weight: 800; color: var(--color-accent-gold);">🏆 ${club.trophies}</div>
-                            <button id="btn-leave-club" class="btn btn--ghost" style="color: var(--color-accent-red); font-size: 0.6rem; padding: 2px 8px;">QUITTER</button>
+                            <div class="row" style="gap: 10px; justify-content: flex-end; margin-top: 5px;">
+                                ${this.canManageClub(club) ? `<button id="btn-settings-club" class="btn btn--ghost" style="color: var(--color-accent-blue); font-size: 0.6rem; padding: 2px 8px;">⚙️ GÉRER</button>` : ''}
+                                <button id="btn-leave-club" class="btn btn--ghost" style="color: var(--color-accent-red); font-size: 0.6rem; padding: 2px 8px;">QUITTER</button>
+                            </div>
                         </div>
                     </div>
 
@@ -256,6 +259,38 @@ export class SocialPage {
                         <button id="btn-club-chat-send" class="btn btn--accent btn--icon" style="width: 38px; height: 38px; border-radius: 8px;">➡️</button>
                     </div>
                 </div>
+                ${this.renderClubSettingsModal(club)}
+            </div>
+        `;
+    }
+
+    canManageClub(club) {
+        if (!club) return false;
+        const me = club.members.find(m => m.tag === 'Toi');
+        return me && (me.role === 'president' || me.role === 'vice');
+    }
+
+    renderClubSettingsModal(club) {
+        return `
+            <div id="club-settings-modal" class="modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9999; align-items: center; justify-content: center;">
+                <div class="card anim-scale-in" style="width: 90%; max-width: 400px; padding: 20px; border: 2px solid var(--color-accent-blue); box-shadow: 0 0 20px rgba(74, 158, 255, 0.4);">
+                    <h2 style="margin-bottom: 20px; color: var(--color-accent-blue);">⚙️ PARAMÈTRES DU CLUB</h2>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-size: 0.75rem; color: var(--color-text-muted); display: block; margin-bottom: 5px;">Blason (Emoji) :</label>
+                        <input type="text" id="club-emoji-input" class="input" value="${club.emoji || '🏠'}" maxlength="4" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--color-border); padding: 10px; border-radius: 8px; font-size: 1.2rem; text-align: center;">
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label style="font-size: 0.75rem; color: var(--color-text-muted); display: block; margin-bottom: 5px;">Message du jour (Optionnel) :</label>
+                        <input type="text" id="club-motd-input" class="input" placeholder="Annonce à tous les membres..." maxlength="50" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--color-border); padding: 10px; border-radius: 8px; font-size: 0.8rem;">
+                    </div>
+
+                    <div class="row" style="gap: 10px; justify-content: center;">
+                        <button id="btn-club-settings-cancel" class="btn btn--outline" style="flex: 1;">ANNULER</button>
+                        <button id="btn-club-settings-save" class="btn btn--primary" style="flex: 1;">ENREGISTRER</button>
+                    </div>
+                </div>
             </div>
         `;
     }
@@ -305,7 +340,6 @@ export class SocialPage {
             };
         });
 
-        // Club buttons
         const joinBtn = document.getElementById('btn-join-club');
         if (joinBtn) joinBtn.onclick = () => { this.app.clubManager?.joinClub(); this.refresh(); };
 
@@ -317,6 +351,28 @@ export class SocialPage {
 
         const leaveBtn = document.getElementById('btn-leave-club');
         if (leaveBtn) leaveBtn.onclick = () => { this.app.clubManager?.leaveClub(); this.refresh(); };
+
+        // Settings Modal
+        const settingsBtn = document.getElementById('btn-settings-club');
+        const settingsModal = document.getElementById('club-settings-modal');
+        if (settingsBtn && settingsModal) {
+            settingsBtn.onclick = () => settingsModal.style.display = 'flex';
+
+            document.getElementById('btn-club-settings-cancel').onclick = () => settingsModal.style.display = 'none';
+            document.getElementById('btn-club-settings-save').onclick = () => {
+                const newEmoji = document.getElementById('club-emoji-input').value.trim();
+                const newMotd = document.getElementById('club-motd-input').value.trim();
+
+                if (newEmoji) {
+                    this.app.clubManager?.editClubEmoji(newEmoji);
+                }
+                if (newMotd && newMotd.length > 0) {
+                    this.app.clubManager?.sendMessage(`[ANNONCE] : ${newMotd}`);
+                }
+                settingsModal.style.display = 'none';
+                this.refresh();
+            };
+        }
 
         // Promote / Kick
         document.querySelectorAll('.btn-promote').forEach(btn => {
@@ -363,7 +419,7 @@ export class SocialPage {
         window.app.uiManager = window.app.uiManager || {};
         window.app.uiManager.showTradeModal = (tag, name) => {
             document.getElementById('trade-modal').style.display = 'flex';
-            document.getElementById('trade-modal-title').innerText = `ÉCHANGER AVEC ${name.toUpperCase()}`;
+            document.getElementById('trade-modal-title').innerText = `ÉCHANGER AVEC ${(name?.toString() || 'JOUEUR').toUpperCase()}`;
             document.getElementById('trade-target-tag').value = tag;
         };
         const tradeSend = document.getElementById('btn-trade-send');

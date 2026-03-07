@@ -24,7 +24,7 @@ export class HeroDetailsPage {
                 <div class="page__header row row--between" style="margin-bottom: 20px;">
                     <button class="btn btn--outline" id="btn-back-armory" style="padding: 8px 15px; font-size: 0.7rem;">← ARMURERIE</button>
                     <div class="badge" style="background: ${rarity.color}22; color: ${rarity.color}; border: 1px solid ${rarity.color}; padding: 4px 12px; border-radius: 20px; font-size: 0.65rem; font-weight: 800;">
-                        ${rarity.label ? rarity.label.toUpperCase() : 'COMMUN'}
+                        ${(rarity?.label || 'COMMUN').toUpperCase()}
                     </div>
                 </div>
 
@@ -38,9 +38,9 @@ export class HeroDetailsPage {
                         ` : ''}
                     </div>
                     <h1 style="font-size: 2.2rem; font-weight: 900; margin-top: 20px; letter-spacing: -1.5px; text-transform: uppercase;">${this.hero.name}</h1>
-                    <div style="background: rgba(255,255,255,0.05); padding: 4px 12px; border-radius: 4px; font-size: 0.7rem; color: var(--color-text-muted); margin-top: 5px;">
-                        ${this.hero.class.toUpperCase()} — ${this.hero.description}
-                    </div>
+                    <div style="font-size: var(--font-size-sm); color: var(--color-text-muted); font-weight: 700; margin-top: 5px; opacity: 0.8; letter-spacing: 1px;">
+                            ${(this.hero.archetype?.label || 'COMMUN').toUpperCase()} — ${this.hero.description || 'Aucune description'}
+                        </div>
                 </div>
 
                 <!-- Maîtrise Section -->
@@ -57,10 +57,10 @@ export class HeroDetailsPage {
 
                 <!-- Stats Grid -->
                 <div class="grid-2" style="margin-top: 25px; gap: 12px;">
-                    ${new StatCard('❤ VIE', this.hero.stats.hp, { color: 'var(--color-accent-red)' }).render()}
-                    ${new StatCard('⚔ DÉGÂTS', this.hero.stats.attack, { color: 'var(--color-accent-gold)' }).render()}
-                    ${new StatCard('🛡 DÉFENSE', this.hero.stats.defense, { color: 'var(--color-accent-blue)' }).render()}
-                    ${new StatCard('⚡ VITESSE', Math.round(this.hero.stats.speed * 100), { color: 'var(--color-accent-green)' }).render()}
+                    ${new StatCard('❤ VIE', this.hero.stats.hp, '❤️').render()}
+                    ${new StatCard('⚔ DÉGÂTS', this.hero.stats.attack, '⚔️').render()}
+                    ${new StatCard('🛡 DÉFENSE', this.hero.stats.defense, '🛡️').render()}
+                    ${new StatCard('⚡ VITESSE', Math.round(this.hero.stats.speed * 100), '⚡').render()}
                 </div>
 
                 <!-- Capacities -->

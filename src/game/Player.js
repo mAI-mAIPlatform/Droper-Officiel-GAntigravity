@@ -236,6 +236,7 @@ export class Player extends Entity {
                     damage: this.attack * this.activeBoosts.damage,
                     speed: 600,
                     owner: 'player',
+                    emitter: this, // v1.0.2 - Pour AttackEffects
                 });
             }
             return bullets; // Array of bullets
@@ -248,6 +249,7 @@ export class Player extends Entity {
             damage: this.attack * this.activeBoosts.damage,
             speed: 600,
             owner: 'player',
+            emitter: this, // v1.0.2 - Pour AttackEffects
         };
     }
 
@@ -345,7 +347,7 @@ export class Player extends Entity {
 
         const state = this.shootCooldown > this.shootRate * 0.7 ? 'shoot' : 'idle';
         if (spriteRenderer) {
-            spriteRenderer.drawPlayer(ctx, this.x, this.y, this.angle, state, this.color, this.equippedSkin);
+            spriteRenderer.drawPlayer(ctx, this.x, this.y, this.angle, state, this.color, this.equippedSkin, this.hero);
         } else {
             ctx.save();
             ctx.translate(this.x, this.y); ctx.rotate(this.angle);

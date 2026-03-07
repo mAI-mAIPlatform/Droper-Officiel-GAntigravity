@@ -175,7 +175,7 @@ export class CollectionPage {
                     <div class="card" style="min-width: 220px; text-align: center; padding: var(--spacing-lg);">
                         <canvas id="skin-preview" width="180" height="180" style="background: rgba(0,0,0,0.5); border-radius: 12px;"></canvas>
                         <div style="margin-top: var(--spacing-md);">
-                            <strong style="color: var(--color-accent-blue);">${hero.name.toUpperCase()}</strong>
+                            <strong style="color: var(--color-accent-blue);">${(hero?.name?.toString() || 'HÉROS').toUpperCase()}</strong>
                             <div style="font-size: var(--font-size-sm); color: var(--color-text-secondary); margin-top: 4px;">${skinData.name}</div>
                         </div>
                     </div>

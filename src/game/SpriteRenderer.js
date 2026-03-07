@@ -17,7 +17,7 @@ export class SpriteRenderer {
     }
 
     // === JOUEUR ===
-    drawPlayer(ctx, x, y, angle, state = 'idle', color = '#4a9eff', skin = 'default') {
+    drawPlayer(ctx, x, y, angle, state = 'idle', color = '#4a9eff', skin = 'default', heroData = null) {
         ctx.save();
         ctx.translate(x, y);
         ctx.rotate(angle);
@@ -114,6 +114,74 @@ export class SpriteRenderer {
             ctx.beginPath();
             ctx.arc(26, 0, 3 + Math.random() * 2, 0, TWO_PI);
             ctx.fill();
+        }
+
+        // --- Clothing (v1.0.2 Réalisme) ---
+        if (heroData && heroData.clothing) {
+            ctx.fillStyle = 'rgba(0,0,0,0.3)'; // Base shadow clothing
+            switch (heroData.clothing) {
+                case 'military_vest':
+                    ctx.fillStyle = '#4b5320'; // Army green
+                    ctx.fillRect(-6, -8, 12, 16);
+                    ctx.strokeStyle = '#2d3319';
+                    ctx.strokeRect(-6, -8, 12, 16);
+                    // Pockets
+                    ctx.fillStyle = '#3a4216';
+                    ctx.fillRect(-4, -6, 4, 4);
+                    ctx.fillRect(-4, 2, 4, 4);
+                    break;
+                case 'cyber_shell':
+                    ctx.fillStyle = '#0f172a';
+                    ctx.beginPath();
+                    ctx.moveTo(-10, -5); ctx.lineTo(-2, -10); ctx.lineTo(6, -5);
+                    ctx.lineTo(6, 5); ctx.lineTo(-2, 10); ctx.lineTo(-10, 5);
+                    ctx.fill();
+                    ctx.strokeStyle = '#06b6d4';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                    break;
+                case 'heavy_armor':
+                    ctx.fillStyle = '#1e293b';
+                    ctx.fillRect(-12, -12, 24, 24);
+                    // Plates
+                    ctx.fillStyle = '#334155';
+                    ctx.fillRect(-10, -10, 20, 10);
+                    ctx.fillRect(-10, 2, 20, 8);
+                    break;
+                case 'ghillie_suit':
+                    ctx.fillStyle = '#166534';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 12, 0, TWO_PI);
+                    ctx.fill();
+                    // Leaves pseudo-random
+                    ctx.fillStyle = '#14532d';
+                    for (let i = 0; i < 8; i++) {
+                        ctx.beginPath();
+                        ctx.arc(Math.cos(i) * 8, Math.sin(i) * 8, 4, 0, TWO_PI);
+                        ctx.fill();
+                    }
+                    break;
+                case 'shadow_cloak':
+                    ctx.fillStyle = 'rgba(15, 23, 42, 0.8)';
+                    ctx.beginPath();
+                    // Cape flow
+                    const capeY = Math.sin(this.time * 5) * 3;
+                    ctx.moveTo(-15, -8);
+                    ctx.lineTo(8, -10);
+                    ctx.quadraticCurveTo(-15, capeY, -20, 0);
+                    ctx.quadraticCurveTo(-15, -capeY, 8, 10);
+                    ctx.lineTo(-15, 8);
+                    ctx.fill();
+                    break;
+                case 'titanium_plates':
+                    ctx.fillStyle = '#e2e8f0';
+                    ctx.beginPath();
+                    ctx.moveTo(0, -14); ctx.lineTo(10, 0); ctx.lineTo(0, 14); ctx.lineTo(-10, 0);
+                    ctx.fill();
+                    ctx.strokeStyle = '#94a3b8';
+                    ctx.stroke();
+                    break;
+            }
         }
 
         // Shield glow outline

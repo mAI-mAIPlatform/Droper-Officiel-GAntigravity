@@ -114,7 +114,7 @@ export class FlashEventMode {
             ctx.fillStyle = event.color;
             ctx.font = 'bold 11px Outfit, sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText(`${event.emoji} ${event.name.toUpperCase()}`, this.engine.width / 2, 50);
+            ctx.fillText(`${event.emoji || '⚡'} ${(event.name?.toString() || 'ÉVÉNEMENT').toUpperCase()}`, this.engine.width / 2, 50);
         }
     }
 

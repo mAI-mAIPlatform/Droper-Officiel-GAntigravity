@@ -211,6 +211,24 @@ export const SHOP_OFFERS = [
         cost: { type: 'gems', amount: 250 },
         category: 'cosmetic',
     },
+    {
+        id: 'cosm_clothing_leather',
+        name: 'Veste Cuir',
+        emoji: '🧥',
+        description: 'Veste en cuir de biker noire.',
+        reward: { type: 'cosmetic', cosmType: 'clothing', cosmId: 'leather_jacket' },
+        cost: { type: 'coins', amount: 1500 },
+        category: 'cosmetic',
+    },
+    {
+        id: 'cosm_clothing_sport',
+        name: 'Veste Sport',
+        emoji: '🎽',
+        description: 'Veste de survêtement rouge.',
+        reward: { type: 'cosmetic', cosmType: 'clothing', cosmId: 'sport_jacket' },
+        cost: { type: 'gems', amount: 80 },
+        category: 'cosmetic',
+    },
 ];
 
 export function getOffersByCategory(category) {

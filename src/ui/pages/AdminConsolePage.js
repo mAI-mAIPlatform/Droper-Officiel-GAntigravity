@@ -201,15 +201,48 @@ export class AdminConsolePage {
         }
 
         if (this.activeTab === 'event') {
+            const events = this.app.flashEventManager ? this.app.flashEventManager.events : [];
+            const currentEvent = this.app.flashEventManager ? this.app.flashEventManager.currentEvent : null;
+
             return `
-                <div class="card">
-                    <h3>🌪️ Modificateurs & Debug</h3>
-                    <div class="row" style="gap: 10px; flex-wrap: wrap;">
-                        <button class="btn btn--purple btn-admin-flag" data-flag="godMode" style="opacity: ${config.godMode ? 1 : 0.5}">😇 GOD MODE</button>
-                        <button class="btn btn--purple btn-admin-flag" data-flag="infiniteAmmo" style="opacity: ${config.infiniteAmmo ? 1 : 0.5}">♾️ MUNITIONS INF.</button>
-                        <button class="btn btn--purple btn-admin-flag" data-flag="doubleFireRate" style="opacity: ${config.doubleFireRate ? 1 : 0.5}">🔥 TIR RAPIDE x2</button>
-                        <button class="btn btn--purple btn-admin-flag" data-flag="doubleHP" style="opacity: ${config.doubleHP ? 1 : 0.5}">❤️ VITA x2</button>
-                        <button class="btn btn--purple btn-admin-flag" data-flag="smallPlayer" style="opacity: ${config.smallPlayer ? 1 : 0.5}">🤏 PETIT JOUEUR</button>
+                <div class="admin-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="card">
+                        <h3>⚡ GESTION DES ÉVÉNEMENTS FLASH</h3>
+                        <p style="font-size: 0.75rem; color: var(--color-text-muted); margin-bottom: 15px;">
+                            Forcer le démarrage ou l'arrêt d'un événement en cours sans redémarrer le serveur.
+                        </p>
+                        
+                        <div class="row row--between" style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; margin-bottom: 15px;">
+                            <div>
+                                <strong style="font-size: 0.8rem; color: var(--color-accent-blue);">Événement Actif :</strong>
+                                <div style="font-size: 0.9rem; margin-top: 4px;">
+                                    ${currentEvent ? `${currentEvent.emoji} <span style="color: ${currentEvent.color || '#fff'}">${currentEvent.name}</span>` : '<span style="color: var(--color-text-muted);">🚫 Aucun</span>'}
+                                </div>
+                            </div>
+                            ${currentEvent ? `<button id="btn-stop-event" class="btn btn--outline" style="border-color: #ef4444; color: #ef4444; padding: 5px 15px; font-size: 0.7rem;">STOPPER</button>` : ''}
+                        </div>
+
+                        <div class="stack" style="gap: 8px; max-height: 250px; overflow-y: auto;">
+                            ${events.map(ev => `
+                                <div class="row row--between" style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 6px;">
+                                    <div>
+                                        <div style="font-weight: 700; font-size: 0.8rem;">${ev.emoji} ${ev.name}</div>
+                                    </div>
+                                    <button class="btn btn--ghost btn-force-event" data-id="${ev.id}" style="color: var(--color-accent-green); font-size: 0.65rem; padding: 4px 10px; border: 1px solid var(--color-accent-green);">▶ DÉMARRER</button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>🌪️ Modificateurs & Debug</h3>
+                        <div class="row" style="gap: 10px; flex-wrap: wrap;">
+                            <button class="btn btn--purple btn-admin-flag" data-flag="godMode" style="opacity: ${config.godMode ? 1 : 0.5}">😇 GOD MODE</button>
+                            <button class="btn btn--purple btn-admin-flag" data-flag="infiniteAmmo" style="opacity: ${config.infiniteAmmo ? 1 : 0.5}">♾️ MUNITIONS INF.</button>
+                            <button class="btn btn--purple btn-admin-flag" data-flag="doubleFireRate" style="opacity: ${config.doubleFireRate ? 1 : 0.5}">🔥 TIR RAPIDE x2</button>
+                            <button class="btn btn--purple btn-admin-flag" data-flag="doubleHP" style="opacity: ${config.doubleHP ? 1 : 0.5}">❤️ VITA x2</button>
+                            <button class="btn btn--purple btn-admin-flag" data-flag="smallPlayer" style="opacity: ${config.smallPlayer ? 1 : 0.5}">🤏 PETIT JOUEUR</button>
+                        </div>
                     </div>
                 </div>
             `;
@@ -283,6 +316,24 @@ export class AdminConsolePage {
                 const flag = btn.dataset.flag;
                 am.setAdminFlag(flag, !am.config[flag]);
                 this.refresh();
+            };
+        });
+
+        const stopEventBtn = document.getElementById('btn-stop-event');
+        if (stopEventBtn && this.app.flashEventManager) {
+            stopEventBtn.onclick = () => {
+                this.app.flashEventManager.stopCurrentEvent(this.app.engine);
+                this.refresh();
+            };
+        }
+
+        document.querySelectorAll('.btn-force-event').forEach(btn => {
+            btn.onclick = () => {
+                if (this.app.flashEventManager) {
+                    this.app.flashEventManager.forceEvent(btn.dataset.id);
+                    if (this.app.engine) this.app.flashEventManager.applyModifiers(this.app.engine);
+                    this.refresh();
+                }
             };
         });
 

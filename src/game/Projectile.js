@@ -3,6 +3,7 @@
    ============================ */
 
 import { Entity } from './Entity.js';
+import { AttackEffects } from './effects/AttackEffects.js';
 
 export class Projectile extends Entity {
     constructor(options) {
@@ -19,6 +20,7 @@ export class Projectile extends Entity {
         this.speed = options.speed || 600;
         this.damage = options.damage || 10;
         this.owner = options.owner || 'player';
+        this.emitter = options.emitter || null; // v1.0.2 - Garder la source du tir pour le style (Héros)
         this.lifetime = 2.0; // secondes
         this.trail = [];
         this.maxTrailLength = 6;
@@ -60,11 +62,11 @@ export class Projectile extends Entity {
                         engine.particles.spawnImpact(this.x, this.y, this.color);
                     }
                     if (engine.audioManager) {
-                        engine.audioManager.playHit();
+                        engine.audioManager.playHit(this.x, this.y);
                     }
 
                     if (!entity.alive) {
-                        if (engine.audioManager) engine.audioManager.playEnemyDeath();
+                        if (engine.audioManager) engine.audioManager.playEnemyDeath(entity.x, entity.y);
                         if (engine.particles) engine.particles.spawnExplosion(entity.x, entity.y, entity.color);
                         engine.onEnemyKilled(entity);
                     }
@@ -83,15 +85,22 @@ export class Projectile extends Entity {
                     engine.particles.spawnImpact(this.x, this.y, '#ef4444');
                 }
                 if (engine.audioManager) {
-                    engine.audioManager.playHit();
+                    engine.audioManager.playHit(this.x, this.y);
                 }
             }
         }
     }
 
-    draw(ctx) {
+    draw(ctx, spriteRenderer) {
         if (!this.alive) return;
 
+        // Si le tir vient d'une entité avec un style (ex: Héros joueur), on utilise AttackEffects
+        if (this.owner === 'player' && this.emitter && this.emitter.hero && this.emitter.hero.attackStyle) {
+            AttackEffects.drawProjectile(ctx, this, spriteRenderer);
+            return;
+        }
+
+        // --- Rendu standard des balles (Ennemis, Cas basiques) ---
         // Trail lumineux
         for (let i = 0; i < this.trail.length; i++) {
             const t = this.trail[i];

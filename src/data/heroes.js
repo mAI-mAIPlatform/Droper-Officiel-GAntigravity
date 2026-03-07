@@ -37,6 +37,9 @@ export const HEROES = [
         glowColor: '#2563eb',
         trailColor: 'rgba(74, 158, 255, 0.3)',
         bodySize: 11,
+        // v1.0.2 - Réalisme
+        clothing: 'military_vest',
+        attackStyle: 'kinetic_bullet',
         bulletPattern: 'single',
         bulletColor: '#4a9eff',
         bulletSpeed: 240,
@@ -59,6 +62,9 @@ export const HEROES = [
         glowColor: '#06b6d4',
         trailColor: 'rgba(34, 211, 238, 0.3)',
         bodySize: 9,
+        // v1.0.2 - Réalisme
+        clothing: 'cyber_shell',
+        attackStyle: 'laser_beam',
         bulletPattern: 'burst',
         bulletColor: '#22d3ee',
         bulletSpeed: 300,
@@ -81,6 +87,9 @@ export const HEROES = [
         glowColor: '#16a34a',
         trailColor: 'rgba(34, 197, 94, 0.3)',
         bodySize: 14,
+        // v1.0.2 - Réalisme
+        clothing: 'heavy_armor',
+        attackStyle: 'plasma_cannon',
         bulletPattern: 'heavy',
         bulletColor: '#22c55e',
         bulletSpeed: 180,
@@ -103,6 +112,9 @@ export const HEROES = [
         glowColor: '#dc2626',
         trailColor: 'rgba(239, 68, 68, 0.3)',
         bodySize: 10,
+        // v1.0.2 - Réalisme
+        clothing: 'ghillie_suit',
+        attackStyle: 'sniper_tracer',
         bulletPattern: 'snipe',
         bulletColor: '#ef4444',
         bulletSpeed: 350,
@@ -125,6 +137,9 @@ export const HEROES = [
         glowColor: '#9333ea',
         trailColor: 'rgba(168, 85, 247, 0.3)',
         bodySize: 10,
+        // v1.0.2 - Réalisme
+        clothing: 'shadow_cloak',
+        attackStyle: 'spirit_blade',
         bulletPattern: 'scatter',
         bulletColor: '#a855f7',
         bulletSpeed: 220,
@@ -147,6 +162,9 @@ export const HEROES = [
         glowColor: '#f59e0b',
         trailColor: 'rgba(251, 191, 36, 0.3)',
         bodySize: 14,
+        // v1.0.2 - Réalisme
+        clothing: 'titanium_plates',
+        attackStyle: 'shockwave',
         bulletPattern: 'wave',
         bulletColor: '#fbbf24',
         bulletSpeed: 160,

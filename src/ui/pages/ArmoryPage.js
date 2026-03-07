@@ -28,7 +28,7 @@ export class ArmoryPage {
           ${Object.values(ARCHETYPES).map(arch => `
             <button class="btn btn--sm btn--outline btn--shine filter-btn" data-filter="${arch.id}" style="width: auto; min-width: 110px;">
               <span style="font-size: 1.2rem; margin-right: 5px;">${arch.icon}</span> 
-              ${arch.label.toUpperCase()}
+              ${(arch?.label?.toString() || 'INCONNU').toUpperCase()}
             </button>
           `).join('')}
         </div>
@@ -248,6 +248,19 @@ export class ArmoryPage {
             ` : ''}
           </div>
 
+          <!-- COSMÉTIQUES (Skins, Auras, Vêtements) -->
+          <div class="card" style="padding: 10px; border: 1px solid var(--color-accent-blue);">
+            <div class="row row--between" style="margin-bottom: 8px;">
+              <span style="font-size: 0.7rem; font-weight: 800; color: var(--color-accent-blue);">✨ COSMÉTIQUES</span>
+            </div>
+            <div class="row" style="gap: 8px; overflow-x: auto; padding-bottom: 5px;">
+              ${this.renderCosmeticSlot('Vêtement', this.app.skinManager?.data?.equippedClothing, 'clothing')}
+              ${this.renderCosmeticSlot('Aura', this.app.skinManager?.data?.equippedAura, 'aura')}
+              ${this.renderCosmeticSlot('Trace de Tir', this.app.skinManager?.data?.equippedTrail, 'trail')}
+            </div>
+            <!-- NOTE: Les listes complètes pourraient être gérées dans une modale spécifique "Garderoba" -->
+          </div>
+
         </div>
       ` : ''}
 
@@ -420,6 +433,36 @@ export class ArmoryPage {
         <div class="progress-bar" style="height: 5px;">
           <div class="progress-bar__fill" style="width: ${pct}%; background: ${color};"></div>
         </div>
+      </div>
+    `;
+  }
+
+  renderCosmeticSlot(label, equippedId, type) {
+    let itemName = 'Rien';
+    let emoji = '✖️';
+    if (equippedId) {
+      // Find in shop offers
+      const { SHOP_OFFERS } = require('../../data/shop.js');
+      const offer = SHOP_OFFERS.find(o => o.reward?.cosmId === equippedId);
+      if (offer) {
+        itemName = offer.name;
+        emoji = offer.emoji;
+      } else {
+        itemName = equippedId;
+        emoji = '✨';
+      }
+    }
+
+    return `
+      <div class="stack" style="flex:1; gap: 4px; align-items: center; border: 1px solid var(--color-border); padding: 8px; border-radius: 8px; background: rgba(0,0,0,0.2);">
+        <span style="font-size: 0.6rem; color: var(--color-text-muted);">${label}</span>
+        <span style="font-size: 1.5rem; filter: drop-shadow(0 0 5px rgba(255,255,255,0.2));">${emoji}</span>
+        <span style="font-size: 0.65rem; color: var(--color-accent-blue); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80px;">
+          ${itemName}
+        </span>
+        <button class="btn btn--outline btn--sm" style="font-size: 0.5rem; padding: 2px 5px; margin-top: 5px;" onclick="window.location.hash='#shop'">
+          BOUTIQUE
+        </button>
       </div>
     `;
   }

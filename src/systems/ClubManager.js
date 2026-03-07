@@ -144,8 +144,29 @@ export class ClubManager {
             return false;
         }
         this.data.myClub.members = this.data.myClub.members.filter(m => m.tag !== tag);
-        this.persist();
         toast.info(`${target.name} a été expulsé du club.`);
+        return true;
+    }
+
+    editClubEmoji(newEmoji) {
+        if (!this.hasClub) return false;
+        const me = this.data.myClub.members.find(m => m.tag === 'Toi');
+        const myPower = this.getGradeInfo(me?.role).power;
+
+        // Seuls Président (5) et Vice (4)
+        if (myPower < 4) {
+            toast.error('Tu n\'as pas la permission de modifier le club !');
+            return false;
+        }
+
+        if (!newEmoji || newEmoji.length > 5) {
+            toast.error('Emoji invalide !');
+            return false;
+        }
+
+        this.data.myClub.emoji = newEmoji;
+        this.persist();
+        toast.success('Le blason du club a été mis à jour !');
         return true;
     }
 
