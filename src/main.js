@@ -9,6 +9,7 @@ import './styles/components.css';
 import './styles/layout.css';
 import { Router } from './router.js';
 import { ErrorReporter } from './utils/ErrorReporter.js';
+import { toast } from './ui/components/ToastManager.js';
 
 // Activer le rapport d'erreurs global
 ErrorReporter.init();
@@ -36,7 +37,7 @@ import { DailyRewardManager } from './systems/DailyRewardManager.js';
 
 class DroperApp {
     constructor() {
-        this.version = '1.0.7';
+        this.version = '1.0.8';
         this.app = this; // Self reference for managers [v0.3.1]
         this.saveManager = new SaveManager();
         this.playerManager = new PlayerManager(this.saveManager);
