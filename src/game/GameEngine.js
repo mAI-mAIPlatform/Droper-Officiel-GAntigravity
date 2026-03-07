@@ -1,5 +1,5 @@
 /* ============================
-   DROPER — Game Engine 2D (v1.0.6)
+   DROPER — Game Engine 2D (v1.0.7)
    ============================ */
 
 import { Player } from './Player.js';
@@ -266,7 +266,7 @@ export class GameEngine {
         this.currentMode.applyTheme();
         this.generateMap(modeId);
 
-        this.running = true;
+        // this.running = true; // BUG: Ne pas mettre true ici, sinon start() retourne sans lancer la boucle
         this.paused = false;
         this.gameOver = false;
         this.score = 0;
@@ -277,8 +277,10 @@ export class GameEngine {
         this.generateStars();
 
         // Joueur
-        const selectedHero = this.app.heroManager?.selectedHero;
-        this.player = new Player(selectedHero, this.width / 2, this.height / 2);
+        // Initialiser le joueur proprement
+        const heroId = this.app.playerManager?.selectedHero || 'soldier';
+        const heroData = this.app.heroManager?.getFullHero(heroId);
+        this.player = new Player(heroData, this.width / 2, this.height / 2);
         this.entities.push(this.player);
 
         // Vagues

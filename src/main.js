@@ -1,5 +1,5 @@
 /* ============================
-  * DROPER — Main Entry Point (v1.0.0)
+  * DROPER — Main Entry Point (v1.0.7)
  * (c) 2026 mCompany / Mathias 🚀============================ */
 
 import './styles/variables.css';
@@ -36,7 +36,7 @@ import { DailyRewardManager } from './systems/DailyRewardManager.js';
 
 class DroperApp {
     constructor() {
-        this.version = '1.0.6';
+        this.version = '1.0.7';
         this.app = this; // Self reference for managers [v0.3.1]
         this.saveManager = new SaveManager();
         this.playerManager = new PlayerManager(this.saveManager);
@@ -135,6 +135,8 @@ class DroperApp {
 // Lancement avec Splash Screen v0.9.0
 document.addEventListener('DOMContentLoaded', () => {
     const app = new DroperApp();
+    window.app = app;
+    window.app.toast = toast; // Accessibilité globale pour les anciens composants
 
     // Initialise l'audio pour tenter de jouer le Splash FX
     app.audioManager.init();
