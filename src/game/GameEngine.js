@@ -1,5 +1,5 @@
 /* ============================
-   DROPER — Game Engine 2D (v1.0.4)
+   DROPER — Game Engine 2D (v1.0.6)
    ============================ */
 
 import { Player } from './Player.js';
@@ -274,7 +274,7 @@ export class GameEngine {
         this.gameTime = 0;
         this.wave = 0;
         this.entities = [];
-        this.stars = this.generateStars();
+        this.generateStars();
 
         // Joueur
         const selectedHero = this.app.heroManager?.selectedHero;

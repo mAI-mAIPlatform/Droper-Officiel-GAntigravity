@@ -17,6 +17,11 @@ export class WaveManager {
         this.spawnInterval = 0.6;
     }
 
+    start() {
+        this.reset();
+        console.log("🌊 WaveManager démarré.");
+    }
+
     update(dt) {
         if (this.betweenWaves) {
             this.betweenWaveTimer -= dt;
