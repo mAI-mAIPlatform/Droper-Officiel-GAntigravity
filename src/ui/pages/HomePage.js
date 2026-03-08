@@ -128,11 +128,17 @@ export class HomePage {
             <a href="#pass-saison" class="btn btn--shine btn--sm" style="margin-top: 15px; background: var(--gradient-gold); color: black;">VOIR LE PASS</a>
           </div>
 
-          <!-- Boutique & Quêtes -->
+          <!-- Boutique, Événements & Quêtes -->
           <div class="stack" style="gap: var(--spacing-md);">
-            <div class="card" style="background: var(--gradient-purple); border: none; padding: 15px; cursor: pointer;" onclick="window.location.hash='#shop'">
-               <div style="font-size: var(--font-size-xs); color: rgba(255,255,255,0.8); text-transform: uppercase; font-weight: 700;">🎁 Boutique</div>
-               <div style="font-size: 0.9rem; font-weight: 800; color: white; margin-top: 5px;">Skins & Emotes Limités</div>
+            <div class="row" style="gap: var(--spacing-md);">
+                <div class="card" style="flex: 1; background: var(--gradient-purple); border: none; padding: 15px; cursor: pointer;" onclick="window.location.hash='#shop'">
+                   <div style="font-size: var(--font-size-xs); color: rgba(255,255,255,0.8); text-transform: uppercase; font-weight: 700;">🎁 Boutique</div>
+                   <div style="font-size: 0.82rem; font-weight: 800; color: white; margin-top: 5px;">Skins Limités</div>
+                </div>
+                <div class="card" style="flex: 1; background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); border: none; padding: 15px; cursor: pointer;" onclick="window.location.hash='#evenements'">
+                   <div style="font-size: var(--font-size-xs); color: rgba(255,255,255,0.8); text-transform: uppercase; font-weight: 700;">✨ Événements</div>
+                   <div style="font-size: 0.82rem; font-weight: 800; color: white; margin-top: 5px;">Défis & Cadeaux</div>
+                </div>
             </div>
 
             <div class="card" style="padding: 15px;">

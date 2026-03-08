@@ -6,13 +6,13 @@ export class DailyRewardManager {
     constructor(app) {
         this.app = app;
         this.rewards = [
-            { day: 1, type: 'coins', amount: 500, emoji: '💰' },
-            { day: 2, type: 'gems', amount: 10, emoji: '💎' },
-            { day: 3, type: 'coins', amount: 1000, emoji: '💰' },
-            { day: 4, type: 'mixed', coins: 500, gems: 5, emoji: '📦' },
-            { day: 5, type: 'gems', amount: 20, emoji: '💎' },
-            { day: 6, type: 'coins', amount: 2500, emoji: '💰' },
-            { day: 7, type: 'mixed', coins: 5000, gems: 50, emoji: '🎁' },
+            { day: 1, type: 'coins', amount: 800, emoji: '💰' },
+            { day: 2, type: 'gems', amount: 15, emoji: '💎' },
+            { day: 3, type: 'mixed', coins: 1500, gems: 10, emoji: '⚖️' },
+            { day: 4, type: 'item', itemId: 'crate_rare', amount: 1, emoji: '🎁' },
+            { day: 5, type: 'gems', amount: 30, emoji: '💎' },
+            { day: 6, type: 'coins', amount: 4000, emoji: '💰' },
+            { day: 7, type: 'mixed', coins: 10000, gems: 100, emoji: '👑' },
         ];
     }
 

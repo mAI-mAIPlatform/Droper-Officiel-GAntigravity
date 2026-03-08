@@ -3,6 +3,8 @@
    ============================ */
 
 import { HEROES, getHeroById } from '../data/heroes.js';
+import { XP_PER_MASTERY_LEVEL, getMasteryReward } from '../data/masteryRewards.js';
+import { toast } from '../ui/components/ToastManager.js';
 
 export class HeroManager {
     constructor(saveManager) {
@@ -41,8 +43,11 @@ export class HeroManager {
             chips: [],
             equippedChips: [],
             superchargeUnlocked: false, // NEW v0.4.0
-            wins: 0, // NEW v0.9.2
-            masteryTier: 'DÉBUTANT' // NEW v0.9.2
+            wins: 0,
+            masteryTier: 'DÉBUTANT',
+            masteryXp: 0,
+            masteryLevel: 1,
+            claimedMasteryRewards: [] // Array of levels
         };
 
         if (!saved) return defaults;
@@ -94,6 +99,46 @@ export class HeroManager {
         this.data[heroId] = state;
         this.persist();
         return state;
+    }
+
+    addMasteryXp(heroId, amount) {
+        const state = this.getHeroState(heroId);
+        if (!state.unlocked) return state;
+
+        state.masteryXp += amount;
+
+        while (state.masteryXp >= XP_PER_MASTERY_LEVEL) {
+            state.masteryXp -= XP_PER_MASTERY_LEVEL;
+            state.masteryLevel += 1;
+            toast.reward(`👑 Maîtrise ${state.masteryLevel} atteinte avec ${this.getHeroById(heroId)?.name} !`);
+        }
+
+        this.data[heroId] = state;
+        this.persist();
+        return state;
+    }
+
+    claimMasteryReward(heroId, level, economyManager, inventoryManager, skinManager, emoteManager) {
+        const state = this.getHeroState(heroId);
+        if (state.masteryLevel < level) return { success: false, reason: "Niveau de maîtrise insuffisant" };
+        if (state.claimedMasteryRewards.includes(level)) return { success: false, reason: "Récompense déjà récupérée" };
+
+        const reward = getMasteryReward(heroId, level);
+        if (!reward) return { success: false, reason: "Pas de récompense à ce niveau" };
+
+        // Process reward
+        if (reward.type === 'coins') economyManager.addCoins(reward.amount);
+        else if (reward.type === 'gems') economyManager.addGems(reward.amount);
+        else if (reward.type === 'item') inventoryManager.addItem(reward.itemId, reward.amount);
+        else if (reward.type === 'skin') skinManager.unlock(reward.skinId);
+        else if (reward.type === 'emote') emoteManager.unlock(reward.emoteId);
+
+        state.claimedMasteryRewards.push(level);
+        this.data[heroId] = state;
+        this.persist();
+
+        toast.success(`Récompense Maîtrise nv.${level} récupérée !`);
+        return { success: true };
     }
 
     addWin(heroId) {
@@ -163,6 +208,15 @@ export class HeroManager {
         if (!this.allHeroes) this.refreshHeroList();
         const hero = this.allHeroes.find(h => h.id === heroId);
         if (!hero) return null;
+        return this.getHeroData(hero);
+    }
+
+    getHeroById(heroId) {
+        return HEROES.find(h => h.id === heroId) || (this.app?.adminManager?.config?.customHeroes || []).find(h => h.id === heroId);
+    }
+
+    getHeroData(hero) {
+        const heroId = hero.id;
         const state = this.getHeroState(heroId);
         const mult = this.getStatMultiplier(state.level);
 

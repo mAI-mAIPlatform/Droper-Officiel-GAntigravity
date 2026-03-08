@@ -26,9 +26,21 @@ export class Player extends Entity {
             this.maxHp *= 2;
             this.hp = this.maxHp;
         }
-        if (adminConfig.smallPlayer) {
-            this.width *= 0.6;
-            this.height *= 0.6;
+        if (adminConfig.smallPlayer || adminConfig.scale) {
+            const scale = adminConfig.scale || 0.6;
+            this.width *= scale;
+            this.height *= scale;
+        }
+
+        // v1.1.1 Event Modifiers
+        const eventMods = window.app?.eventManager?.getActiveModifiers() || {};
+        if (eventMods.forceOneHp) {
+            this.maxHp = 1;
+            this.hp = 1;
+        }
+        if (eventMods.scale) {
+            this.width *= eventMods.scale;
+            this.height *= eventMods.scale;
         }
 
         this.hero = heroData;
@@ -84,6 +96,9 @@ export class Player extends Entity {
         this.equippedSkin = heroData?.skin || 'default';
         this.equippedEmote = 'none';
         this.activeEmoteTimer = 0;
+
+        // stats v1.1.2
+        this.damageTaken = 0;
     }
 
     update(dt, engine) {
@@ -316,6 +331,7 @@ export class Player extends Entity {
     takeDamage(amount) {
         if (this.invincibleTimer > 0) return 0;
         const dmg = super.takeDamage(amount);
+        this.damageTaken += dmg;
         this.invincibleTimer = 0.3;
         return dmg;
     }

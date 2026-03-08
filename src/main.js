@@ -16,6 +16,7 @@ ErrorReporter.init();
 import { SaveManager } from './systems/SaveManager.js';
 import { PlayerManager } from './systems/PlayerManager.js';
 import { EconomyManager } from './systems/EconomyManager.js';
+import { ThemeManager } from './systems/ThemeManager.js';
 import { HeroManager } from './systems/HeroManager.js';
 import { QuestManager } from './systems/QuestManager.js';
 import { AudioManager } from './systems/AudioManager.js';
@@ -34,10 +35,12 @@ import { MatchHistoryManager } from './systems/MatchHistoryManager.js';
 import { AdminManager } from './systems/AdminManager.js';
 import { TradeManager } from './systems/TradeManager.js';
 import { DailyRewardManager } from './systems/DailyRewardManager.js';
+import { EventManager } from './systems/events/EventManager.js';
 
 class DroperApp {
+    static APP_NAME = "Droper";
+    static APP_VERSION = "1.1.4";
     constructor() {
-        this.version = '1.1.0';
         this.app = this; // Self reference for managers [v0.3.1]
         this.saveManager = new SaveManager();
         this.playerManager = new PlayerManager(this.saveManager);
@@ -60,6 +63,8 @@ class DroperApp {
         this.matchHistoryManager = new MatchHistoryManager(this.saveManager);
         this.dailyRewardManager = new DailyRewardManager(this);
         this.adminManager = new AdminManager(this);
+        this.themeManager = new ThemeManager();
+        this.eventManager = new EventManager(this);
 
         // Wiring [v0.3.1]
         this.heroManager.app = this;
@@ -72,6 +77,7 @@ class DroperApp {
         this.skinManager.app = this;
         this.emoteManager.app = this;
         this.matchHistoryManager.app = this;
+        this.eventManager.app = this;
 
         this.router = null;
         this.selectedMode = null;
@@ -86,6 +92,7 @@ class DroperApp {
         this.heroManager.load();
         this.questManager.load();
         this.seasonPassManager.load();
+        this.themeManager.setSeasonalTheme(this.seasonPassManager.data.seasonId);
         this.inventoryManager.load();
         this.recordManager.load();
         this.matchHistoryManager.load();

@@ -3,35 +3,48 @@
    ============================ */
 
 export const SHOP_OFFERS = [
-    // --- FLASH ---
+    // --- OFFRES FLASH (FLASH) ---
     {
-        id: 'mega_coins',
-        name: 'Mega Pack de Pièces',
-        emoji: '🪙',
-        description: 'Un énorme pack de pièces.',
-        reward: { type: 'coins', amount: 5000 },
-        cost: { type: 'gems', amount: 80 },
+        id: 'flash_gold_stack',
+        name: 'Petit Pactole',
+        emoji: '💰',
+        description: 'Un petit boost de pièces pour tes achats.',
+        reward: { type: 'coins', amount: 1200 },
+        cost: { type: 'gems', amount: 25 },
         category: 'flash',
+        rarity: 'rare'
     },
     {
-        id: 'flash_crate',
-        name: 'Caisse Flash',
-        emoji: '📦',
-        description: 'Caisse basique à prix réduit !',
-        reward: { type: 'item', itemId: 'crate_basic', amount: 1 },
-        cost: { type: 'coins', amount: 800 },
+        id: 'flash_epic_fragments',
+        name: 'Fragments Épiques x10',
+        emoji: '🧩',
+        description: 'Fragments de héros aléatoires de rareté Épique.',
+        reward: { type: 'item', itemId: 'fragment_hero', amount: 10 },
+        cost: { type: 'coins', amount: 1800 },
         category: 'flash',
+        rarity: 'epic'
+    },
+    {
+        id: 'flash_basic_crate',
+        name: 'Caisse de Secours',
+        emoji: '📦',
+        description: 'Une caisse basique pour les urgences.',
+        reward: { type: 'item', itemId: 'crate_basic', amount: 1 },
+        cost: { type: 'coins', amount: 450 },
+        category: 'flash',
+        rarity: 'common'
     },
 
-    // --- PACKS HÉROS ---
+    // --- HÉROS & PACKS (HERO) ---
     {
         id: 'pack_tank',
         name: 'Pack Tank',
         emoji: '🛡️',
         description: 'Débloque le Tank + 5 Fragments.',
         reward: { type: 'hero_pack', heroId: 'tank', fragments: 5 },
-        cost: { type: 'gems', amount: 200 },
+        cost: { type: 'gems', amount: 180 },
         category: 'hero',
+        rarity: 'rare'
     },
     {
         id: 'pack_sniper',
@@ -39,8 +52,9 @@ export const SHOP_OFFERS = [
         emoji: '🎯',
         description: 'Débloque le Sniper + 5 Fragments.',
         reward: { type: 'hero_pack', heroId: 'sniper', fragments: 5 },
-        cost: { type: 'gems', amount: 200 },
+        cost: { type: 'gems', amount: 180 },
         category: 'hero',
+        rarity: 'rare'
     },
     {
         id: 'pack_astro',
@@ -48,8 +62,9 @@ export const SHOP_OFFERS = [
         emoji: '🚀',
         description: 'Débloque Astro + 10 Fragments.',
         reward: { type: 'hero_pack', heroId: 'astro', fragments: 10 },
-        cost: { type: 'gems', amount: 400 },
+        cost: { type: 'gems', amount: 350 },
         category: 'hero',
+        rarity: 'epic'
     },
     {
         id: 'pack_glacier',
@@ -57,177 +72,135 @@ export const SHOP_OFFERS = [
         emoji: '❄️',
         description: 'Débloque Glacier + 10 Fragments.',
         reward: { type: 'hero_pack', heroId: 'glacier', fragments: 10 },
-        cost: { type: 'gems', amount: 350 },
+        cost: { type: 'gems', amount: 320 },
         category: 'hero',
+        rarity: 'epic'
     },
 
-    // --- CAISSES ---
+    // --- COSMÉTIQUES PREMIUM (COSMETIC) ---
+    {
+        id: 'cosm_aura_neon',
+        name: 'Aura Néon Pulse',
+        emoji: '💜',
+        description: 'Une aura vibrante qui change de couleur.',
+        reward: { type: 'cosmetic', cosmType: 'aura', cosmId: 'neon' },
+        cost: { type: 'gems', amount: 120 },
+        category: 'cosmetic',
+        rarity: 'epic'
+    },
+    {
+        id: 'cosm_aura_stars',
+        name: 'Aura Étoilée',
+        emoji: '⭐',
+        description: 'Des étoiles dorées gravitent autour de toi.',
+        reward: { type: 'cosmetic', cosmType: 'aura', cosmId: 'stars' },
+        cost: { type: 'gems', amount: 450 },
+        category: 'cosmetic',
+        rarity: 'legendary'
+    },
+    {
+        id: 'cosm_trail_stars',
+        name: 'Trace Étoiles Filantes',
+        emoji: '✨',
+        description: 'Laisse une traînée d\'étoiles derrière toi.',
+        reward: { type: 'cosmetic', cosmType: 'trail', cosmId: 'stars_trail' },
+        cost: { type: 'gems', amount: 120 },
+        category: 'cosmetic',
+        rarity: 'epic'
+    },
+    {
+        id: 'cosm_trail_pixel',
+        name: 'Trace Pixel Art',
+        emoji: '🕹️',
+        description: 'Un style rétro pour tes mouvements.',
+        reward: { type: 'cosmetic', cosmType: 'trail', cosmId: 'pixel_trail' },
+        cost: { type: 'coins', amount: 2000 },
+        category: 'cosmetic',
+        rarity: 'rare'
+    },
+    {
+        id: 'cosm_clothing_leather',
+        name: 'Blouson Cuir Noir',
+        emoji: '🧥',
+        description: 'Style biker indémodable.',
+        reward: { type: 'cosmetic', cosmType: 'clothing', cosmId: 'leather_jacket' },
+        cost: { type: 'coins', amount: 1500 },
+        category: 'cosmetic',
+        rarity: 'rare'
+    },
+    {
+        id: 'cosm_clothing_sport',
+        name: 'Veste de Sport',
+        emoji: '🎽',
+        description: 'Confort et style sur le terrain.',
+        reward: { type: 'cosmetic', cosmType: 'clothing', cosmId: 'sport_jacket' },
+        cost: { type: 'gems', amount: 60 },
+        category: 'cosmetic',
+        rarity: 'common'
+    },
+
+    // --- RESSOURCES & CAISSES (CRATE) ---
     {
         id: 'buy_crate_rare',
         name: 'Caisse Rare',
         emoji: '🎁',
-        description: 'Récompenses plus généreuses.',
+        description: 'Contient des objets de qualité Rare ou Épique.',
         reward: { type: 'item', itemId: 'crate_rare', amount: 1 },
-        cost: { type: 'gems', amount: 120 },
+        cost: { type: 'gems', amount: 90 },
         category: 'crate',
+        rarity: 'rare'
     },
     {
         id: 'buy_crate_epic',
-        name: 'Caisse Épique + Clé',
-        emoji: '✨',
-        description: 'Caisse Épique avec la Clé Dorée.',
-        reward: { type: 'item_bundle', items: [{ itemId: 'crate_epic', amount: 1 }, { itemId: 'key_gold', amount: 1 }] },
-        cost: { type: 'gems', amount: 350 },
-        category: 'crate',
-    },
-    {
-        id: 'buy_safe',
-        name: 'Coffre-fort',
-        emoji: '🔒',
-        description: 'Ouvre un mystérieux Coffre-fort.',
-        reward: { type: 'item', itemId: 'crate_safe', amount: 1 },
-        cost: { type: 'coins', amount: 100 },
-        category: 'crate',
-    },
-    {
-        id: 'buy_event_tokens',
-        name: 'Jetons d\'Événement x50',
-        emoji: '🎟️',
-        description: 'Achète de la monnaie événementielle.',
-        reward: { type: 'eventTokens', amount: 50 },
-        cost: { type: 'gems', amount: 20 },
-        category: 'season',
-    },
-
-    // --- SAISON ---
-    {
-        id: 'season_crate',
-        name: 'Caisse Saison 1',
-        emoji: '🌅',
-        description: 'Exclusif Saison 1 + Clé.',
-        reward: { type: 'item_bundle', items: [{ itemId: 'crate_season', amount: 1 }, { itemId: 'key_season', amount: 1 }] },
-        cost: { type: 'gems', amount: 500 },
-        category: 'season',
-    },
-    {
-        id: 'season_fragments',
-        name: 'Fragments Saisonniers x5',
-        emoji: '🌟',
-        description: 'Fragments exclusifs S1.',
-        reward: { type: 'item', itemId: 'fragment_season', amount: 5 },
+        name: 'Pack Multi-Caisse',
+        emoji: '📦',
+        description: '3 Caisses Basiques + 1 Caisse Épique.',
+        reward: { type: 'item_bundle', items: [{ itemId: 'crate_basic', amount: 3 }, { itemId: 'crate_epic', amount: 1 }] },
         cost: { type: 'gems', amount: 300 },
-        category: 'season',
+        category: 'crate',
+        rarity: 'epic'
+    },
+    {
+        id: 'currency_coins_large',
+        name: 'Malle de Pièces',
+        emoji: '📦',
+        description: '5000 pièces pour vos améliorations.',
+        reward: { type: 'coins', amount: 5000 },
+        cost: { type: 'gems', amount: 100 },
+        category: 'currency',
+        rarity: 'rare'
+    },
+    {
+        id: 'currency_gems_medium',
+        name: 'Petit Sac de Gemmes',
+        emoji: '💎',
+        description: 'Vendu par lot de 200 gemmes.',
+        reward: { type: 'gems', amount: 200 },
+        cost: { type: 'coins', amount: 10000 },
+        category: 'currency',
+        rarity: 'epic'
     },
 
-    // --- BOOSTS ---
+    // --- BOOSTS (BOOST) ---
     {
-        id: 'starter_pack',
-        name: 'Pack Débutant',
-        emoji: '🎁',
-        description: 'Tout pour bien commencer.',
-        reward: { type: 'mixed', coins: 2000, gems: 50 },
+        id: 'booster_xp_pack',
+        name: 'Pack de Boosters XP',
+        emoji: '⚡',
+        description: '3 Boosters XP pour progresser vite.',
+        reward: { type: 'item', itemId: 'booster_xp', amount: 3 },
         cost: { type: 'gems', amount: 100 },
         category: 'boost',
+        rarity: 'rare'
     },
     {
-        id: 'starter_pro',
-        name: 'Starter Pro',
-        emoji: '🛡️',
-        description: 'Pour les compétiteurs sérieux.',
-        reward: { type: 'mixed', coins: 10000, gems: 250 },
-        cost: { type: 'gems', amount: 400 },
-        category: 'boost',
-    },
-    {
-        id: 'starter_elite',
-        name: 'Starter Elite',
-        emoji: '👑',
-        description: 'Le pack ultime du champion.',
-        reward: { type: 'mixed', coins: 50000, gems: 1000 },
-        cost: { type: 'gems', amount: 1200 },
-        category: 'boost',
-    },
-    {
-        id: 'xp_boost',
-        name: 'Boost XP x2',
-        emoji: '⚡',
-        description: 'Double ton XP pendant 1 heure.',
-        reward: { type: 'item', itemId: 'booster_xp', amount: 1 },
-        cost: { type: 'gems', amount: 50 },
-        category: 'boost',
-    },
-    {
-        id: 'coin_boost',
-        name: 'Boost Pièces x2',
+        id: 'booster_coins_pack',
+        name: 'Pack de Boosters Pièces',
         emoji: '💰',
-        description: 'Double les pièces pendant 1 heure.',
-        reward: { type: 'item', itemId: 'booster_coins', amount: 1 },
-        cost: { type: 'gems', amount: 50 },
+        description: '3 Boosters de pièces.',
+        reward: { type: 'item', itemId: 'booster_coins', amount: 3 },
+        cost: { type: 'gems', amount: 100 },
         category: 'boost',
-    },
-    // --- PUCES (NANO-MODS) v0.2.4 ---
-    {
-        id: 'chip_speed',
-        name: 'Puce de Vitesse',
-        emoji: '💨',
-        description: 'Boost de vitesse (+30%) pendant 10s.',
-        cost: { type: 'coins', amount: 150 },
-        category: 'chips',
-    },
-    {
-        id: 'chip_tir',
-        name: 'Puce de Tir',
-        emoji: '🔥',
-        description: 'Vitesse de tir accrue (+50%) pendant 10s.',
-        cost: { type: 'coins', amount: 150 },
-        category: 'chips',
-    },
-
-    // --- COSMETIQUES (v0.9.9) ---
-    {
-        id: 'cosm_aura_neon',
-        name: 'Aura Néon',
-        emoji: '💜',
-        description: 'Débloque l\'Aura Néon Pulse.',
-        reward: { type: 'cosmetic', cosmType: 'aura', cosmId: 'neon' },
-        cost: { type: 'gems', amount: 150 },
-        category: 'cosmetic',
-    },
-    {
-        id: 'cosm_trail_stars',
-        name: 'Trace Étoiles',
-        emoji: '✨',
-        description: 'Débloque la Trace Étoiles Filantes.',
-        reward: { type: 'cosmetic', cosmType: 'trail', cosmId: 'stars_trail' },
-        cost: { type: 'gems', amount: 150 },
-        category: 'cosmetic',
-    },
-    {
-        id: 'cosm_aura_shadow',
-        name: 'Aura Ombre',
-        emoji: '🖤',
-        description: 'Débloque l\'Aura Ombre Noire.',
-        reward: { type: 'cosmetic', cosmType: 'aura', cosmId: 'shadow' },
-        cost: { type: 'gems', amount: 250 },
-        category: 'cosmetic',
-    },
-    {
-        id: 'cosm_clothing_leather',
-        name: 'Veste Cuir',
-        emoji: '🧥',
-        description: 'Veste en cuir de biker noire.',
-        reward: { type: 'cosmetic', cosmType: 'clothing', cosmId: 'leather_jacket' },
-        cost: { type: 'coins', amount: 1500 },
-        category: 'cosmetic',
-    },
-    {
-        id: 'cosm_clothing_sport',
-        name: 'Veste Sport',
-        emoji: '🎽',
-        description: 'Veste de survêtement rouge.',
-        reward: { type: 'cosmetic', cosmType: 'clothing', cosmId: 'sport_jacket' },
-        cost: { type: 'gems', amount: 80 },
-        category: 'cosmetic',
+        rarity: 'rare'
     },
 ];
 

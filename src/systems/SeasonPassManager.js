@@ -56,6 +56,12 @@ export class SeasonPassManager {
     get xpToNextTier() { return SEASON_PASS.xpPerTier; }
     get xpProgress() { return this.data.xp % SEASON_PASS.xpPerTier; }
 
+    getSeasonData() {
+        if (this.data.seasonId === 'season_1') return SEASON_PASS;
+        // Future seasons: if (this.data.seasonId === 'season_2') return SEASON_2;
+        return SEASON_PASS;
+    }
+
     // === Season Pass ===
     addXp(amount) {
         this.data.xp += amount;

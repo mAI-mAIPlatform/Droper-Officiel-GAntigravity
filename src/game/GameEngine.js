@@ -13,7 +13,6 @@ import { AnimationManager } from './AnimationManager.js';
 import { Payload } from './Payload.js';
 import { Enemy } from './Enemy.js';
 import { WeatherSystem } from './WeatherSystem.js';
-import { EventManager } from '../systems/events/EventManager.js';
 import { ReplaySystem } from '../systems/ReplaySystem.js';
 import { AntiCheatLogger } from '../systems/AntiCheatLogger.js';
 import { NetworkSync } from './NetworkSync.js';
@@ -62,7 +61,7 @@ export class GameEngine {
         this.isReplaying = false;
         this.antiCheat = new AntiCheatLogger(this);
         this.networkSync = new NetworkSync(this.app); // v0.9.9 Multiplayer
-        this.eventManager = new EventManager(this.app); // v1.0.2 Events
+        this.eventManager = this.app?.eventManager; // v1.1.1 Events from App
 
         // --- CAVEAUX SYSTEM ---
         this.gasCenter = { x: 0, y: 0 };
@@ -237,8 +236,17 @@ export class GameEngine {
 
     handleMouseMove(e) {
         const rect = this.canvas.getBoundingClientRect();
-        this.mouseX = e.clientX - rect.left;
-        this.mouseY = e.clientY - rect.top;
+        let x = e.clientX - rect.left;
+        let y = e.clientY - rect.top;
+
+        // v1.1.2 Mirror Map Input Correction
+        const eventModifiers = this.eventManager?.getActiveModifiers() || {};
+        if (eventModifiers.mirrorX) {
+            x = this.width - x;
+        }
+
+        this.mouseX = x;
+        this.mouseY = y;
         if (this.player) {
             this.player.mouseX = this.mouseX;
             this.player.mouseY = this.mouseY;
@@ -505,6 +513,18 @@ export class GameEngine {
 
             entity.update(dtMult, this);
 
+            // v1.1.1 Magnet Modifier
+            if (eventModifiers.magnetism && entity.type !== 'projectile' && this.player && this.player.alive) {
+                const dx = this.player.x - entity.x;
+                const dy = this.player.y - entity.y;
+                const dist = Math.hypot(dx, dy);
+                if (dist < 400 && dist > 10) {
+                    const force = (400 - dist) / 1000;
+                    entity.x += dx * force * dt;
+                    entity.y += dy * force * dt;
+                }
+            }
+
             // Collision Murs
             if (entity.type === 'enemy' || entity.type === 'boss') {
                 this.checkWallCollision(entity);
@@ -523,6 +543,24 @@ export class GameEngine {
                 }
             }
         }
+
+        // v1.1.1 Explosive on Death
+        if (eventModifiers.explodeOnDeath) {
+            const deadEntities = this.entities.filter(e => !e.alive);
+            deadEntities.forEach(e => {
+                if (e.type === 'enemy' || e.type === 'bot' || e.type === 'player') {
+                    this.particles.spawnExplosion(e.x, e.y, '#ff4400', 10);
+                    // Area damage
+                    this.entities.forEach(other => {
+                        if (other.alive && (other.type === 'enemy' || other.type === 'bot' || other.type === 'player')) {
+                            const d = Math.hypot(other.x - e.x, other.y - e.y);
+                            if (d < 100) other.takeDamage(20);
+                        }
+                    });
+                }
+            });
+        }
+
         this.entities = this.entities.filter(e => e.alive);
 
         // Particules
@@ -548,6 +586,15 @@ export class GameEngine {
         }
 
         // Payload logic
+        if (this.isLocal) {
+            this.app.heroManager.addHeroXp(this.player.id, xp);
+            this.app.heroManager.addMasteryXp(this.player.id, Math.floor(xp * 0.5)); // Mastery XP is 50% of Hero XP
+            if (this.gameStats.rank === 1) {
+                this.app.heroManager.addWin(this.player.id);
+            }
+        }
+
+        // Boss Hunt logic
         if (this.payload) {
             this.payload.update(dt, this);
             if (this.payload.progress >= 1) {
@@ -651,6 +698,13 @@ export class GameEngine {
             ctx.translate(ox, oy);
         }
 
+        // v1.1.1 Mirror Map
+        const eventModifiers = this.eventManager?.getActiveModifiers() || {};
+        if (eventModifiers.mirrorX) {
+            ctx.translate(this.width, 0);
+            ctx.scale(-1, 1);
+        }
+
         // Fond
         ctx.fillStyle = '#080c16';
         ctx.fillRect(0, 0, this.width, this.height);
@@ -669,7 +723,6 @@ export class GameEngine {
         const config = this.app.adminManager?.config || {};
 
         // Effets visuels d'événements
-        const eventModifiers = this.eventManager?.getActiveModifiers() || {};
         if (config.nightMode || eventModifiers.nightMode) {
             ctx.fillStyle = 'rgba(0, 0, 20, 0.4)';
             ctx.fillRect(0, 0, this.width, this.height);
@@ -757,6 +810,31 @@ export class GameEngine {
         // Pause overlay
         if (this.paused) {
             this.drawPauseOverlay(ctx);
+        }
+
+        // v1.1.1 Lights Out / Fog of War
+        if (eventModifiers.darkAmbient && this.player && this.player.alive) {
+            const radius = eventModifiers.visionRadius || 150;
+            const gradient = ctx.createRadialGradient(
+                this.player.x, this.player.y, radius * 0.5,
+                this.player.x, this.player.y, radius
+            );
+            gradient.addColorStop(0, 'rgba(0,0,0,0)');
+            gradient.addColorStop(1, 'rgba(0,0,0,0.95)');
+
+            ctx.save();
+            // Invert mirror if active for HUD overlay
+            if (eventModifiers.mirrorX) {
+                ctx.translate(this.width, 0);
+                ctx.scale(-1, 1);
+            }
+
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, this.width, this.height);
+
+            // Fill rest of screen outside the gradient area if needed
+            // (The gradient already covers most since it's large enough)
+            ctx.restore();
         }
     }
 
@@ -1056,6 +1134,17 @@ export class GameEngine {
             this.app.questManager.updateProgress('daily_xp_1', this.score);
             this.app.questManager.updateProgress('daily_kills', this.kills);
             this.app.questManager.updateProgress('weekly_games', 1);
+
+            // [NEW] v1.1.1 — Événements Temporaires
+            if (this.app.eventManager) {
+                this.app.eventManager.onMatchEnd({
+                    kills: this.kills,
+                    score: this.score,
+                    rank: 1, // Simplified for now
+                    isVictory: won,
+                    damageTaken: this.player ? this.player.damageTaken : 0
+                });
+            }
         }
 
         // Animation de fin

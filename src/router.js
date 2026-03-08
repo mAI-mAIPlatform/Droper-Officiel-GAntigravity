@@ -22,6 +22,7 @@ import { SocialPage } from './ui/pages/SocialPage.js';
 import { HeroDetailsPage } from './ui/pages/HeroDetailsPage.js';
 import { AdminConsolePage } from './ui/pages/AdminConsolePage.js';
 import { MapEditorPage } from './ui/pages/MapEditorPage.js';
+import { EventsPage } from './ui/pages/EventsPage.js';
 
 export class Router {
     constructor(app) {
@@ -56,6 +57,8 @@ export class Router {
             'hero-details': HeroDetailsPage,
             'admin': AdminConsolePage,
             'editeur-map': MapEditorPage,
+            'evenements': EventsPage,
+            'events': EventsPage,
         };
 
         this.fullscreenRoutes = ['game'];

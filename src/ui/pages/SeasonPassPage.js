@@ -13,6 +13,7 @@ export class SeasonPassPage {
 
   render() {
     const sp = this.app.seasonPassManager;
+    const seasonData = sp.getSeasonData() || SEASON_PASS;
     const am = this.app.adminManager;
     const currentTier = sp.currentTier;
     const xpProgress = sp.xpProgress;
@@ -24,17 +25,17 @@ export class SeasonPassPage {
       <div class="page">
         <div class="page__header">
           <h1 class="section-title">
-            <span class="section-title__prefix">///</span> PASS DE SAISON 1
+            <span class="section-title__prefix">///</span> PASS ${seasonData.name.toUpperCase()}
           </h1>
           <p style="color: var(--color-text-muted); margin-top: var(--spacing-xs);">
-            ${SEASON_PASS.emoji} <strong style="color: var(--color-accent-gold);">${SEASON_PASS.name}</strong>
+            ${seasonData.emoji} <strong style="color: var(--color-accent-gold);">${seasonData.name}</strong>
           </p>
         </div>
 
         <!-- Progression -->
         <div class="card anim-fade-in-up" style="margin-bottom: var(--spacing-xl);">
           <div class="row row--between" style="margin-bottom: var(--spacing-sm);">
-            <span style="font-weight: 700;">Palier ${currentTier} / ${SEASON_PASS.maxTier}</span>
+            <span style="font-weight: 700;">Palier ${currentTier} / ${seasonData.maxTier}</span>
             <span style="font-size: var(--font-size-xs); color: var(--color-text-muted);">
               ${xpProgress} / ${xpNeeded} XP
             </span>
@@ -56,9 +57,9 @@ export class SeasonPassPage {
         <!-- Piste des paliers -->
         <div class="season-pass">
           <div class="season-pass__track">
-            ${SEASON_PASS.tiers.map(tier => {
+            ${seasonData.tiers.map(tier => {
       const status = sp.getTierStatus(tier.tier);
-      return this.renderTier(tier, status, isPremium);
+      return this.renderTier(tier, status, isPremium, seasonData);
     }).join('')}
           </div>
         </div>
@@ -82,7 +83,7 @@ export class SeasonPassPage {
     `;
   }
 
-  renderTier(tierData, status, isPremium) {
+  renderTier(tierData, status, isPremium, seasonData) {
     const { tier, free, premium } = tierData;
     const reached = status.reached;
 

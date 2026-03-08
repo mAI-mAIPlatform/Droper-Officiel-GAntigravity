@@ -4,6 +4,8 @@
 
 import { getHeroById, RARITIES } from '../../data/heroes.js';
 import { StatCard } from '../components/StatCard.js';
+import { MASTERY_REWARDS, getMasteryReward } from '../../data/masteryRewards.js';
+import { toast } from '../components/ToastManager.js';
 
 export class HeroDetailsPage {
     constructor(app) {
@@ -18,6 +20,11 @@ export class HeroDetailsPage {
         const state = this.hero.state;
         const rarity = this.hero.rarity || RARITIES.COMMON;
         const masteryColor = this.getMasteryColor(state.masteryTier);
+
+        // Maîtrise Section v1.1.4
+        const masteryXp = state.masteryXp || 0;
+        const masteryLevel = state.masteryLevel || 1;
+        const xpNeeded = 1000; // Constante de la route
 
         return `
             <div class="page page--hero-details anim-fade-in" style="padding-bottom: 80px;">
@@ -43,23 +50,46 @@ export class HeroDetailsPage {
                     </div>
                     <h1 style="font-size: 2.2rem; font-weight: 900; margin-top: 20px; letter-spacing: -1.5px; text-transform: uppercase;">${this.hero.name}</h1>
                     <div style="font-size: var(--font-size-sm); color: var(--color-text-muted); font-weight: 700; margin-top: 5px; opacity: 0.8; letter-spacing: 1px;">
-                            ${(this.hero.archetype?.label || 'COMMUN').toUpperCase()} — ${this.hero.description || 'Aucune description'}
+                            ${(this.hero.archetype?.label || 'COMMUN').toUpperCase()} — NV.${state.level}
                         </div>
                 </div>
 
-                <!-- Maîtrise Section -->
-                <div class="card" style="margin-top: 30px; border-left: 4px solid ${masteryColor}; background: rgba(255,255,255,0.02);">
-                    <div class="row row--between" style="margin-bottom: 12px; align-items: baseline;">
-                        <span style="color: ${masteryColor}; font-size: 0.75rem; font-weight: 900; letter-spacing: 1px;">MAÎTRISE : ${state.masteryTier}</span>
-                        <span style="font-size: 0.7rem; color: var(--color-text-muted); font-weight: 600;">${state.wins || 0} Victoires</span>
+                <!-- Mastery Road v1.1.4 -->
+                <div class="section" style="margin-top: 35px;">
+                  <h3 style="font-size: 0.8rem; font-weight: 800; color: var(--color-text-muted); margin-bottom: 15px; text-transform: uppercase;">🛤️ ROUTE DE MAÎTRISE</h3>
+                  <div class="card" style="padding: 20px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px;">
+                    <div class="row row--between" style="margin-bottom: 10px;">
+                      <strong style="color: var(--color-accent-gold);">Niveau ${masteryLevel}</strong>
+                      <span style="font-size: 0.7rem; color: var(--color-text-muted);">${masteryXp} / ${xpNeeded} XP</span>
                     </div>
-                    <div class="progress-bar" style="height: 10px; background: rgba(255,255,255,0.05); border-radius: 5px; overflow: hidden;">
-                        <div class="progress-bar__fill" style="width: ${this.getMasteryProgress(state.wins)}%; background: ${masteryColor}; box-shadow: 0 0 10px ${masteryColor};"></div>
+                    <div class="progress-bar" style="height: 10px; border-radius: 5px; background: rgba(255,255,255,0.05);">
+                        <div class="progress-bar__fill" style="width: ${(masteryXp / xpNeeded) * 100}%; background: linear-gradient(90deg, #f59e0b, #fbbf24); box-shadow: 0 0 15px rgba(251, 191, 36, 0.3);"></div>
                     </div>
-                    <p style="font-size: 0.6rem; color: var(--color-text-muted); margin-top: 8px;">Gagne des trophées avec ce héros pour débloquer l'aura Légendaire !</p>
+                    
+                    <div class="row" style="margin-top: 20px; gap: 10px; overflow-x: auto; padding-bottom: 10px;">
+                      ${Object.entries(MASTERY_REWARDS).map(([lvl, reward]) => {
+                const level = parseInt(lvl);
+                const isClaimed = state.claimedMasteryRewards?.includes(level);
+                const isUnlocked = masteryLevel >= level;
+                const canClaim = isUnlocked && !isClaimed;
+
+                return `
+                          <div class="reward-node ${canClaim ? 'reward-node--can-claim' : ''}" 
+                               style="flex: 0 0 80px; text-align: center; background: ${isUnlocked ? 'rgba(251, 191, 36, 0.1)' : 'rgba(255,255,255,0.02)'}; 
+                                      padding: 10px; border-radius: 12px; border: 1px solid ${canClaim ? 'var(--color-accent-gold)' : 'rgba(255,255,255,0.05)'}; 
+                                      position: relative; cursor: ${canClaim ? 'pointer' : 'default'}"
+                               data-level="${level}">
+                             <div style="font-size: 0.6rem; color: var(--color-text-muted); margin-bottom: 5px;">NV.${level}</div>
+                             <div style="font-size: 1.5rem;">${reward.emoji}</div>
+                             ${isClaimed ? '<div style="position: absolute; top:0; right:0; background: var(--color-accent-green); width: 18px; height: 18px; border-radius: 50%; font-size: 10px; display: flex; align-items: center; justify-content: center; z-index: 2;">✓</div>' : ''}
+                          </div>
+                        `;
+            }).join('')}
+                    </div>
+                  </div>
                 </div>
 
-                <!-- Stats Grid -->
+                <!--Stats Grid-->
                 <div class="grid-2" style="margin-top: 25px; gap: 12px;">
                     ${new StatCard('❤ VIE', this.hero.stats.hp, '❤️').render()}
                     ${new StatCard('⚔ DÉGÂTS', this.hero.stats.attack, '⚔️').render()}
@@ -67,7 +97,7 @@ export class HeroDetailsPage {
                     ${new StatCard('⚡ VITESSE', Math.round(this.hero.stats.speed * 100), '⚡').render()}
                 </div>
 
-                <!-- Capacities -->
+                <!--Capacities -->
                 <h3 style="font-size: 0.8rem; font-weight: 800; color: var(--color-text-muted); margin-top: 35px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;">Capacités</h3>
                 
                 <div class="stack" style="gap: 12px;">
@@ -94,17 +124,18 @@ export class HeroDetailsPage {
                     ` : ''}
                 </div>
 
-                <!-- Lore / Histoire du Héros -->
-                ${this.hero.story ? `
+                <!--Lore / Histoire du Héros-->
+            ${this.hero.story ? `
                     <h3 style="font-size: 0.8rem; font-weight: 800; color: var(--color-text-muted); margin-top: 35px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;">📖 Histoire</h3>
                     <div class="card" style="padding: 20px; background: rgba(255,255,255,0.02); border-left: 4px solid ${this.hero.bodyColor};">
                         <p style="font-size: 0.8rem; color: var(--color-text-secondary); line-height: 1.7; font-style: italic;">
                             "${this.hero.story}"
                         </p>
                     </div>
-                ` : ''}
+                ` : ''
+            }
             </div>
-        `;
+            `;
     }
 
     getMasteryColor(tier) {
@@ -127,6 +158,34 @@ export class HeroDetailsPage {
         const btnBack = document.getElementById('btn-back-armory');
         if (btnBack) {
             btnBack.onclick = () => window.location.hash = '#armurerie';
+        }
+
+        // Mastery Claim logic
+        document.querySelectorAll('[data-level]').forEach(el => {
+            el.onclick = () => {
+                const level = parseInt(el.dataset.level);
+                const res = this.app.heroManager.claimMasteryReward(
+                    this.heroId,
+                    level,
+                    this.app.economyManager,
+                    this.app.inventoryManager,
+                    this.app.skinManager,
+                    this.app.emoteManager
+                );
+                if (res.success) {
+                    this.refresh();
+                } else if (res.reason) {
+                    toast.error(res.reason);
+                }
+            };
+        });
+    }
+
+    refresh() {
+        const container = document.getElementById('page-container');
+        if (container) {
+            container.innerHTML = this.render();
+            this.afterRender();
         }
     }
 }
